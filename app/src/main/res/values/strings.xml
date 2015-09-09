@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">Riple</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Login</string>
+    <string name="fb_app_id">1649797728595501</string>
+    <string name="fb_app_secret">b1669c767c8e654bbda43ceebc0cf3b1</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="Title">riple</string>
+    <string name="Facebooklogintext">Facebook</string>
+    <string name="fb_namespace">hhwhiskey</string>
+    <string name="no_connection">No network connection detected. Check your network settings.</string>
 </resources>
