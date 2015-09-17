@@ -15,10 +15,13 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+
 import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.Utils.ConnectionDetector;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.entities.Profile;
+import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnLoginListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
 
@@ -29,11 +32,13 @@ import java.util.List;
 public class LoginActivity extends AppCompatActivity {
 
     private SimpleFacebook mSimpleFacebook;
+    private Switch fbSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
 
         //Calls the keyhash method
         printKeyHash(this);
@@ -45,8 +50,8 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         //FB login switch
-        Switch FBswitch = (Switch) findViewById(R.id.FBSwitch);
-        FBswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        fbSwitch = (Switch) findViewById(R.id.fbSwitch);
+        fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     loginFacebook();
@@ -65,7 +70,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onLogin(String accessToken, List<Permission> acceptedPermissions, List<Permission> declinedPermissions) {
                 // change the state of the button or do whatever you want
+                Log.i("Kevin", "Logged in");
                 Toast.makeText(getApplicationContext(), "You have logged into Facebook!", Toast.LENGTH_SHORT).show();
+
+                //getFriends();
+
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+
             }
 
             @Override
@@ -81,10 +93,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onException(Throwable throwable) {
                 // exception from facebook
+                throwable.printStackTrace();
             }
         };
 
         mSimpleFacebook.login(onLoginListener);
+    }
+
+    private void getFriends() {
+        mSimpleFacebook.getFriends(onFriendsListener);
     }
 
     //FB logout code
@@ -113,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //Every activity that wants to use simplefacebook but have this in the onResume
-        //mSimpleFacebook = SimpleFacebook.getInstance(this);
+        mSimpleFacebook = SimpleFacebook.getInstance(this);
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
     }
@@ -121,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
     //Every activity that wants to use simplefacebook must have this in the onActivityResult
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       // mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
+        mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -157,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
             //getting application package name, as defined in manifest
             String packageName = context.getApplicationContext().getPackageName();
 
-            //Retriving package info
+            //Retrieving package info
             packageInfo = context.getPackageManager().getPackageInfo(packageName,
                     PackageManager.GET_SIGNATURES);
 
@@ -181,6 +198,23 @@ public class LoginActivity extends AppCompatActivity {
 
         return key;
     }
+
+    OnFriendsListener onFriendsListener = new OnFriendsListener() {
+        @Override
+        public void onComplete(List<Profile> friends) {
+            Log.i("Kevin", "Number of friends = " + friends.size());
+        }
+        @Override
+        public void onFail(String reason) {
+            Log.i("Kevin", "Fail reason = " + reason);
+        }
+
+
+    /*
+     * You can override other methods here:
+     * onThinking(), onFail(String reason), onException(Throwable throwable)
+     */
+    };
 }
     /* d();
 

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/friendList"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.facebook.login.widget.ProfilePictureView
+        android:id="@+id/profilePic"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/dropTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="DropTitle"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/profilePic"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/firstName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="First Name"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/profilePic"
+        android:textAlignment="center"
+        android:layout_alignRight="@+id/dropPic"
+        android:layout_alignEnd="@+id/dropPic" />
+
+    <ImageView
+        android:id="@+id/dropPic"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        android:padding="8dp"
+        android:layout_below="@+id/postComment"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/dropRipleCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Riple Count"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/dropDescription"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/dropCommentCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="CommentCount"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_above="@+id/postComment"
+        android:layout_toRightOf="@+id/dropRipleCount"
+        android:layout_toEndOf="@+id/dropRipleCount" />
+
+    <TextView
+        android:id="@+id/dropDescription"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Drop Description Ellipsis"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/profilePic"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="42dp" />
+
+    <TextView
+        android:id="@+id/shareFB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Share to FB"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_above="@+id/postComment"
+        android:layout_toRightOf="@+id/dropCommentCount"
+        android:layout_toEndOf="@+id/dropCommentCount" />
+
+    <TextView
+        android:id="@+id/postComment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Post Comment"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/dropRipleCount"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/lastName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Last Name"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAlignment="center"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/firstName"
+        android:layout_toEndOf="@+id/firstName" />
+
+    <!--<TextView
+        android:id="@+id/nameView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/nameView1"
+        android:layout_toEndOf="@+id/nameView1"
+        android:layout_toRightOf="@+id/nameView1"
+        android:padding="4dp"
+        android:text="LastName"
+        android:textAppearance="?android:attr/textAppearanceMedium" />-->
+
+
+</RelativeLayout>

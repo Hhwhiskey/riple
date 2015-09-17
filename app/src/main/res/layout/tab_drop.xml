@@ -1,16 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:facebook="http://schemas.android.com/tools">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Drop tab says Hello :D"
-        android:id="@+id/textView"
-        android:textColor="@color/tabsScrollColor"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:text="The smallest drop can create a ripple..."
+        android:id="@+id/dropTextView"
+        android:textColor="@color/PrimaryText"
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp" />
 
-</LinearLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:id="@+id/recyclerView_1_layout"
+        android:layout_below="@+id/dropTextView"
+        android:layout_alignParentBottom="true">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/friend_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp">
+            </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:id="@+id/recyclerView_2_layout"
+        android:layout_below="@+id/recyclerView_1_layout">
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>

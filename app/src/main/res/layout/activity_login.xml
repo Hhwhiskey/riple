@@ -4,18 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.khfire22gmail.riple.LoginActivity">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/tool_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"/>
+    tools:context="com.khfire22gmail.riple.LoginActivity"
+    android:id="@+id/Login">
 
     <Switch
-        android:id="@+id/FBSwitch"
+        android:id="@+id/fbSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
@@ -23,11 +19,91 @@
         android:textColor="#ffffff"
         android:textOff="Out"
         android:textOn="In"
-        android:layout_marginRight="109dp"
-        android:layout_marginEnd="109dp"
-        android:layout_marginBottom="72dp"
+        android:layout_marginBottom="31dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Login with Facebook"
+        android:id="@+id/loginText"
+        android:textSize="24sp"
+        android:textColor="@color/PrimaryText"
+        android:layout_above="@+id/fbSwitch"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="riple"
+        android:id="@+id/titleText"
+        android:textSize="96sp"
+        android:textAlignment="center"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="true"
+        android:textColor="@color/PrimaryText"
+        android:paddingLeft="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/quote"
+        android:id="@+id/quote"
+        android:textColor="@color/PrimaryText"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:layout_below="@+id/definition"
+        android:layout_alignLeft="@+id/definition"
+        android:layout_alignStart="@+id/definition"
+        android:layout_marginTop="26dp"
+        android:textStyle="italic"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentEnd="true"
+        android:padding="8dp"
+        android:singleLine="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_alignParentTop="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="- Mother Teresa"
+        android:id="@+id/motherTeresa"
+        android:textColor="@color/PrimaryText"
+        android:layout_below="@+id/quote"
+        android:layout_alignRight="@+id/quote"
+        android:layout_alignEnd="@+id/quote"
+        android:paddingRight="50dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="verb | rip·ple | \ˈri-pəl\"
+        android:id="@+id/dictionary"
+        android:layout_below="@+id/titleText"
+        android:layout_alignLeft="@+id/titleText"
+        android:layout_alignStart="@+id/titleText"
+        android:layout_marginTop="24dp"
+        android:paddingLeft="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="1 : to change the world"
+        android:id="@+id/definition"
+        android:layout_marginTop="26dp"
+        android:layout_below="@+id/dictionary"
+        android:layout_alignLeft="@+id/dictionary"
+        android:layout_alignStart="@+id/dictionary"
+        android:paddingLeft="8dp" />
 
 </RelativeLayout>

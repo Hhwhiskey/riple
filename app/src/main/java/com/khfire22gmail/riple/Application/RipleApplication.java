@@ -21,7 +21,10 @@ public class RipleApplication extends Application {
         Permission[] permissions = new Permission[]{
                 Permission.USER_PHOTOS,
                 Permission.EMAIL,
-                Permission.PUBLISH_ACTION
+                Permission.PUBLISH_ACTION,
+                Permission.PUBLIC_PROFILE,
+                Permission.READ_FRIENDLISTS
+
         };
 
         SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
@@ -31,5 +34,16 @@ public class RipleApplication extends Application {
                 .build();
 
         SimpleFacebook.setConfiguration(configuration);
+
+
+        /*// Instantiate a SinchClient using the SinchClientBuilder.
+        android.content.Context context = this.getApplicationContext();
+        SinchClient sinchClient = Sinch.getSinchClientBuilder().context(context)
+                .applicationKey(getString(R.string.SINCH_APP_KEY))
+                .applicationSecret(getString(R.string.SINCH_APP_SECRET))
+                .environmentHost(getString(R.string.SINCH_ENVIRONMENT_HOST))
+                .userId("<user id>")
+                .build();*/
+
     }
 }
