@@ -1,3 +1,10 @@
+
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
+}
+
 # Add project specific ProGuard rules here.
 # By default, the flags in this file are appended to flags specified
 # in C:\Users\Kevin\AppData\Local\Android\sdk2/tools/proguard/proguard-android.txt

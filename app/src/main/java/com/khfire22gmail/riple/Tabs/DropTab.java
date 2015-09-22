@@ -5,6 +5,7 @@ import android.graphics.Picture;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.IdeaAdapter;
 import com.khfire22gmail.riple.model.StringAdapter;
@@ -23,10 +25,11 @@ import com.sromku.simple.fb.SimpleFacebook;
  */
 public class DropTab extends Fragment {
 
+    RecyclerView mRecyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
+    RecyclerView.Adapter dropAdapter;
     private SimpleFacebook mSimpleFacebook;
-
-    RecyclerView recyclerView1;
-    RecyclerView recyclerView2;
+    private RecyclerView dropView;
     private FragmentActivity context;
     private ProgressBar progressBar;
     private FriendAdapter friendAdapter;
@@ -36,15 +39,98 @@ public class DropTab extends Fragment {
 
     public Picture mPicture;
 
+    // public userID = 504322442;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_drop, container, false);
 
-        /*ProfilePictureView profilePicture = (ProfilePictureView) view.findViewById(R.id.profilePic);
-        profilePicture.setProfileId(userID);*/
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
 
-    return view;
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        dropAdapter = new DropAdapter();
+        mRecyclerView.setAdapter(dropAdapter);
+
+        return view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSimpleFacebook = SimpleFacebook.getInstance(context);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
+    }
+}
+        /*int listImages[] = new int[]{R.drawable.ic_user_default, R.drawable.ic_user_default,
+                R.drawable.ic_user_default, R.drawable.ic_user_default, R.drawable.ic_user_default};
+
+        ArrayList<Card> cards = new ArrayList<Card>();
+
+        for (int i = 0; i<5; i++) {
+            // Create a Card
+            Card card = new Card(getActivity());
+            // Create a CardHeader
+            CardHeader header = new CardHeader(getActivity());
+            // Add Header to card
+            header.setTitle("User Name");
+            card.setTitle("Title");
+            card.addCardHeader(header);
+
+            CardThumbnail thumb = new CardThumbnail(getActivity());
+            thumb.setDrawableResource(listImages[i]);
+            card.addCardThumbnail(thumb);
+
+            cards.add(card);
+        }
+
+        CardArrayAdapter mCardArrayAdapter = new CardArrayAdapter(getActivity(), cards);
+
+        CardListView listView = (CardListView) view.findViewById(R.id.myList);
+        if (listView != null) {
+            listView.setAdapter(mCardArrayAdapter);
+        }*/
+
+
+        /*ImageView imageView = (ImageView) view.findViewById(R.id.profilePic);
+
+        Glide.with(this).load("http://goo.gl/gEgYUd").into(imageView);*/
+
+
+
+//        ProfilePictureView profilePicture = (ProfilePictureView) view.findViewById(R.id.profilePic);
+//        profilePicture.setProfileId(userID);
+
+        /*ProfilePictureView profilePictureView = (ProfilePictureView) view.findViewById(R.id.profilePic);
+
+        ImageView fbImage = ((ImageView) profilePictureView.getChildAt(0));
+
+        Bitmap bitmap = ((BitmapDrawable) fbImage.getDrawable()).getBitmap();
+*/
+    /*    return view;
+    }
+
+    OnPhotosListener onPhotosListener = new OnPhotosListener() {
+        @Override
+        public void onComplete(List<Photo> photos) {
+        }*/
+
+//        mSimpleFacebook.getPhotos(onPhotosListener);
+//
+//        mSimpleFacebook.getPhotos(Profile, onPhotosListener);
+
+    /*
+     * You can override other methods here:
+     * onThinking(), onFail(String reason), onException(Throwable throwable)
+     */
+
 
         //TODO
         /*FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
@@ -72,17 +158,7 @@ public class DropTab extends Fragment {
         return view;
         }*/
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mSimpleFacebook = SimpleFacebook.getInstance(context);
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
 
 
@@ -230,4 +306,4 @@ public class DropTab extends Fragment {
         return Uri.withAppendedPath(person, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
 
     }*/
-}
+

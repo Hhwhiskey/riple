@@ -15,15 +15,19 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-
 import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.Utils.ConnectionDetector;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.entities.Photo;
 import com.sromku.simple.fb.entities.Profile;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnLoginListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
+import com.sromku.simple.fb.listeners.OnPhotosListener;
+import com.sromku.simple.fb.listeners.OnProfileListener;
+import com.sromku.simple.fb.utils.Attributes;
+import com.sromku.simple.fb.utils.PictureAttributes;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -73,8 +77,6 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i("Kevin", "Logged in");
                 Toast.makeText(getApplicationContext(), "You have logged into Facebook!", Toast.LENGTH_SHORT).show();
 
-                //getFriends();
-
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
 
@@ -97,12 +99,37 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
+        PictureAttributes pictureAttributes = Attributes.createPictureAttributes();
+        pictureAttributes.setHeight(500);
+        pictureAttributes.setWidth(500);
+        pictureAttributes.setType(PictureAttributes.PictureType.SQUARE);
+
+        Profile.Properties properties = new Profile.Properties.Builder()
+                .add(Profile.Properties.ID)
+                .add(Profile.Properties.FIRST_NAME)
+                .add(Profile.Properties.COVER)
+                .add(Profile.Properties.PICTURE, pictureAttributes)
+                .build();
+
         mSimpleFacebook.login(onLoginListener);
+        //mSimpleFacebook.getProfile(onProfileListener);
+        mSimpleFacebook.getProfile(properties, onProfileListener);
+        mSimpleFacebook.getPhotos(onPhotosListener);
     }
 
-    private void getFriends() {
-        mSimpleFacebook.getFriends(onFriendsListener);
-    }
+    OnPhotosListener onPhotosListener = new OnPhotosListener() {
+        @Override
+        public void onComplete(List<Photo> photos) {
+            Log.i("Kevin", "Number of photos = " + photos.size());
+        }
+
+    /*
+     * You can override other methods here:
+     * onThinking(), onFail(String reason), onException(Throwable throwable)
+     */
+    };
+
+
 
     //FB logout code
     private void logoutFacebook() {
@@ -199,7 +226,13 @@ public class LoginActivity extends AppCompatActivity {
         return key;
     }
 
-    OnFriendsListener onFriendsListener = new OnFriendsListener() {
+    OnProfileListener onProfileListener = new OnProfileListener() {
+        @Override
+        public void onComplete(Profile profile) {
+            Log.i("Kevin", "My profile id = " + profile.getId());
+        }
+
+        OnFriendsListener onFriendsListener = new OnFriendsListener() {
         @Override
         public void onComplete(List<Profile> friends) {
             Log.i("Kevin", "Number of friends = " + friends.size());
@@ -210,6 +243,12 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
+
+    /*
+     * You can override other methods here:
+     * onThinking(), onFail(String reason), onException(Throwable throwable)
+     */
+        };
     /*
      * You can override other methods here:
      * onThinking(), onFail(String reason), onException(Throwable throwable)

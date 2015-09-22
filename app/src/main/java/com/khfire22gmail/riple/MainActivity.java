@@ -25,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
     int Numboftabs = 5;
     ViewPager mViewPager;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

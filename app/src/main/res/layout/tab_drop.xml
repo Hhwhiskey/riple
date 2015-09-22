@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:facebook="http://schemas.android.com/tools">
+    android:orientation="vertical">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/drop_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
+
+
+<!--
+</RelativeLayout>
 
     <TextView
+        android:id="@+id/dropTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="The smallest drop can create a ripple..."
-        android:id="@+id/dropTextView"
-        android:textColor="@color/PrimaryText"
         android:layout_centerHorizontal="true"
+        android:padding="8dp"
+        android:text="The smallest drop can create a ripple..."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/PrimaryText"
         android:textSize="16sp" />
 
     <RelativeLayout
+        android:id="@+id/recyclerView_1_layout"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
-        android:id="@+id/recyclerView_1_layout"
-        android:layout_below="@+id/dropTextView"
         android:layout_alignParentBottom="true">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/friend_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:textAlignment="center"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp">
-            </android.support.v7.widget.RecyclerView>
+        &lt;!&ndash;<android.support.v7.widget.RecyclerView
+            android:id="@+id/dropView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp">
+        </android.support.v7.widget.RecyclerView>&ndash;&gt;
+
+
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="200dp"
-        android:id="@+id/recyclerView_2_layout"
-        android:layout_below="@+id/recyclerView_1_layout">
-    </RelativeLayout>
-
-
-
-
-</RelativeLayout>
+</RelativeLayout>-->

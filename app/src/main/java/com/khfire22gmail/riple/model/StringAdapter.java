@@ -78,7 +78,7 @@ public class StringAdapter extends RecyclerView.Adapter <StringAdapter.MyViewHol
         public MyViewHolder(View itemView) {
             super(itemView);
             //number = (TextView) itemView.findViewById(R.id.itemListTextView);
-            name = (TextView) itemView.findViewById(R.id.userName);
+            //name = (TextView) itemView.findViewById(R.id.userName);
             //lastName = (TextView) itemView.findViewById(R.id.nameView2);
             //profilePic = (ImageView) itemView.findViewById(R.id.profilePic);
             itemView.setOnClickListener(this);

@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
 
-import org.w3c.dom.Text;
-
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
@@ -92,7 +90,7 @@ public class UserAdapter extends RecyclerView.Adapter <UserAdapter.MyViewHolder>
             //userId.setText(current.userId);
             firstName.setText(current.firstName);
             lastName.setText(current.lastName);
-            profilePic.setImage(current.profilePic);
+            //profilePic.setImage(current.profilePic);
         }
 
         @Override
