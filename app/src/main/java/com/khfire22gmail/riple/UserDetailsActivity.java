@@ -1,12 +1,13 @@
-package com.khfire22gmail.riple.Tabs;
+package com.khfire22gmail.riple;
 
+/**
+ * Created by Kevin on 9/23/2015.
+ */
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -14,35 +15,51 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.Application.RipleApplication;
-import com.khfire22gmail.riple.LoginActivity;
-import com.khfire22gmail.riple.R;
 import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by Kevin on 9/8/2015.
- */
-public class RipleTab extends Fragment {
+public class UserDetailsActivity extends AppCompatActivity {
 
     private ProfilePictureView userProfilePictureView;
     private TextView userNameView;
+    private TextView userGenderView;
+    private TextView userEmailView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.tab_riple,container,false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        userProfilePictureView = (ProfilePictureView) view.findViewById(R.id.ripleProfilePic);
-        userNameView = (TextView) view.findViewById(R.id.ripleUserName);
+        setContentView(R.layout.tab_riple);
+
+        userProfilePictureView = (ProfilePictureView) findViewById(R.id.ripleProfilePic);
+        userNameView = (TextView) findViewById(R.id.ripleUserName);
+        //userGenderView = (TextView) findViewById(R.id.userGender);
+        //userEmailView = (TextView) findViewById(R.id.userEmail);
+
 
         //Fetch Facebook user info if it is logged
         ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
             makeMeRequest();
         }
+    }
 
-        return view;
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            // Check if the user is currently logged
+            // and show any cached content
+            updateViewsWithProfileInfo();
+        } else {
+            // If the user is not logged in, go to the
+            // activity showing the login view.
+            startLoginActivity();
+        }
     }
 
     private void makeMeRequest() {
@@ -53,16 +70,15 @@ public class RipleTab extends Fragment {
                         if (jsonObject != null) {
                             JSONObject userProfile = new JSONObject();
 
-
                             try {
                                 userProfile.put("facebookId", jsonObject.getLong("id"));
                                 userProfile.put("name", jsonObject.getString("name"));
 
-                                /*if (jsonObject.getString("gender") != null)
+                                if (jsonObject.getString("gender") != null)
                                     userProfile.put("gender", jsonObject.getString("gender"));
 
                                 if (jsonObject.getString("email") != null)
-                                    userProfile.put("email", jsonObject.getString("email"));*/
+                                    userProfile.put("email", jsonObject.getString("email"));
 
                                 // Save the user profile info in a user property
                                 ParseUser currentUser = ParseUser.getCurrentUser();
@@ -104,25 +120,9 @@ public class RipleTab extends Fragment {
         if (currentUser.has("profile")) {
             JSONObject userProfile = currentUser.getJSONObject("profile");
             try {
-                String url;
-                Bundle parametersPicture = new Bundle();
-                parametersPicture.putString("fields", "picture.width(150).height(150)");
-
-                /*GraphResponse lResponsePicture = new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/",
-                        parametersPicture, null).executeAndWait();
-                if (lResponsePicture != null && lResponsePicture.getError() == null &&
-                        lResponsePicture.getJSONObject() != null) {
-                    url = lResponsePicture.getJSONObject().getJSONObject("picture")
-                            .getJSONObject("data").getString("url");
-
-                }*/
 
                 if (userProfile.has("facebookId")) {
-                    //userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
-                    userProfilePictureView.setProfileId("504322442");
-                    //userProfilePictureView.setProfileId("510153007567377443");
-
-
+                    userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
                 } else {
                     // Show the default, blank user profile picture
                     userProfilePictureView.setProfileId(null);
@@ -134,7 +134,7 @@ public class RipleTab extends Fragment {
                     userNameView.setText("");
                 }
 
-                /*if (userProfile.has("gender")) {
+                if (userProfile.has("gender")) {
                     userGenderView.setText(userProfile.getString("gender"));
                 } else {
                     userGenderView.setText("");
@@ -144,13 +144,14 @@ public class RipleTab extends Fragment {
                     userEmailView.setText(userProfile.getString("email"));
                 } else {
                     userEmailView.setText("");
-                }*/
+                }
 
             } catch (JSONException e) {
                 Log.d(RipleApplication.TAG, "Error parsing saved user data.");
             }
         }
     }
+
     public void onLogoutClick(View v) {
         logout();
     }
@@ -164,7 +165,7 @@ public class RipleTab extends Fragment {
     }
 
     private void startLoginActivity() {
-        Intent intent = new Intent(this.getActivity(), LoginActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

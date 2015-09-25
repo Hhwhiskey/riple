@@ -1,6 +1,5 @@
 package com.khfire22gmail.riple.model;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,10 +45,10 @@ public class DropAdapter extends RecyclerView.Adapter <DropAdapter.MyViewHolder>
         return data.get(position);
     }
 
-    public DropAdapter() {
+    /*public DropAdapter() {
         inflater = LayoutInflater.from(context);
         this.data = data;
-    }
+    }*/
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

@@ -1,6 +1,7 @@
 package com.khfire22gmail.riple;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,38 +12,53 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
+import com.khfire22gmail.riple.Application.RipleApplication;
 import com.khfire22gmail.riple.Utils.ConnectionDetector;
-import com.sromku.simple.fb.Permission;
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.entities.Photo;
 import com.sromku.simple.fb.entities.Profile;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
-import com.sromku.simple.fb.listeners.OnLoginListener;
-import com.sromku.simple.fb.listeners.OnLogoutListener;
-import com.sromku.simple.fb.listeners.OnPhotosListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
-import com.sromku.simple.fb.utils.Attributes;
-import com.sromku.simple.fb.utils.PictureAttributes;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private Dialog progressDialog;
     private SimpleFacebook mSimpleFacebook;
     private Switch fbSwitch;
+    private Button loginButton;
+    private Button signUpButton;
+    private EditText usernameField;
+    private EditText passwordField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Check if there is a currently logged in user
+        // and it's linked to a Facebook account.
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if ((currentUser != null) && ParseFacebookUtils.isLinked(currentUser)) {
+            // Go to the user info activity
+            //showUserDetailsActivity();
+        launchMainActivity();
+            // If user is not null and ParseFB is linked, then go to app with login completed
+        }
 
         //Calls the keyhash method
         printKeyHash(this);
@@ -58,16 +74,19 @@ public class LoginActivity extends AppCompatActivity {
         fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    loginFacebook();
+                    //loginFacebook();
+                    onLoginClick();
+
                 } else {
-                    logoutFacebook();
+                    //logoutFacebook();
                 }
             }
         });
+
     }
 
     //FB login code
-    private void loginFacebook() {
+   /* private void loginFacebook() {
 
         OnLoginListener onLoginListener = new OnLoginListener() {
 
@@ -123,13 +142,11 @@ public class LoginActivity extends AppCompatActivity {
             Log.i("Kevin", "Number of photos = " + photos.size());
         }
 
-    /*
+    *//*
      * You can override other methods here:
      * onThinking(), onFail(String reason), onException(Throwable throwable)
-     */
+     *//*
     };
-
-
 
     //FB logout code
     private void logoutFacebook() {
@@ -143,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
         };
 
         mSimpleFacebook.logout(onLogoutListener);
-    }
+    }*/
 
 
     @Override
@@ -157,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //Every activity that wants to use simplefacebook but have this in the onResume
-        mSimpleFacebook = SimpleFacebook.getInstance(this);
+        //mSimpleFacebook = SimpleFacebook.getInstance(this);
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
     }
@@ -165,9 +182,49 @@ public class LoginActivity extends AppCompatActivity {
     //Every activity that wants to use simplefacebook must have this in the onActivityResult
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
+        //mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
+
+    public void onLoginClick() {
+    //public void onLoginClick(View v) {
+        //progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
+        List<String> permissions = Arrays.asList("public_profile", "email");
+        // NOTE: for extended permissions, like "user_about_me", your app must be reviewed by the Facebook team
+        // (https://developers.facebook.com/docs/facebook-login/permissions/)
+
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
+            @Override
+            public void done(ParseUser user, ParseException err) {
+                //progressDialog.dismiss();
+                if (user == null) {
+                    Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
+                } else if (user.isNew()) {
+                    Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
+                    launchMainActivity();
+                } else {
+                    Log.d(RipleApplication.TAG, "User logged in through Facebook!");
+                    launchMainActivity();
+
+                }
+            }
+        });
+    }
+
+    private void launchMainActivity() {
+        //Log.d(RipleApplication.TAG, "Method was called");
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void showUserDetailsActivity() {
+        Intent intent = new Intent(this, UserDetailsActivity.class);
+        startActivity(intent);
+    }
+
+    /*private class UserDetailsActivity {
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -254,6 +311,8 @@ public class LoginActivity extends AppCompatActivity {
      * onThinking(), onFail(String reason), onException(Throwable throwable)
      */
     };
+
+
 }
     /* d();
 

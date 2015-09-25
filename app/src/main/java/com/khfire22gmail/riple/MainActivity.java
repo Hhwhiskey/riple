@@ -21,21 +21,21 @@ public class MainActivity extends AppCompatActivity {
     ViewPager pager;
     ViewPagerAdapter adapter;
     SlidingTabLayout tabs;
-    CharSequence Titles[]={"riple","todo","drop","trickle","chat"};
-    int Numboftabs = 5;
+    CharSequence Titles[]={"Riple","Drop","Trickle","Chat"};
+    int Numboftabs = 4;
     ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSimpleFacebook = SimpleFacebook.getInstance(this);
+        //mSimpleFacebook = SimpleFacebook.getInstance(this);
         setContentView(R.layout.activity_main);
         // Creating The Toolbar and setting it as the Toolbar for the activity
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
-//        mViewPager.setCurrentItem(R.layout.tab_drop);
-//        mViewPager.setCurrentItem(position);
+        // mViewPager.setCurrentItem(R.layout.tab_drop);
+        // mViewPager.setCurrentItem(position);
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles, Numboftabs);
@@ -63,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mSimpleFacebook = SimpleFacebook.getInstance(this);
+        //mSimpleFacebook = SimpleFacebook.getInstance(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
+        //mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 

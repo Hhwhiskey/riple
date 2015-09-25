@@ -1,3 +1,4 @@
+/*
 package com.khfire22gmail.riple.Sinch;
 
 import android.app.Service;
@@ -16,9 +17,11 @@ import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.messaging.MessageClientListener;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
+*/
 /**
  * Created by Kevin on 9/10/2015.
- */
+ *//*
+
 public class SinchService extends Service {
 
     private static final String APP_KEY     = Resources.getSystem().getString(R.string.SINCH_APP_KEY);
@@ -186,3 +189,4 @@ public class SinchService extends Service {
 }
 
 
+*/

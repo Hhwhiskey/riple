@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_riple"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="0dp"
+        card_view:cardElevation="8dp"
+        card_view:cardUseCompatPadding="true">
+
+
+        <RelativeLayout
+            android:id="@+id/profileCard"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF">
+
+            <com.facebook.login.widget.ProfilePictureView
+                android:id="@+id/ripleProfilePic"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:foregroundGravity="center_vertical"
+                android:layout_alignBottom="@+id/riplesProfile"
+                android:paddingLeft="8dp" />
+
+            <TextView
+                android:id="@+id/ripleUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/ripleProfilePic"
+                android:width="100dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
+                android:text="Kevin Hodges"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:paddingRight="8dp"
+                android:gravity="center_horizontal"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/riplesProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="2500 riples"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="24sp"
+                android:paddingLeft="16dp"
+                android:elegantTextHeight="false"
+                android:layout_below="@+id/ripleRank"
+                android:layout_toRightOf="@+id/ripleProfilePic"
+                android:paddingRight="16dp"
+                android:layout_alignRight="@+id/ripleUserName"
+                android:layout_alignEnd="@+id/ripleUserName"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/ripleRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:width="100dp"
+                android:paddingLeft="16dp"
+                android:text="&quot;Saint&quot;"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:layout_below="@+id/ripleUserName"
+                android:layout_toRightOf="@+id/ripleProfilePic"
+                android:paddingRight="16dp"
+                android:layout_alignRight="@+id/riplesProfile"
+                android:layout_alignEnd="@+id/riplesProfile"
+                android:gravity="center_horizontal"
+                android:textStyle="italic" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

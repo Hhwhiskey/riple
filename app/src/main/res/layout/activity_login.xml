@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Login with Facebook"
+        android:text="Login"
         android:id="@+id/loginText"
         android:textSize="24sp"
         android:textColor="@color/PrimaryText"

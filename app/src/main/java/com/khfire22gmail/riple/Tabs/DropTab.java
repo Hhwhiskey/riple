@@ -60,13 +60,13 @@ public class DropTab extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mSimpleFacebook = SimpleFacebook.getInstance(context);
+        //mSimpleFacebook = SimpleFacebook.getInstance(context);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
+       // mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
     }
 }
         /*int listImages[] = new int[]{R.drawable.ic_user_default, R.drawable.ic_user_default,

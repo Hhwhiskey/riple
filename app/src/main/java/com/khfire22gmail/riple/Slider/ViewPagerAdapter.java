@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.khfire22gmail.riple.Tabs.ChatTab;
 import com.khfire22gmail.riple.Tabs.DropTab;
 import com.khfire22gmail.riple.Tabs.RipleTab;
-import com.khfire22gmail.riple.Tabs.TodoTab;
 import com.khfire22gmail.riple.Tabs.TrickleTab;
 
 /**
@@ -35,27 +34,22 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter{
     public Fragment getItem(int position) {
 
         // if the position is 0 we are returning the First tab
+
         if (position == 0) {
-            DropTab dropTab = new DropTab();
-            return dropTab;
-        }
-        if (position == 1) {
             RipleTab ripleTab = new RipleTab();
             return ripleTab;
         }
-        if (position == 2) {
-            TodoTab todoTab = new TodoTab();
-            return todoTab;
-        }
-        if (position == 3) {
+
+        if (position == 1) {
             DropTab dropTab = new DropTab();
             return dropTab;
         }
-        if (position == 4) {
+
+        if (position == 2) {
             TrickleTab trickleTab = new TrickleTab();
             return trickleTab;
         }
-        if (position == 5) {
+        if (position == 3) {
             ChatTab chatTab = new ChatTab();
             return chatTab;
         }
