@@ -82,7 +82,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     //FB login code

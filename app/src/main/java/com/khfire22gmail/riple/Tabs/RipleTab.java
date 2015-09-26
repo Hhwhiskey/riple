@@ -17,6 +17,7 @@ import com.khfire22gmail.riple.Application.RipleApplication;
 import com.khfire22gmail.riple.LoginActivity;
 import com.khfire22gmail.riple.R;
 import com.parse.ParseUser;
+import com.sromku.simple.fb.SimpleFacebook;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ public class RipleTab extends Fragment {
 
     private ProfilePictureView userProfilePictureView;
     private TextView userNameView;
+    private SimpleFacebook mSimpleFacebook;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,12 +42,31 @@ public class RipleTab extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
             makeMeRequest();
+//            getFacebookInfo();
         }
 
         return view;
     }
 
+    /*//Graph get fb stuff
+    private void getFacebookInfo() {
+//         make the API call
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me?fields=id,name,picture",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+//             handle the result
+                        Log.i("Kevin", "GraphResponse" + response);
+                    }
+                }
+        ).executeAsync();
+    }*/
+
     private void makeMeRequest() {
+
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
@@ -53,9 +74,8 @@ public class RipleTab extends Fragment {
                         if (jsonObject != null) {
                             JSONObject userProfile = new JSONObject();
 
-
                             try {
-                                userProfile.put("facebookId", jsonObject.getLong("id"));
+                                userProfile.put("facebookId", jsonObject.getString("id"));
                                 userProfile.put("name", jsonObject.getString("name"));
 
                                 /*if (jsonObject.getString("gender") != null)
@@ -118,9 +138,16 @@ public class RipleTab extends Fragment {
                 }*/
 
                 if (userProfile.has("facebookId")) {
-                    //userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
-                    userProfilePictureView.setProfileId("504322442");
-                    //userProfilePictureView.setProfileId("510153007567377443");
+                    userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
+
+                    //AuthData
+                    //userProfilePictureView.setProfileId("504322442");
+
+                    //Parse "facebookId"
+                    //userProfilePictureView.setProfileId("10153007567377444");
+
+                    //Graph ID
+                    //userProfilePictureView.setProfileId("10153036644382443");
 
 
                 } else {
