@@ -42,28 +42,10 @@ public class RipleTab extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
             makeMeRequest();
-//            getFacebookInfo();
         }
 
         return view;
     }
-
-    /*//Graph get fb stuff
-    private void getFacebookInfo() {
-//         make the API call
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/me?fields=id,name,picture",
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-//             handle the result
-                        Log.i("Kevin", "GraphResponse" + response);
-                    }
-                }
-        ).executeAsync();
-    }*/
 
     private void makeMeRequest() {
 
@@ -77,12 +59,6 @@ public class RipleTab extends Fragment {
                             try {
                                 userProfile.put("facebookId", jsonObject.getString("id"));
                                 userProfile.put("name", jsonObject.getString("name"));
-
-                                /*if (jsonObject.getString("gender") != null)
-                                    userProfile.put("gender", jsonObject.getString("gender"));
-
-                                if (jsonObject.getString("email") != null)
-                                    userProfile.put("email", jsonObject.getString("email"));*/
 
                                 // Save the user profile info in a user property
                                 ParseUser currentUser = ParseUser.getCurrentUser();
@@ -128,27 +104,8 @@ public class RipleTab extends Fragment {
                 Bundle parametersPicture = new Bundle();
                 parametersPicture.putString("fields", "picture.width(150).height(150)");
 
-                /*GraphResponse lResponsePicture = new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/",
-                        parametersPicture, null).executeAndWait();
-                if (lResponsePicture != null && lResponsePicture.getError() == null &&
-                        lResponsePicture.getJSONObject() != null) {
-                    url = lResponsePicture.getJSONObject().getJSONObject("picture")
-                            .getJSONObject("data").getString("url");
-
-                }*/
-
                 if (userProfile.has("facebookId")) {
                     userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
-
-                    //AuthData
-                    //userProfilePictureView.setProfileId("504322442");
-
-                    //Parse "facebookId"
-                    //userProfilePictureView.setProfileId("10153007567377444");
-
-                    //Graph ID
-                    //userProfilePictureView.setProfileId("10153036644382443");
-
 
                 } else {
                     // Show the default, blank user profile picture
@@ -160,18 +117,6 @@ public class RipleTab extends Fragment {
                 } else {
                     userNameView.setText("");
                 }
-
-                /*if (userProfile.has("gender")) {
-                    userGenderView.setText(userProfile.getString("gender"));
-                } else {
-                    userGenderView.setText("");
-                }
-
-                if (userProfile.has("email")) {
-                    userEmailView.setText(userProfile.getString("email"));
-                } else {
-                    userEmailView.setText("");
-                }*/
 
             } catch (JSONException e) {
                 Log.d(RipleApplication.TAG, "Error parsing saved user data.");

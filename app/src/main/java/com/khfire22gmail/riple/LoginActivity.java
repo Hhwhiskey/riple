@@ -2,6 +2,7 @@ package com.khfire22gmail.riple;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,9 +13,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -25,7 +24,6 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
-import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.entities.Profile;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
@@ -38,12 +36,7 @@ import java.util.List;
 public class LoginActivity extends AppCompatActivity {
 
     private Dialog progressDialog;
-    private SimpleFacebook mSimpleFacebook;
     private Switch fbSwitch;
-    private Button loginButton;
-    private Button signUpButton;
-    private EditText usernameField;
-    private EditText passwordField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,93 +67,13 @@ public class LoginActivity extends AppCompatActivity {
         fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    //loginFacebook();
                     onLoginClick();
-
                 } else {
-                    //logoutFacebook();
+                    //onLogOutClick();
                 }
             }
         });
     }
-
-    //FB login code
-   /* private void loginFacebook() {
-
-        OnLoginListener onLoginListener = new OnLoginListener() {
-
-            @Override
-            public void onLogin(String accessToken, List<Permission> acceptedPermissions, List<Permission> declinedPermissions) {
-                // change the state of the button or do whatever you want
-                Log.i("Kevin", "Logged in");
-                Toast.makeText(getApplicationContext(), "You have logged into Facebook!", Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-
-            }
-
-            @Override
-            public void onCancel() {
-                Toast.makeText(getApplicationContext(), "You have failed to login to Facebook!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFail(String reason) {
-                Toast.makeText(getApplicationContext(), "You have failed to login to Facebook!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                // exception from facebook
-                throwable.printStackTrace();
-            }
-        };
-
-        PictureAttributes pictureAttributes = Attributes.createPictureAttributes();
-        pictureAttributes.setHeight(500);
-        pictureAttributes.setWidth(500);
-        pictureAttributes.setType(PictureAttributes.PictureType.SQUARE);
-
-        Profile.Properties properties = new Profile.Properties.Builder()
-                .add(Profile.Properties.ID)
-                .add(Profile.Properties.FIRST_NAME)
-                .add(Profile.Properties.COVER)
-                .add(Profile.Properties.PICTURE, pictureAttributes)
-                .build();
-
-        mSimpleFacebook.login(onLoginListener);
-        //mSimpleFacebook.getProfile(onProfileListener);
-        mSimpleFacebook.getProfile(properties, onProfileListener);
-        mSimpleFacebook.getPhotos(onPhotosListener);
-    }
-
-    OnPhotosListener onPhotosListener = new OnPhotosListener() {
-        @Override
-        public void onComplete(List<Photo> photos) {
-            Log.i("Kevin", "Number of photos = " + photos.size());
-        }
-
-    *//*
-     * You can override other methods here:
-     * onThinking(), onFail(String reason), onException(Throwable throwable)
-     *//*
-    };
-
-    //FB logout code
-    private void logoutFacebook() {
-        //logout listener
-        OnLogoutListener onLogoutListener = new OnLogoutListener() {
-
-            @Override
-            public void onLogout() {
-                Toast.makeText(getApplicationContext(), "You have logged out of Facebook", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        mSimpleFacebook.logout(onLogoutListener);
-    }*/
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -172,8 +85,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //Every activity that wants to use simplefacebook but have this in the onResume
-        //mSimpleFacebook = SimpleFacebook.getInstance(this);
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
     }
@@ -181,17 +92,14 @@ public class LoginActivity extends AppCompatActivity {
     //Every activity that wants to use simplefacebook must have this in the onActivityResult
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 
     public void onLoginClick() {
     //public void onLoginClick(View v) {
-        //progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
+        progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
         List<String> permissions = Arrays.asList("public_profile", "email");
-        // NOTE: for extended permissions, like "user_about_me", your app must be reviewed by the Facebook team
-        // (https://developers.facebook.com/docs/facebook-login/permissions/)
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
@@ -205,14 +113,12 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Log.d(RipleApplication.TAG, "User logged in through Facebook!");
                     launchMainActivity();
-
                 }
             }
         });
     }
 
     private void launchMainActivity() {
-        //Log.d(RipleApplication.TAG, "Method was called");
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
     }
@@ -221,9 +127,6 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, UserDetailsActivity.class);
         startActivity(intent);
     }
-
-    /*private class UserDetailsActivity {
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -247,7 +150,6 @@ public class LoginActivity extends AppCompatActivity {
         AppEventsLogger.deactivateApp(this);
 
     }
-
 
     //This is used to generate a keyhash for facebook
     public static String printKeyHash(Activity context) {
@@ -298,28 +200,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.i("Kevin", "Fail reason = " + reason);
         }
 
-
-
-    /*
-     * You can override other methods here:
-     * onThinking(), onFail(String reason), onException(Throwable throwable)
-     */
         };
-    /*
-     * You can override other methods here:
-     * onThinking(), onFail(String reason), onException(Throwable throwable)
-     */
     };
-
-
 }
-    /* d();
-
-    //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
