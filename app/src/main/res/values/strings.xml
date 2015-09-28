@@ -21,5 +21,8 @@
     <string name="parse_id">jWOt6wTsU9ybS3tjtgCR8ScDTpugcyLeNrpo9BRY</string>
     <string name="parse_client_key">LgiMgifTZOuBPeRnqLRagTFxH2zcRstEj0Gle2D0</string>
     <string name="MotherTeresaSig">- Mother Teresa</string>
+    <string name="title_activity_logout">Logout</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>

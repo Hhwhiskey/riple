@@ -59,6 +59,10 @@
             android:name=".Sinch.ListUsersActivity"
             android:label="@string/title_activity_list_users" >
         </activity>
+        <activity
+            android:name=".Settings.Logout"
+            android:label="@string/title_activity_logout" >
+        </activity>
     </application>
 
 </manifest>

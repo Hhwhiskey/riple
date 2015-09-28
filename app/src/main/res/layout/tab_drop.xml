@@ -12,38 +12,3 @@
 </LinearLayout>
 
 
-<!--
-</RelativeLayout>
-
-    <TextView
-        android:id="@+id/dropTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:padding="8dp"
-        android:text="The smallest drop can create a ripple..."
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/PrimaryText"
-        android:textSize="16sp" />
-
-    <RelativeLayout
-        android:id="@+id/recyclerView_1_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="200dp"
-        android:layout_alignParentBottom="true">
-
-        &lt;!&ndash;<android.support.v7.widget.RecyclerView
-            android:id="@+id/dropView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:textAlignment="center"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp">
-        </android.support.v7.widget.RecyclerView>&ndash;&gt;
-
-
-
-    </RelativeLayout>
-
-</RelativeLayout>-->

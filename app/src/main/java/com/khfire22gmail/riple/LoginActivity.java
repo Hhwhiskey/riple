@@ -1,15 +1,10 @@
 package com.khfire22gmail.riple;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,12 +19,7 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
-import com.sromku.simple.fb.entities.Profile;
-import com.sromku.simple.fb.listeners.OnFriendsListener;
-import com.sromku.simple.fb.listeners.OnProfileListener;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,18 +33,15 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Check if there is a currently logged in user
-        // and it's linked to a Facebook account.
+        // Check if there is a currently logged in use and it's linked to a Facebook account.
         ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && ParseFacebookUtils.isLinked(currentUser)) {
-            // Go to the user info activity
-            //showUserDetailsActivity();
-        launchMainActivity();
+            launchMainActivity();
             // If user is not null and ParseFB is linked, then go to app with login completed
         }
 
         //Calls the keyhash method
-        printKeyHash(this);
+        //printKeyHash(this);
 
         //Calls the connection detector
         ConnectionDetector detector = new ConnectionDetector(this);
@@ -62,14 +49,14 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         }
 
-        //FB login switch
+        //Riple login switch
         fbSwitch = (Switch) findViewById(R.id.fbSwitch);
         fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     onLoginClick();
                 } else {
-                    //onLogOutClick();
+                    onLogoutClick();
                 }
             }
         });
@@ -89,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
         AppEventsLogger.activateApp(this);
     }
 
-    //Every activity that wants to use simplefacebook must have this in the onActivityResult
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -97,34 +83,45 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginClick() {
-    //public void onLoginClick(View v) {
         progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
         List<String> permissions = Arrays.asList("public_profile", "email");
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
-                //progressDialog.dismiss();
+                progressDialog.dismiss();
                 if (user == null) {
                     Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
+                    Toast.makeText(getApplicationContext(), "Uh oh. The user cancelled the Facebook login.", Toast.LENGTH_SHORT).show();
                 } else if (user.isNew()) {
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
+                    Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
                 } else {
                     Log.d(RipleApplication.TAG, "User logged in through Facebook!");
+                    Toast.makeText(getApplicationContext(), "User logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
                 }
             }
         });
     }
 
-    private void launchMainActivity() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
+    public void onLogoutClick() {
+        logout();
+
     }
 
-    private void showUserDetailsActivity() {
-        Intent intent = new Intent(this, UserDetailsActivity.class);
+    private void logout() {
+        // Log the user out
+        ParseUser.logOut();
+        Toast.makeText(getApplicationContext(), "You have logged out of Riple", Toast.LENGTH_SHORT).show();
+
+        // Go to the login view
+        //Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+    }
+
+    private void launchMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
     }
 
@@ -152,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     //This is used to generate a keyhash for facebook
-    public static String printKeyHash(Activity context) {
+    /*public static String printKeyHash(Activity context) {
         PackageInfo packageInfo;
         String key = null;
         try {
@@ -182,25 +179,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return key;
-    }
+    }*/
 
-    OnProfileListener onProfileListener = new OnProfileListener() {
-        @Override
-        public void onComplete(Profile profile) {
-            Log.i("Kevin", "My profile id = " + profile.getId());
-        }
-
-        OnFriendsListener onFriendsListener = new OnFriendsListener() {
-        @Override
-        public void onComplete(List<Profile> friends) {
-            Log.i("Kevin", "Number of friends = " + friends.size());
-        }
-        @Override
-        public void onFail(String reason) {
-            Log.i("Kevin", "Fail reason = " + reason);
-        }
-
-        };
-    };
 }
 

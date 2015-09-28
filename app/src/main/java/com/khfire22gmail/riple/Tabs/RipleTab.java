@@ -123,7 +123,7 @@ public class RipleTab extends Fragment {
             }
         }
     }
-    public void onLogoutClick(View v) {
+    /*public void onLogoutClick(View v) {
         logout();
     }
 
@@ -133,7 +133,7 @@ public class RipleTab extends Fragment {
 
         // Go to the login view
         startLoginActivity();
-    }
+    }*/
 
     private void startLoginActivity() {
         Intent intent = new Intent(this.getActivity(), LoginActivity.class);
