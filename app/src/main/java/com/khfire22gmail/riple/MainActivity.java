@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.khfire22gmail.riple.Slider.SlidingTabLayout;
 import com.khfire22gmail.riple.Slider.ViewPagerAdapter;
+import com.parse.ParseUser;
 import com.sromku.simple.fb.SimpleFacebook;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,15 +22,15 @@ public class MainActivity extends AppCompatActivity {
     ViewPager pager;
     ViewPagerAdapter adapter;
     SlidingTabLayout tabs;
-    CharSequence Titles[]={"Riple","Drop","Trickle","Chat"};
+    CharSequence Titles[]={"Riple","Drops","Trickle","Chat"};
     int Numboftabs = 4;
     ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //mSimpleFacebook = SimpleFacebook.getInstance(this);
         setContentView(R.layout.activity_main);
+
         // Creating The Toolbar and setting it as the Toolbar for the activity
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
@@ -63,12 +64,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        //mSimpleFacebook = SimpleFacebook.getInstance(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -87,10 +86,24 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.logoutButton) {
+            ParseUser.logOut();
+            // Go to the login view
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    /*private void logout() {
+        // Log the user out
+        ParseUser.logOut();
+
+        // Go to the login view
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+    }*/
 }

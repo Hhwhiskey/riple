@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
                 } else {
-                    Log.d(RipleApplication.TAG, "User logged in through Facebook!");
+                    Log.d(RipleApplication.TAG, "You have logged in through Facebook!");
                     Toast.makeText(getApplicationContext(), "User logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
                 }
@@ -107,17 +107,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLogoutClick() {
-        logout();
-
-    }
-
-    private void logout() {
         // Log the user out
         ParseUser.logOut();
         Toast.makeText(getApplicationContext(), "You have logged out of Riple", Toast.LENGTH_SHORT).show();
-
-        // Go to the login view
-        //Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
     }
 
     private void launchMainActivity() {

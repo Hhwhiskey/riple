@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/profilePic"
+        android:id="@+id/trickleProfilePic"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_alignParentTop="true"
@@ -15,30 +15,30 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:id="@+id/dropTitle"
+        android:id="@+id/trickleTitle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="Wash your eldery neighbors car for them"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_below="@+id/profilePic"
+        android:layout_below="@+id/trickleProfilePic"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/firstName"
+        android:id="@+id/trickleUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="Kevin"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/profilePic"
+        android:layout_toRightOf="@+id/trickleProfilePic"
         android:textAlignment="center"
         android:width="50dp"
-        android:layout_toStartOf="@+id/dropTodo"
-        android:layout_toLeftOf="@+id/dropTodo" />
+        android:layout_toStartOf="@+id/trickleTodo"
+        android:layout_toLeftOf="@+id/trickleTodo" />
 
     <!--<ImageView
         android:id="@+id/dropPic"
@@ -53,49 +53,49 @@
         android:layout_alignParentEnd="true" />-->
 
     <TextView
-        android:id="@+id/dropRipleCount"
+        android:id="@+id/trickleRipleCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="205 riples"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_below="@+id/dropDescription"
+        android:layout_below="@+id/trickleDescription"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textSize="10sp" />
 
     <TextView
-        android:id="@+id/dropCommentCount"
+        android:id="@+id/trickleCommentCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="12 comments"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_alignTop="@+id/dropRipleCount"
-        android:layout_toRightOf="@+id/profilePic"
-        android:layout_toEndOf="@+id/profilePic"
+        android:layout_alignTop="@+id/trickleRipleCount"
+        android:layout_toRightOf="@+id/trickleProfilePic"
+        android:layout_toEndOf="@+id/trickleProfilePic"
         android:textSize="10sp" />
 
     <TextView
-        android:id="@+id/dropDescription"
+        android:id="@+id/trickleDescription"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="Blah blah blah"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_below="@+id/dropTitle"
+        android:layout_below="@+id/trickleTitle"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:id="@+id/shareFB"
+        android:id="@+id/trickleShareFB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="Share"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_alignTop="@+id/dropTodo"
-        android:layout_toRightOf="@+id/dropTodo"
+        android:layout_alignTop="@+id/trickleTodo"
+        android:layout_toRightOf="@+id/trickleTodo"
         android:width="110dp" />
 
     <!--<TextView
@@ -117,12 +117,12 @@
         android:text="Hodges"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textAlignment="center"
-        android:layout_above="@+id/dropDate"
-        android:layout_toRightOf="@+id/firstName"
-        android:layout_toEndOf="@+id/firstName" />
+        android:layout_above="@+id/trickleTime"
+        android:layout_toRightOf="@+id/trickleUserName"
+        android:layout_toEndOf="@+id/trickleUserName" />
 
     <TextView
-        android:id="@+id/dropTodo"
+        android:id="@+id/trickleTodo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
@@ -130,20 +130,20 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:width="110dp"
         android:textAlignment="center"
-        android:layout_alignTop="@+id/dropCommentCount"
-        android:layout_toRightOf="@+id/dropCommentCount"
-        android:layout_toEndOf="@+id/dropCommentCount" />
+        android:layout_alignTop="@+id/trickleCommentCount"
+        android:layout_toRightOf="@+id/trickleCommentCount"
+        android:layout_toEndOf="@+id/trickleCommentCount" />
 
     <TextView
-        android:id="@+id/dropDate"
+        android:id="@+id/trickleTime"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:text="September 18, 2015 @ 3:32 p.m."
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_above="@+id/dropTitle"
-        android:layout_toRightOf="@+id/profilePic"
-        android:layout_toEndOf="@+id/profilePic"
+        android:layout_above="@+id/trickleTitle"
+        android:layout_toRightOf="@+id/trickleProfilePic"
+        android:layout_toEndOf="@+id/trickleProfilePic"
         android:textSize="10dp" />
 
     <!--<TextView

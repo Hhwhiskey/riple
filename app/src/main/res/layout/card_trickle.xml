@@ -8,143 +8,151 @@
     <android.support.v7.widget.CardView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        card_view:cardElevation="24dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        card_view:cardCornerRadius="0dp"
+        card_view:cardElevation="8dp"
+        card_view:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
-            android:layout_height="175dp">
+            android:layout_height="200dp
+            "
+            android:background="#ffffff">
 
-            <ImageView
-                android:id="@+id/profilePic"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_alignParentTop="true"
+            <com.facebook.login.widget.ProfilePictureView
+                android:id="@+id/trickleProfilePic"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:foregroundGravity="center_vertical"
+                android:paddingLeft="8dp" />
 
             <TextView
-                android:id="@+id/firstName"
+                android:id="@+id/trickleUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Kevin"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/profilePic"
-                android:textAlignment="center"
+                android:layout_toRightOf="@+id/trickleProfilePic"
+                android:layout_toStartOf="@+id/trickleTodo"
                 android:width="50dp"
-                android:layout_toStartOf="@+id/dropTodo"
-                android:layout_toLeftOf="@+id/dropTodo" />
-
-            <TextView
-                android:id="@+id/lastName"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Hodges"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Kevin Hodges"
                 android:textAlignment="center"
-                android:layout_alignBottom="@+id/firstName"
-                android:layout_toRightOf="@+id/dropCommentCount"
-                android:layout_toEndOf="@+id/dropCommentCount" />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/dropDate"
+                android:id="@+id/trickleTime"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="September 18, 2015 @ 3:32 p.m."
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_above="@+id/dropTitle"
-                android:layout_toRightOf="@+id/profilePic"
-                android:layout_toEndOf="@+id/profilePic"
-                android:textSize="10dp" />
+                android:textSize="10dp"
+                android:layout_below="@+id/trickleUserName"
+                android:layout_toRightOf="@+id/trickleProfilePic"
+                android:layout_toEndOf="@+id/trickleProfilePic"/>
 
             <TextView
-                android:id="@+id/dropTitle"
+                android:id="@+id/trickleTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/trickleProfilePic"
+                android:elegantTextHeight="false"
                 android:padding="8dp"
                 android:text="Title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_below="@+id/profilePic"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:textStyle="bold"
-                android:elegantTextHeight="true" />
+                android:ellipsize="start"/>
 
             <TextView
-                android:id="@+id/dropDescription"
+                android:id="@+id/trickleDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Description"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_below="@+id/dropTitle"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
+                android:elegantTextHeight="false"
                 android:ellipsize="start"
                 android:enabled="true"
                 android:focusable="false"
-                android:elegantTextHeight="false" />
+                android:padding="8dp"
+                android:text="Description"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_below="@+id/trickleTitle"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
             <TextView
-                android:id="@+id/dropRipleCount"
+                android:id="@+id/trickleRipleCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="8dp"
                 android:text="205 riples"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
-                android:layout_below="@+id/dropDescription"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:padding="8dp" />
+                android:layout_alignBaseline="@+id/trickleTodo"
+                android:layout_alignBottom="@+id/trickleTodo"
+                android:layout_toLeftOf="@+id/trickleTime"
+                android:layout_toStartOf="@+id/trickleTime"/>
 
             <TextView
-                android:id="@+id/dropCommentCount"
+                android:id="@+id/trickleCommentCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="12 comments"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
-                android:layout_alignTop="@+id/dropRipleCount"
-                android:layout_toRightOf="@+id/dropRipleCount"
-                android:layout_toEndOf="@+id/dropRipleCount" />
+                android:paddingTop="8dp"
+                android:gravity="center"
+                android:paddingRight="8dp"
+                android:layout_alignBaseline="@+id/trickleRipleCount"
+                android:layout_alignBottom="@+id/trickleRipleCount"
+                android:layout_toLeftOf="@+id/trickleTodo"
+                android:layout_toStartOf="@+id/trickleTodo"
+                android:layout_marginRight="30dp"
+                android:layout_marginEnd="30dp"/>
 
-            <TextView
-                android:id="@+id/dropTodo"
+            <Button
+                android:id="@+id/trickleTodo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Todo"
+                android:width="25dp"
+                android:background="#ffffff"
+                android:padding="4dp"
+                android:text="Riple"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:width="100dp"
+                android:textStyle="bold"
                 android:textAlignment="center"
-                android:textStyle="bold"
+                android:paddingBottom="8dp"
                 android:layout_alignParentBottom="true"
-                android:layout_toLeftOf="@+id/shareFB"
-                android:layout_toStartOf="@+id/shareFB" />
+                android:layout_toLeftOf="@+id/trickleShareFB"
+                android:layout_toStartOf="@+id/trickleShareFB"/>
 
-            <TextView
-                android:id="@+id/shareFB"
+            <Button
+                android:id="@+id/trickleShareFB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Share"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:width="100dp"
-                android:textStyle="bold"
-                android:layout_alignTop="@+id/dropTodo"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:textAlignment="center" />
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/trickleTodo"
+                android:width="25dp"
+                android:background="#ffffff"
+                android:padding="4dp"
+                android:text="Share"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold"
+                android:paddingBottom="8dp"/>
 
             <!--<ImageView
                 android:id="@+id/dropPic"

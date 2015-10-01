@@ -1,14 +1,11 @@
 package com.khfire22gmail.riple.Settings;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.khfire22gmail.riple.LoginActivity;
 import com.khfire22gmail.riple.R;
-import com.parse.ParseUser;
 
 
 public class Logout extends AppCompatActivity {
@@ -40,18 +37,5 @@ public class Logout extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onLogoutClick() {
-        logout();
-
-    }
-
-    private void logout() {
-        // Log the user out
-        ParseUser.logOut();
-
-        // Go to the login view
-        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
     }
 }
