@@ -13,8 +13,8 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
-import com.khfire22gmail.riple.Application.RipleApplication;
-import com.khfire22gmail.riple.Utils.ConnectionDetector;
+import com.khfire22gmail.riple.application.RipleApplication;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -27,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private Dialog progressDialog;
     private Switch fbSwitch;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
         List<String> permissions = Arrays.asList("public_profile", "email");
 
+//      Assigns the current user to Parse.userProfilePictureView
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
@@ -94,6 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
                     Toast.makeText(getApplicationContext(), "Uh oh. The user cancelled the Facebook login.", Toast.LENGTH_SHORT).show();
                 } else if (user.isNew()) {
+
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
                     Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
@@ -106,6 +109,8 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+
+
     public void onLogoutClick() {
         // Log the user out
         ParseUser.logOut();
@@ -113,6 +118,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void launchMainActivity() {
+
+
+
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
     }
@@ -145,7 +153,7 @@ public class LoginActivity extends AppCompatActivity {
         PackageInfo packageInfo;
         String key = null;
         try {
-            //getting application package name, as defined in manifest
+            //getting application package author, as defined in manifest
             String packageName = context.getApplicationContext().getPackageName();
 
             //Retrieving package info

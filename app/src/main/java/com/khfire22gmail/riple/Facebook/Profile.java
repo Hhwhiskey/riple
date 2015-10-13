@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Facebook;
+package com.khfire22gmail.riple.facebook;
 
 import com.google.gson.annotations.SerializedName;
 import com.sromku.simple.fb.entities.Image;
@@ -23,12 +23,12 @@ public class Profile extends User{
     }
 
     /**
-     * Returns the first name of the user. <br>
+     * Returns the first author of the user. <br>
      * <br>
      * <b> Permissions:</b><br>
      * {@link com.sromku.simple.fb.Permission#PUBLIC_PROFILE}
      *
-     * @return the first name of the user
+     * @return the first author of the user
      */
     public String getFirstName() {
         return mFirstName;
@@ -38,12 +38,12 @@ public class Profile extends User{
     private String mFirstName;
 
     /**
-     * Returns the last name of the user. <br>
+     * Returns the last author of the user. <br>
      * <br>
      * <b> Permissions:</b><br>
      * {@link com.sromku.simple.fb.Permission#PUBLIC_PROFILE}
      *
-     * @return the last name of the user
+     * @return the last author of the user
      */
     public String getLastName() {
         return mLastName;

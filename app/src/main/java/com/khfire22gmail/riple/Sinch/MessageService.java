@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Sinch;
+package com.khfire22gmail.riple.sinch;
 
 import android.app.Service;
 import android.content.Intent;

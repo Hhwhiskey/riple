@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Facebook;
+package com.khfire22gmail.riple.facebook;
 
 import com.sromku.simple.fb.SessionManager;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;

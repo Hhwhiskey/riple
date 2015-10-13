@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+    <include
+        android:id="@+id/view_drop_card"
+        layout="@layout/card_trickle"
+        android:layout_width="fill_parent"
+        android:layout_height="180dp"/>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/view_drop_recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/writeComment"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/view_drop_card"
+        />
+
+    <EditText
+        android:id="@+id/writeComment"
+        android:layout_width="235dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/commentPost"
+        android:layout_toRightOf="@+id/commentProfilePicture"
+        android:layout_toStartOf="@+id/commentPost"
+        android:text="Write a comment..."
+        />
+
+    <com.facebook.login.widget.ProfilePictureView
+        android:id="@+id/commentProfilePicture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/writeComment"
+        android:foregroundGravity="center_vertical"
+        android:paddingLeft="8dp"/>
+
+    <Button
+        android:id="@+id/commentPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:width="50dp"
+        android:text="Post"/>
+
+</RelativeLayout>

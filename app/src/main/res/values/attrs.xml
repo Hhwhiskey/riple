@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="FloatingActionButton">
-        <attr name="withColor" format="color"/>
-        <attr name="withDrawable" format="reference"/>
-        <attr name="textColor" format="color"/>
-        <attr name="textSize" format="dimension"/>
+    <declare-styleable author="FloatingActionButton">
+        <attr author="withColor" format="color"/>
+        <attr author="withDrawable" format="reference"/>
+        <attr author="textColor" format="color"/>
+        <attr author="textSize" format="dimension"/>
     </declare-styleable>
 </resources>

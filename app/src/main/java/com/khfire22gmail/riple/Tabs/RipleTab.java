@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Tabs;
+package com.khfire22gmail.riple.tabs;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.ProfilePictureView;
-import com.khfire22gmail.riple.Application.RipleApplication;
+import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.LoginActivity;
 import com.khfire22gmail.riple.R;
 import com.parse.ParseUser;

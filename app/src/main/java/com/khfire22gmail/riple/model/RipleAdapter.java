@@ -20,7 +20,7 @@ import java.util.List;
 public class RipleAdapter extends RecyclerView.Adapter<RipleAdapter.MyViewHolder> {
 
     private LayoutInflater inflater;
-    List<TrickleItem> data = Collections.emptyList();
+    List<DropItem> data = Collections.emptyList();
 
     public static interface RipleAdapterDelegate {
         public void itemSelected(Object item);
@@ -45,7 +45,7 @@ public class RipleAdapter extends RecyclerView.Adapter<RipleAdapter.MyViewHolder
     }
 
 
-    public RipleAdapter(Context context, List<TrickleItem> data){
+    public RipleAdapter(Context context, List<DropItem> data){
         inflater = LayoutInflater.from(context);
         this.data = data;
     }
@@ -83,11 +83,11 @@ public class RipleAdapter extends RecyclerView.Adapter<RipleAdapter.MyViewHolder
 
             super(itemView);
             //profilePic = (ImageView) itemView.findViewById(R.id.profilePic);
-            userName = (TextView) itemView.findViewById(R.id.trickleUserName);
+//            userName = (TextView) itemView.findViewById(R.id.name);
             //dropTime = (TextView) itemView.findViewById(R.id.dropTime);
             //dropTitle = (TextView) itemView.findViewById(R.id.dropTitle);
-            dropDescription = (TextView) itemView.findViewById(R.id.trickleDescription);
-            dropRipleCount = (TextView) itemView.findViewById(R.id.trickleRipleCount);
+            dropDescription = (TextView) itemView.findViewById(R.id.description);
+            dropRipleCount = (TextView) itemView.findViewById(R.id.riple_count);
             //dropCommentCount = (TextView) itemView.findViewById(R.id.dropCommentCount);
 
             itemView.setOnClickListener(this);
@@ -95,15 +95,14 @@ public class RipleAdapter extends RecyclerView.Adapter<RipleAdapter.MyViewHolder
 
         public void update(int position){
 
-            /*TrickleItem current = data.get(position);
+            DropItem current = data.get(position);
 //            trickleProfilePic.setImage(current.trickleProfilePic);
-            trickleUserName.setText(current.trickleUserName);
-            trickleTime.setText(current.trickleTime);
-            trickleTitle.setText(current.trickleTitle);
-            trickleDescription.setText(current.trickleDescription);
-            trickleRipleCount.setText(String.valueOf(current.trickleRipleCount));
-            trickleCommentCount.setText(current.trickleCommentCount);
-*/
+            /*author.setText(current.author);
+            trickletime.setText(current.trickletime);
+            title.setText(current.title);
+            description.setText(current.description);
+            ripleCount.setText(String.valueOf(current.ripleCount));
+            commentCount.setText(current.commentCount);*/
         }
 
         @Override

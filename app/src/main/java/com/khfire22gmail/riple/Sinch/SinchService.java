@@ -41,8 +41,8 @@ public class SinchService extends Service {
             return SinchService.this.isStarted();
         }
 
-        public void startClient (String userName) {
-            start(userName);
+        public void startClient (String author) {
+            start(author);
         }
 
         public void stopClient () {
@@ -107,9 +107,9 @@ public class SinchService extends Service {
         }
     }
 
-    private void start(String userName) {
+    private void start(String author) {
         if (mSinchClient == null) {
-            mSinchClient = Sinch.getSinchClientBuilder().context(getApplicationContext()).userId(userName)
+            mSinchClient = Sinch.getSinchClientBuilder().context(getApplicationContext()).userId(author)
                     .applicationKey(APP_KEY)
                     .applicationSecret(APP_SECRET)
                     .environmentHost(ENVIRONMENT).build();

@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Utils;
+package com.khfire22gmail.riple.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

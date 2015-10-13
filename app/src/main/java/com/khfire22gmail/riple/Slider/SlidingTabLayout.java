@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.khfire22gmail.riple.Slider;
+package com.khfire22gmail.riple.slider;
 
 /**
  * Created by Kevin on 9/8/2015.

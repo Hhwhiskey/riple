@@ -24,5 +24,7 @@
     <string name="title_activity_logout">Logout</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_create_drop">CreateDrop</string>
+    <string name="title_activity_clicked_drop">ClickedDrop</string>
 
 </resources>

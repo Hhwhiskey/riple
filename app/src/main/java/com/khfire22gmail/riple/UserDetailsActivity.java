@@ -3,6 +3,7 @@ package com.khfire22gmail.riple;
 /**
  * Created by Kevin on 9/23/2015.
  */
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +15,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.ProfilePictureView;
-import com.khfire22gmail.riple.Application.RipleApplication;
+import com.khfire22gmail.riple.application.RipleApplication;
 import com.parse.ParseUser;
 
 import org.json.JSONException;
@@ -71,8 +72,8 @@ public class UserDetailsActivity extends AppCompatActivity {
                             JSONObject userProfile = new JSONObject();
 
                             try {
-                                userProfile.put("facebookId", jsonObject.getLong("id"));
-                                userProfile.put("name", jsonObject.getString("name"));
+                                userProfile.put("userProfilePictureView", jsonObject.getLong("id"));
+                                userProfile.put("author", jsonObject.getString("author"));
 
                                 if (jsonObject.getString("gender") != null)
                                     userProfile.put("gender", jsonObject.getString("gender"));
@@ -116,20 +117,23 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void updateViewsWithProfileInfo() {
+
+
+
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser.has("profile")) {
             JSONObject userProfile = currentUser.getJSONObject("profile");
             try {
 
-                if (userProfile.has("facebookId")) {
-                    userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
+                if (userProfile.has("userProfilePictureView")) {
+                    userProfilePictureView.setProfileId(userProfile.getString("userProfilePictureView"));
                 } else {
                     // Show the default, blank user profile picture
                     userProfilePictureView.setProfileId(null);
                 }
 
-                if (userProfile.has("name")) {
-                    userNameView.setText(userProfile.getString("name"));
+                if (userProfile.has("author")) {
+                    userNameView.setText(userProfile.getString("author"));
                 } else {
                     userNameView.setText("");
                 }

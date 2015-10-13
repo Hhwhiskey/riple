@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Application;
+package com.khfire22gmail.riple.application;
 
 import android.app.Application;
 

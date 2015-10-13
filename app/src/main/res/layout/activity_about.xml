@@ -1,49 +1,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.khfire22gmail.riple.Settings.About">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.khfire22gmail.riple.settings.About">
 
     <TextView
+        android:id="@+id/textViewMotherTeresaQuote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/quote"
-        android:id="@+id/textViewMotherTeresaQuote"
-        android:textColor="@color/PrimaryText"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textStyle="italic"
-        android:layout_marginTop="34dp"
-        android:layout_below="@+id/textViewexplanation"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:gravity="center_horizontal" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/explanation"
-        android:id="@+id/textViewexplanation"
-        android:textColor="@color/PrimaryText"
-        android:textSize="20sp"
+        android:layout_below="@+id/textViewexplanation"
+        android:layout_marginTop="34dp"
+        android:gravity="center_horizontal"
+        android:text="@string/quote"
         android:textAlignment="center"
-        android:gravity="center"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/PrimaryText"
-        android:text="@string/MotherTeresaSig"
+        android:textSize="18sp"
+        android:textStyle="italic"/>
+
+    <TextView
+        android:id="@+id/textViewexplanation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="@string/explanation"
+        android:textAlignment="center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/PrimaryText"
+        android:textSize="20sp"/>
+
+    <TextView
         android:id="@+id/MotherTeresaSig"
-        android:layout_below="@+id/textViewMotherTeresaQuote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/textViewMotherTeresaQuote"
         android:layout_alignRight="@+id/textViewMotherTeresaQuote"
-        android:layout_alignEnd="@+id/textViewMotherTeresaQuote" />
+        android:layout_below="@+id/textViewMotherTeresaQuote"
+        android:text="@string/MotherTeresaSig"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/PrimaryText"/>
 </RelativeLayout>

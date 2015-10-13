@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Tabs;
+package com.khfire22gmail.riple.tabs;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

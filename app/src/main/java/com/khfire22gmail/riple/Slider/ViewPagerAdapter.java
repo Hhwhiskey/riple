@@ -1,13 +1,13 @@
-package com.khfire22gmail.riple.Slider;
+package com.khfire22gmail.riple.slider;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.khfire22gmail.riple.Tabs.ChatTab;
-import com.khfire22gmail.riple.Tabs.DropTab;
-import com.khfire22gmail.riple.Tabs.RipleTab;
-import com.khfire22gmail.riple.Tabs.TrickleTab;
+import com.khfire22gmail.riple.tabs.ChatTab;
+import com.khfire22gmail.riple.tabs.DropTab;
+import com.khfire22gmail.riple.tabs.RipleTab;
+import com.khfire22gmail.riple.tabs.TrickleTab;
 
 /**
  * Created by Kevin on 9/8/2015.

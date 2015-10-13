@@ -9,8 +9,15 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drop_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="500dp"/>
+
+    <!--<Button
+        android:id="@+id/button_test"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="Popup Test"/>-->
     </LinearLayout>
+
 <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
 
 

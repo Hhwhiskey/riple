@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.khfire22gmail.riple.Slider;
+package com.khfire22gmail.riple.slider;
 
 import android.R;
 import android.content.Context;
