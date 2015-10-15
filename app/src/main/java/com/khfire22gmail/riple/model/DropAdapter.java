@@ -68,8 +68,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         if (mTabName.equals(RIPLE)) {
             xmlLayoutId = R.layout.card_riple;
 
-        } else if (mTabName.equals(DROP)) {
-            xmlLayoutId = R.layout.card_trickle;
+        /*} else if (mTabName.equals(DROP)) {
+            xmlLayoutId = R.layout.card_trickle;*/
 
         } else if (mTabName.equals(TRICKLE)) {
             xmlLayoutId = R.layout.card_trickle;
@@ -93,10 +93,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-//        public ImageView trickleProfilePic;
         public ProfilePictureView profilePicture;
-        public TextView author;
         public TextView createdAt;
+        public TextView author;
         public TextView title;
         public TextView description;
         public TextView ripleCount;
@@ -109,8 +108,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             super(itemView);
 
             profilePicture = (ProfilePictureView) itemView.findViewById(R.id.profile_picture);
-            author = (TextView) itemView.findViewById(R.id.author);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
+            author = (TextView) itemView.findViewById(R.id.author);
             title = (TextView) itemView.findViewById(R.id.title);
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
@@ -126,8 +125,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             DropItem current = data.get(position);
 
             profilePicture.setProfileId(current.facebookId);
+            createdAt.setText(String.valueOf(current.createdAt));
             author.setText(current.author);
-            createdAt.setText((CharSequence) current.createdAt);
             title.setText(current.title);
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));

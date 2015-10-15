@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.khfire22gmail.riple" >
 
-     <!--TODO Update permissions for Marshmallow http://guides.codepath.com/android/Understanding-App-Permissions#runtime-permissions -->
+    <!-- TODO Update permissions for Marshmallow http://guides.codepath.com/android/Understanding-App-Permissions#runtime-permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -60,12 +60,16 @@
             android:label="@string/title_activity_logout" >
         </activity>
         <activity
-            android:name=".CreateDrop"
+            android:name=".Actions.CreateDrop"
             android:label="@string/title_activity_create_drop" >
         </activity>
         <activity
-            android:name=".ClickedDrop"
+            android:name=".Actions.ViewDrop"
             android:label="@string/title_activity_clicked_drop" >
+        </activity>
+        <activity
+            android:name=".Actions.ViewRiple"
+            android:label="@string/title_activity_view_riple" >
         </activity>
     </application>
 

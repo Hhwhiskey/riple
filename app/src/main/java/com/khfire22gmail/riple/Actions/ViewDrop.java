@@ -1,11 +1,13 @@
-package com.khfire22gmail.riple;
+package com.khfire22gmail.riple.Actions;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ClickedDrop extends AppCompatActivity {
+import com.khfire22gmail.riple.R;
+
+public class ViewDrop extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

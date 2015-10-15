@@ -6,7 +6,7 @@
                 android:weightSum="1">
 
     <include
-        android:id="@+id/view_drop_card"
+        android:id="@+id/card_view_drop"
         layout="@layout/card_trickle"
         android:layout_width="fill_parent"
         android:layout_height="180dp"/>
@@ -19,7 +19,7 @@
         android:layout_above="@+id/writeComment"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="false"
-        android:layout_below="@+id/view_drop_card"
+        android:layout_below="@+id/card_view_drop"
         />
 
     <EditText

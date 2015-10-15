@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple;
+package com.khfire22gmail.riple.Actions;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
+
+import com.khfire22gmail.riple.R;
 
 
 public class CreateDrop extends AppCompatActivity {

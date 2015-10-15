@@ -3,6 +3,9 @@ package com.khfire22gmail.riple.tabs;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +16,22 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.ProfilePictureView;
-import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.LoginActivity;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.application.RipleApplication;
+import com.khfire22gmail.riple.model.DropAdapter;
+import com.khfire22gmail.riple.model.DropItem;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.sromku.simple.fb.SimpleFacebook;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -29,14 +40,27 @@ public class RipleTab extends Fragment {
 
     private ProfilePictureView userProfilePictureView;
     private TextView userNameView;
-    private SimpleFacebook mSimpleFacebook;
+    private RecyclerView mRecyclerView;
+    private List<DropItem> list;
+    private RecyclerView.ItemAnimator animator;
+    private DropAdapter ripleAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.tab_riple,container,false);
 
+//        Riple Card
         userProfilePictureView = (ProfilePictureView) view.findViewById(R.id.ripleProfilePic);
         userNameView = (TextView) view.findViewById(R.id.ripleUserName);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        list = getItemsFromParse();
+        ripleAdapter = new DropAdapter(getActivity(), list, "riple");
+        mRecyclerView.setAdapter(ripleAdapter);
+
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(animator);
 
         //Fetch Facebook user info if it is logged
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -45,6 +69,64 @@ public class RipleTab extends Fragment {
         }
 
         return view;
+    }
+
+    public static List<DropItem> getItemsFromParse() {
+        final List<DropItem> dropList = new ArrayList<>();
+
+        String currentUser = ParseUser.getCurrentUser().getObjectId();
+
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+
+        query.whereEqualTo("objectId", currentUser);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+
+                if (e != null) {
+                    Log.i("KEVIN", "error error");
+
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+
+                        DropItem dropItem = new DropItem();
+
+                        //Picture
+                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
+                        //Name
+                        dropItem.setAuthor(list.get(i).getString("name"));
+
+                        //Date
+                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
+
+//                                dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+
+                        //Drop Title
+                        dropItem.setTitle(list.get(i).getString("title"));
+
+                        //Drop description
+                        dropItem.setDescription(list.get(i).getString("description"));
+
+                        //Riple Count
+                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+
+                        //Comment Count
+                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+
+                        //Id that connects commenter to drop
+//                              dropItem.setCommenter(list.get(i).getString("commenter"));
+
+                        dropList.add(dropItem);
+                    }
+
+                    Log.i("KEVIN", "list size: " + list.size());
+                }
+
+            }
+        });
+
+        return dropList;
     }
 
     private void makeMeRequest() {

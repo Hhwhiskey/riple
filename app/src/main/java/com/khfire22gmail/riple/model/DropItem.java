@@ -7,41 +7,32 @@ import java.util.Date;
  */
 public class DropItem {
 
-//    public ProfilePictureView profilePictureView;
+    public Date createdAt;
     public String objectId;
-    //    public String userName;
     public String author;
     public String facebookId;
-    public String commenter;
-    public Date createdAt;
     public String title;
     public String description;
+    public String commenter;
+    public String comment;
     public String ripleCount;
     public String commentCount;
 
+    public String getComment() {
+        return comment;
+    }
 
-    /*public DropItem(ParseObject po) {
-//        dropItem.setObjectId(list.get(i).getObjectId());
-        objectId = po.getObjectId();
-        author = po.getString("author");
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
-// TODO Get authors author from String
-        dropItem.setName(list.get(i).getString("author"));
+    public String getObjectId() {
+        return objectId;
+    }
 
-// TODO Turn Unix time into a readable date (1444327164)
-        dropItem.setCreatedAt(list.get(i).getDate("createdAt"));
-
-        dropItem.setFacebookId(list.get(i).getFacebookId());
-
-//                        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(oldstring);
-
-
-        dropItem.setTitle(list.get(i).getString("title"));
-        dropItem.setDescription(list.get(i).getString("description"));
-
-        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-    }*/
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
 
     public String getAuthor() {
         return author;
@@ -67,30 +58,6 @@ public class DropItem {
         this.facebookId = facebookId;
     }
 
-    /*public ProfilePictureView getUserProfilePictureView() {
-        return profilePictureView;
-    }
-
-    public void setUserProfilePictureView(ProfilePictureView userProfilePictureView) {
-        this.profilePictureView = userProfilePictureView;
-    }*/
-
-    public String getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
-    }
-
-   /* public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-*/
     public Date getCreatedAt() {
         return createdAt;
     }
