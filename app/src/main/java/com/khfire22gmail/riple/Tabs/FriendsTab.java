@@ -11,7 +11,7 @@ import com.khfire22gmail.riple.R;
 /**
  * Created by Kevin on 9/8/2015.
  */
-public class ChatTab extends Fragment {
+public class FriendsTab extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

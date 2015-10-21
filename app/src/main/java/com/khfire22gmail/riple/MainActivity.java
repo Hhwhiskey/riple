@@ -14,26 +14,27 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
+import com.khfire22gmail.riple.utils.FloatingActionButton;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Toolbar toolbar;
-    ViewPager pager;
+    ViewPager mPager;
     ViewPagerAdapter adapter;
     SlidingTabLayout tabs;
-    CharSequence Titles[] = {"Riple", "Drops", "Trickle", "Chat"};
+    CharSequence Titles[] = {"Riple", "Drops", "Trickle", "Friends"};
     int Numboftabs = 4;
-    ViewPager mViewPager;
 
     private String dropTitle;
     private String dropDescription;
@@ -45,6 +46,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // add button
+        FloatingActionButton fab = new FloatingActionButton(this);
+        fab.setText("FAB");
+        fab.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        fab.setId(R.id.fab_1);
+        fab.setOnClickListener(this);
+        fab.addView(fab);
+
+
+        /*FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
+                .withDrawable(ContextCompat.getDrawable(this, R.drawable.ic_user_default))
+                .withButtonColor(Color.WHITE)
+                .withGravity(Gravity.BOTTOM | Gravity.RIGHT)
+                .withMargins(0, 0, 16, 16)
+                .create();*/
+
+//        fabButton.setOnClickListener();
+
+
+        // Store the current users facebookId
         storeFacebookId();
 
         // Creating The Toolbar and setting it as the Toolbar for the activity
@@ -58,8 +79,11 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles, Numboftabs);
 
         // Assigning ViewPager View and setting the adapter
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(adapter);
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(adapter);
+
+        // Allow fragments to stay in memory
+        mPager.setOffscreenPageLimit(4);
 
         // Assigning the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
@@ -74,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Setting the ViewPager For the SlidingTabsLayout
-        tabs.setViewPager(pager);
+        tabs.setViewPager(mPager);
 
-
-        Button button = (Button) findViewById(R.id.button_test);
+        // Show create Drop Popup
+        Button button = (Button) findViewById(R.id.create_drop_popup_button);
 
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -90,17 +114,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Create Drop Popup
     public void showPopup(View anchorView) {
 
         final View popupView = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
 
         final PopupWindow popupWindow = new PopupWindow(popupView,
-            WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
-        // Example: If you have a TextView inside `popup_layout.xml`
-        // TextView textView = (TextView) popupView.findViewById(R.id.);
-
-        // Initialize more widgets from `popup_layout.xml`
+        popupWindow.setAnimationStyle(R.style.Animation);
 
         // If the PopupWindow should be focusable
         popupWindow.setFocusable(true);
@@ -119,13 +141,11 @@ public class MainActivity extends AppCompatActivity {
 
         popupWindow.showAtLocation(findViewById(R.id.root_layout), 30, 30, 30);
 
-        /*// Using location, the PopupWindow will be displayed right under anchorView
-        popupWindow.showAtLocation(anchorView, Gravity.CENTER, location[0], location[1] + anchorView.getHeight());*/
-
+        // Allow user to input Drop
         postDropButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("HOHO", "You clicked me man...what's up");
+
                 dropTitle = dropTitleView.getEditableText().toString();
                 dropDescription = dropDescriptionView.getEditableText().toString();
                 createDrop(dropTitle, dropDescription);
@@ -136,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Create a new Drop
+    // Take user input and post the Drop
     public void createDrop(String dropTitle, String dropDescription) {
 
         Log.d("Kevin", "Title = " + dropTitle);
@@ -231,7 +251,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onClick(View v) {
+
+    }
 }
+
+
 
     /*private void logout() {
         // Log the user out

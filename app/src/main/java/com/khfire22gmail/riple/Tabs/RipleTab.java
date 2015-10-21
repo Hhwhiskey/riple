@@ -41,9 +41,9 @@ public class RipleTab extends Fragment {
     private ProfilePictureView userProfilePictureView;
     private TextView userNameView;
     private RecyclerView mRecyclerView;
-    private List<DropItem> list;
+    private List<DropItem> mRipleList;
+    private DropAdapter mRipleAdapter;
     private RecyclerView.ItemAnimator animator;
-    private DropAdapter ripleAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,14 +55,13 @@ public class RipleTab extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        list = getItemsFromParse();
-        ripleAdapter = new DropAdapter(getActivity(), list, "riple");
-        mRecyclerView.setAdapter(ripleAdapter);
+
+        loadRipleItemsFromParse();
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setItemAnimator(animator);
 
-        //Fetch Facebook user info if it is logged
+//        Fetch Facebook user info if it is logged
         ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
             makeMeRequest();
@@ -71,16 +70,25 @@ public class RipleTab extends Fragment {
         return view;
     }
 
-    public static List<DropItem> getItemsFromParse() {
-        final List<DropItem> dropList = new ArrayList<>();
+    public void loadRipleItemsFromParse() {
+        final List<DropItem> ripleList = new ArrayList<>();
 
         String currentUser = ParseUser.getCurrentUser().getObjectId();
+//      String viewRiple = ParseUser.getViewRiple().getObjectId();
 
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+        final ParseQuery<ParseObject> query1 = ParseQuery.getQuery("Drop");
+        query1.whereEqualTo("author", currentUser);
 
-        query.whereEqualTo("objectId", currentUser);
+        final ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Drop");
+        query2.whereEqualTo("done", currentUser);
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(query1);
+        queries.add(query2);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
 
@@ -100,7 +108,7 @@ public class RipleTab extends Fragment {
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
 
-//                                dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
                         //Drop Title
                         dropItem.setTitle(list.get(i).getString("title"));
@@ -117,16 +125,24 @@ public class RipleTab extends Fragment {
                         //Id that connects commenter to drop
 //                              dropItem.setCommenter(list.get(i).getString("commenter"));
 
-                        dropList.add(dropItem);
+                        ripleList.add(dropItem);
                     }
 
-                    Log.i("KEVIN", "list size: " + list.size());
+                    Log.i("KEVIN", "PARSE LIST SIZE: " + ripleList.size());
+                    updateRecyclerView(ripleList);
                 }
-
             }
         });
+    }
 
-        return dropList;
+    private void updateRecyclerView(List<DropItem> items) {
+        Log.d("KEVIN", "RIPLE LIST SIZE: " + items.size());
+
+        mRipleList = items;
+
+        mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
+        mRecyclerView.setAdapter(mRipleAdapter);
+
     }
 
     private void makeMeRequest() {

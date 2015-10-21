@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
@@ -36,45 +37,47 @@ import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 // TODO WaveSwipeRefreshLayout
 public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnRefreshListener*/ {
 
+    public static final String TAG = TrickleTab.class.getSimpleName();
+
     private ListView mListview;
     private PopupWindow popupWindow;
     private LayoutInflater layoutInflater;
     private RelativeLayout relativeLayout;
     private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
-    RecyclerView mRecyclerView;
-    List<DropItem> list;
-    DropAdapter trickleAdapter;
     private ParseUser currentUser;
     private String currentUserObject;
     private String currentUserName;
     private RecyclerView.ItemAnimator animator;
+    RecyclerView mRecyclerView;
+    List<DropItem> mTrickleList;
+    DropAdapter mTrickleAdapter;
+
+    ProfilePictureView picture;
 
     /*public void onActivityCreated (Bundle savedInstanceState)
-
     Added in API level 11
     Called when the fragment's activity has been created and this fragment's view hierarchy instantiated. It can be used to do final initialization once these pieces are in place, such as retrieving views or restoring state. It is also useful for fragments that use setRetainInstance(boolean) to retain their instance, as this callback tells the fragment when it is fully associated with the new activity instance. This is called after onCreateView(LayoutInflater, ViewGroup, Bundle) and before onViewStateRestored(Bundle).
-
     Parameters
     savedInstanceState	If the fragment is being re-created from a previous saved state, this is the state.*/
     /*@Override
     public void onActivityCreated(Bundle savedInstanceState) {
-    
+
     }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_trickle, container, false);
 
+        setRetainInstance(true);
+
 //        Create recyclerView and set it to display list
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        list = getItemsFromParse();
-        trickleAdapter = new DropAdapter(getActivity(), list, "trickle");
-        mRecyclerView.setAdapter(trickleAdapter);
+
+        loadTrickleItemsFromParse();
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setItemAnimator(animator);
-
 
 /*//        This will show a popup window which will contain the activity_clicked_drop
         button.setOnClickListener(new View.OnClickListener() {
@@ -97,13 +100,31 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
         return view;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        /*if (savedInstanceState != null) {
+            //probably orientation change
+            myData = (List<String>) savedInstanceState.getSerializable("list");
+        } else {
+            if (myData != null) {
+                //returning from backstack, data is fine, do nothing
+            } else {
+                //newly created, compute data
+                myData = computeData();
+            }
+        }*/
+
+
+    }
+
     /*private void initView() {
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) getActivity().findViewById(R.id.main_swipe);
         mWaveSwipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);
         mWaveSwipeRefreshLayout.setOnRefreshListener(this);
         mWaveSwipeRefreshLayout.setWaveColor(0x00000000);
 //        mWaveSwipeRefreshLayout.setMaxDropHeight(1500);
-
         mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.trickle_recycler_view);
     }*/
 
@@ -117,7 +138,6 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
     /*@Override
     public void onRefresh() {
         refresh();
-
     }*/
 
     /*private void refresh(){
@@ -153,61 +173,86 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
         return super.onOptionsItemSelected(item);
     }
 
-    public static List<DropItem> getItemsFromParse() {
-        final List<DropItem> dropList = new ArrayList<>();
+    public void loadTrickleItemsFromParse() {
+        final List<DropItem> trickleList = new ArrayList<>();
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+//        query.orderByDescending(createdAt);
+//        query.setLimit(25);
 
-                query.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> list, ParseException e) {
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
 
-                        if (e != null) {
-                            Log.i("KEVIN", "error error");
+                if (e != null) {
+                    Log.d("KEVIN", "error error");
 
-                        } else {
-                            for (int i = 0; i < list.size(); i++) {
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
 
-                                DropItem dropItem = new DropItem();
+                        DropItem dropItem = new DropItem();
 
-                                //Picture
-                                dropItem.setFacebookId(list.get(i).getString("facebookId"));
-                                //Name
-                                dropItem.setAuthor(list.get(i).getString("name"));
+                        //Picture
+                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
+                        //Name
+                        dropItem.setAuthor(list.get(i).getString("name"));
 
-                                //Date
-                                dropItem.setCreatedAt(list.get(i).getCreatedAt());
+                        //Date
+                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
 
-//                                dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
-                                //Drop Title
-                                dropItem.setTitle(list.get(i).getString("title"));
+                        //Drop Title
+                        dropItem.setTitle(list.get(i).getString("title"));
 
-                                //Drop description
-                                dropItem.setDescription(list.get(i).getString("description"));
+                        //Drop description
+                        dropItem.setDescription(list.get(i).getString("description"));
 
-                                //Riple Count
-                                dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                        //Riple Count
+                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
 
-                                //Comment Count
-                                dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                        //Comment Count
+                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                                //Id that connects commenter to drop
+                        //Id that connects commenter to drop
 //                              dropItem.setCommenter(list.get(i).getString("commenter"));
 
-                                dropList.add(dropItem);
-                            }
-
-                            Log.i("KEVIN", "list size: " + list.size());
-                        }
-
+                        trickleList.add(dropItem);
                     }
-                });
 
-        return dropList;
+                    Log.i("KEVIN", "PARSE LIST SIZE: " + trickleList.size());
+                    updateRecyclerView(trickleList);
+                }
+            }
+        });
+    }
+
+    private void updateRecyclerView(List<DropItem> items) {
+        Log.d("KEVIN", "TRICKLE LIST SIZE: " + items.size());
+
+        mTrickleList = items;
+
+        mTrickleAdapter = new DropAdapter(getActivity(), mTrickleList, "trickle");
+        mRecyclerView.setAdapter(mTrickleAdapter);
+    }
+
+
+//    Adds this Drop to your Drops list
+    public void ripleThisDrop() {
+
+        /*Log.d("Kevin", "Title = " + dropTitle);
+        Log.d("Kevin", "Description = " + dropDescription);*/
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        ParseObject drop = new ParseObject("Drop");
+        drop.put("todo", currentUser.getObjectId());
+
+        /*drop.put("facebookId", currentUser.get("facebookId"));
+        drop.put("name", currentUser.get("name"));
+        drop.put("title", dropTitle);
+        drop.put("description", dropDescription);*/
+
+        drop.saveInBackground();
     }
 }
-
-
-
-

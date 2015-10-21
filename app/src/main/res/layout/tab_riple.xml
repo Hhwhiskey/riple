@@ -8,19 +8,18 @@
     android:orientation="vertical">
 
     <include
-        layout="@layout/card_riple"/>
+        layout="@layout/card_profile"/>
 
-    <!--<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+    <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
         android:id="@+id/riple_swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>-->
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/riple_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
-
+    </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
 </LinearLayout>
 

@@ -23,12 +23,6 @@
             android:layout_height="wrap_content"
             android:background="#ffffff">
 
-            <!--<ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@id/profile_picture"
-                android:contentDescription=""/>-->
-
             <com.facebook.login.widget.ProfilePictureView
                 android:id="@+id/profile_picture"
                 android:layout_width="65dp"
@@ -148,7 +142,7 @@
                 android:padding="4dp"
                 android:paddingBottom="8dp"
                 android:paddingRight="8dp"
-                android:text="Riple'd"
+                android:text="Done"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold"/>

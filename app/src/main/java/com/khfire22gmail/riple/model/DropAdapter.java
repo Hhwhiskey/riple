@@ -1,4 +1,3 @@
-
 package com.khfire22gmail.riple.model;
 
 import android.content.Context;
@@ -20,6 +19,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     private final String mTabName;
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
+
 
     public static interface TrickleAdapterDelegate {
         public void itemSelected(Object item);
@@ -49,16 +49,19 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public static final String TRICKLE = "trickle";
 
 
-    /**
-     * One idea is to pass a param where you can choose which
-     * xml layout you want inflated by the adapter
-     */
+
+    /*  One idea is to pass a param where you can choose which
+     xml layout you want inflated by the adapter*/
+
+
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
         inflater = LayoutInflater.from(context);
         this.data = data;
         mTabName = tabName;
     }
+
+
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -68,8 +71,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         if (mTabName.equals(RIPLE)) {
             xmlLayoutId = R.layout.card_riple;
 
-        /*} else if (mTabName.equals(DROP)) {
-            xmlLayoutId = R.layout.card_trickle;*/
+        } else if (mTabName.equals(DROP)) {
+            xmlLayoutId = R.layout.card_drop;
 
         } else if (mTabName.equals(TRICKLE)) {
             xmlLayoutId = R.layout.card_trickle;
@@ -81,9 +84,22 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         return viewHolder;
     }
 
+
     @Override
     public void onBindViewHolder(MyViewHolder viewHolder, int position) {
         viewHolder.update(position);
+
+        /*ProfilePictureView picture = (ProfilePictureView) findViewById(R.id.profile_picture);
+
+        //TODO What is wrong with my creation of an OCL here?
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("Kevin", "ProfilePictureView Listener worked!");
+                Intent intent = new Intent(DropAdapter.this, ViewRiple.class);
+                startActivity(intent);
+            }
+        });*/
     }
 
     @Override
@@ -94,8 +110,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ProfilePictureView profilePicture;
-        public TextView createdAt;
         public TextView author;
+        public TextView createdAt;
         public TextView title;
         public TextView description;
         public TextView ripleCount;
@@ -135,10 +151,25 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 //            comment.setText(current.comment);
         }
 
+        /*@Override
+        public void onClick(View v) {
+            if (View v ){
+                mListener.onTomato((ImageView)v)
+            } else {
+                mListener.onPotato(v);
+            }
+        }*/
+
+        String adapterPos = String.valueOf((getAdapterPosition()));
+
         @Override
         public void onClick(View v) {
+//            Toast.makeText(this, "The Item Clicked is: " + adapterPos, Toast.LENGTH_SHORT).show();
+            getDelegate().itemSelected(data.get(getAdapterPosition()));
+           /* Intent intent = new Intent(this, ViewDrop.class);
+            startActivity(intent);*/
 
-            getDelegate().itemSelected(data.get(getPosition()));
+
         }
     }
 }

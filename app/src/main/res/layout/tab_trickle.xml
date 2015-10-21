@@ -2,19 +2,21 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/trickle_layout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/trickle_drop_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-   <!-- <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+    <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
         android:id="@+id/swipe_trickle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>-->
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/trickle_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+    </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
 </LinearLayout>

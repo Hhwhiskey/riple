@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         //Riple login switch
-        fbSwitch = (Switch) findViewById(R.id.fbSwitch);
+        fbSwitch = (Switch) findViewById(R.id.fb_switch);
         fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
