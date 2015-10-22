@@ -60,15 +60,15 @@
             android:label="@string/title_activity_logout" >
         </activity>
         <activity
-            android:name=".Actions.CreateDrop"
+            android:name=".actions.CreateDrop"
             android:label="@string/title_activity_create_drop" >
         </activity>
         <activity
-            android:name=".Actions.ViewDrop"
+            android:name=".actions.ViewDrop"
             android:label="@string/title_activity_clicked_drop" >
         </activity>
         <activity
-            android:name=".Actions.ViewRiple"
+            android:name=".actions.ViewOtherUser"
             android:label="@string/title_activity_view_riple" >
         </activity>
     </application>

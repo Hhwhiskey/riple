@@ -1,6 +1,7 @@
 package com.khfire22gmail.riple.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.actions.ViewOtherUser;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -16,9 +18,12 @@ import java.util.List;
 
 public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> {
 
+    Context mContext;
+
     private final String mTabName;
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
+
 
 
     public static interface TrickleAdapterDelegate {
@@ -47,21 +52,19 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public static final String RIPLE = "riple";
     public static final String DROP = "drop";
     public static final String TRICKLE = "trickle";
+    public static final String OTHER = "other";
 
 
 
     /*  One idea is to pass a param where you can choose which
      xml layout you want inflated by the adapter*/
 
-
-
     public DropAdapter(Context context, List<DropItem> data, String tabName){
+        mContext = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
         mTabName = tabName;
     }
-
-
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -76,6 +79,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
         } else if (mTabName.equals(TRICKLE)) {
             xmlLayoutId = R.layout.card_trickle;
+
+        } else if (mTabName.equals(OTHER)) {
+            xmlLayoutId = R.layout.card_riple;
         }
 
         // DRY - DON'T REPEAT YOURSELF
@@ -86,20 +92,33 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
     @Override
-    public void onBindViewHolder(MyViewHolder viewHolder, int position) {
+    public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        /*ProfilePictureView picture = (ProfilePictureView) findViewById(R.id.profile_picture);
-
-        //TODO What is wrong with my creation of an OCL here?
-        picture.setOnClickListener(new View.OnClickListener() {
+        viewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("Kevin", "ProfilePictureView Listener worked!");
-                Intent intent = new Intent(DropAdapter.this, ViewRiple.class);
-                startActivity(intent);
+                viewOtherUser(position);
             }
-        });*/
+        });
+
+        viewHolder.authorName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewOtherUser(position);
+            }
+        });
+    }
+
+    private void viewOtherUser(int position) {
+        String mAuthorId = (data.get(position).getAuthorId());
+                /*DropItem thisItem = data.get(position);
+                String thisAuthorId = thisItem.getAuthorId();*/
+        //Log.d("Kevin", "thisItem's authorId = " + mAuthorId);
+
+        Intent intent = new Intent(mContext, ViewOtherUser.class);
+        intent.putExtra("authorId", mAuthorId);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -110,7 +129,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ProfilePictureView profilePicture;
-        public TextView author;
+        public TextView authorName;
         public TextView createdAt;
         public TextView title;
         public TextView description;
@@ -125,11 +144,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
             profilePicture = (ProfilePictureView) itemView.findViewById(R.id.profile_picture);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
-            author = (TextView) itemView.findViewById(R.id.author);
+            authorName = (TextView) itemView.findViewById(R.id.author);
             title = (TextView) itemView.findViewById(R.id.title);
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+
 //            commenter = (TextView) itemView.findViewById(R.id.commenter);
 //            comment = (TextView) itemView.findViewById(R.id.comment);
 
@@ -142,7 +162,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
             profilePicture.setProfileId(current.facebookId);
             createdAt.setText(String.valueOf(current.createdAt));
-            author.setText(current.author);
+            authorName.setText(current.authorName);
             title.setText(current.title);
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));

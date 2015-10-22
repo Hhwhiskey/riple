@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.Actions;
+package com.khfire22gmail.riple.actions;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +25,7 @@ public class CreateDrop extends AppCompatActivity {
         setContentView(R.layout.activity_create_drop);
         editText.requestFocus();
 
-//        dropDescription = String.valueOf(dropDescriptionView.getText());
+        //        dropDescription = String.valueOf(dropDescriptionView.getText());
 //        dropTitle = String.valueOf(dropTitleView.getText());
 
         /*dropDescriptionView = (AutoCompleteTextView) findViewById(R.id.drop_description);

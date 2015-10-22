@@ -74,8 +74,11 @@ public class DropsTab extends Fragment {
 
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
-                        //Name
-                        dropItem.setAuthor(list.get(i).getString("name"));
+                        //Author name
+                        dropItem.setAuthorName(list.get(i).getString("name"));
+
+                        //Author id
+                        dropItem.setAuthorId(list.get(i).getString("author"));
 
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());

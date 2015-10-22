@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                tools:context="com.khfire22gmail.riple.actions.ViewOtherUser">
+
+    <include
+        android:id="@+id/view_riple_card"
+        layout="@layout/card_profile"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+
+    <!--<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+        android:id="@+id/riple_swipe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">-->
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/view_riple_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/view_riple_card"/>
+    <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
+
+</RelativeLayout>

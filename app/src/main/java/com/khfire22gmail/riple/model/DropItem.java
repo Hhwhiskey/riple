@@ -9,7 +9,8 @@ public class DropItem {
 
     public Date createdAt;
     public String objectId;
-    public String author;
+    public String authorId;
+    public String authorName;
     public String facebookId;
     public String title;
     public String description;
@@ -17,6 +18,14 @@ public class DropItem {
     public String comment;
     public String ripleCount;
     public String commentCount;
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
 
     public String getComment() {
         return comment;
@@ -34,12 +43,12 @@ public class DropItem {
         this.objectId = objectId;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getCommenter() {

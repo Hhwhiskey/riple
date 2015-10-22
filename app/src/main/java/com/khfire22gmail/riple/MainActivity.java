@@ -3,7 +3,9 @@ package com.khfire22gmail.riple;
 
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,13 +16,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
-import com.khfire22gmail.riple.utils.FloatingActionButton;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ViewPagerAdapter adapter;
     SlidingTabLayout tabs;
     CharSequence Titles[] = {"Riple", "Drops", "Trickle", "Friends"};
-    int Numboftabs = 4;
+    int numOfTabs = 4;
 
     private String dropTitle;
     private String dropDescription;
@@ -46,24 +47,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // add button
-        FloatingActionButton fab = new FloatingActionButton(this);
-        fab.setText("FAB");
-        fab.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        fab.setId(R.id.fab_1);
-        fab.setOnClickListener(this);
-        fab.addView(fab);
+        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.myFAB);
+        myFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                showPopup(view);
+            }
+        });
 
-
-        /*FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
-                .withDrawable(ContextCompat.getDrawable(this, R.drawable.ic_user_default))
-                .withButtonColor(Color.WHITE)
-                .withGravity(Gravity.BOTTOM | Gravity.RIGHT)
-                .withMargins(0, 0, 16, 16)
-                .create();*/
-
-//        fabButton.setOnClickListener();
-
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) myFab.getLayoutParams();
+            p.setMargins(0, 0, 0, 0); // get rid of margins since shadow area is now the margin
+            myFab.setLayoutParams(p);
+        }
 
         // Store the current users facebookId
         storeFacebookId();
@@ -76,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // mViewPager.setCurrentItem(position);
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles, Numboftabs);
+        adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles, numOfTabs);
 
         // Assigning ViewPager View and setting the adapter
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -99,19 +94,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(mPager);
-
-        // Show create Drop Popup
-        Button button = (Button) findViewById(R.id.create_drop_popup_button);
-
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, CreateDrop.class);
-//                startActivity(intent);
-                showPopup(view);
-            }
-        });
     }
 
     // Create Drop Popup
