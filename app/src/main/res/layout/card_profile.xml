@@ -13,7 +13,6 @@
         card_view:cardElevation="8dp"
         card_view:cardUseCompatPadding="true">
 
-
         <RelativeLayout
             android:id="@+id/profileCard"
             android:layout_width="fill_parent"
@@ -22,24 +21,24 @@
 
             <!--<de.hdodenhof.circleimageview.CircleImageView-->
             <com.facebook.login.widget.ProfilePictureView
-                android:id="@+id/ripleProfilePic"
+                android:id="@+id/profile_pic"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:foregroundGravity="center_vertical"
-                android:layout_alignBottom="@+id/riplesProfile"
+                android:layout_alignBottom="@+id/profile_riple_count"
                 android:paddingLeft="8dp" />
 
             <TextView
-                android:id="@+id/ripleUserName"
+                android:id="@+id/profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/ripleProfilePic"
+                android:layout_toRightOf="@+id/profile_pic"
                 android:width="100dp"
                 android:paddingLeft="8dp"
                 android:paddingTop="8dp"
@@ -52,7 +51,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/riplesProfile"
+                android:id="@+id/profile_riple_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
@@ -61,15 +60,15 @@
                 android:textSize="24sp"
                 android:paddingLeft="16dp"
                 android:elegantTextHeight="false"
-                android:layout_below="@+id/ripleRank"
-                android:layout_toRightOf="@+id/ripleProfilePic"
+                android:layout_below="@+id/profile_rank"
+                android:layout_toRightOf="@+id/profile_pic"
                 android:paddingRight="16dp"
-                android:layout_alignRight="@+id/ripleUserName"
-                android:layout_alignEnd="@+id/ripleUserName"
+                android:layout_alignRight="@+id/profile_name"
+                android:layout_alignEnd="@+id/profile_name"
                 android:gravity="center_horizontal" />
 
             <TextView
-                android:id="@+id/ripleRank"
+                android:id="@+id/profile_rank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:width="100dp"
@@ -78,11 +77,11 @@
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="24sp"
-                android:layout_below="@+id/ripleUserName"
-                android:layout_toRightOf="@+id/ripleProfilePic"
+                android:layout_below="@+id/profile_name"
+                android:layout_toRightOf="@+id/profile_pic"
                 android:paddingRight="16dp"
-                android:layout_alignRight="@+id/riplesProfile"
-                android:layout_alignEnd="@+id/riplesProfile"
+                android:layout_alignRight="@+id/profile_riple_count"
+                android:layout_alignEnd="@+id/profile_riple_count"
                 android:gravity="center_horizontal"
                 android:textStyle="italic" />
 

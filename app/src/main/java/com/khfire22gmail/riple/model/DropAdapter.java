@@ -3,6 +3,7 @@ package com.khfire22gmail.riple.model;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,12 +113,18 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
     private void viewOtherUser(int position) {
         String mAuthorId = (data.get(position).getAuthorId());
+        String mAuthorName = (data.get(position).getAuthorName());
+        String mFacebookId = (data.get(position).getFacebookId());
                 /*DropItem thisItem = data.get(position);
                 String thisAuthorId = thisItem.getAuthorId();*/
-        //Log.d("Kevin", "thisItem's authorId = " + mAuthorId);
+        Log.d("Kevin", "Clicked User's authorId = " + mAuthorId);
+        Log.d("Kevin", "Clicked User's authorName = " + mAuthorName);
+        Log.d("Kevin", "Clicked User's facebookId = " + mFacebookId);
 
         Intent intent = new Intent(mContext, ViewOtherUser.class);
         intent.putExtra("authorId", mAuthorId);
+        intent.putExtra("authorName", mAuthorName);
+        intent.putExtra("facebookId", mFacebookId);
         mContext.startActivity(intent);
     }
 
@@ -149,7 +156,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
-
 //            commenter = (TextView) itemView.findViewById(R.id.commenter);
 //            comment = (TextView) itemView.findViewById(R.id.comment);
 

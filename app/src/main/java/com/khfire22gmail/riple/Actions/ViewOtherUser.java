@@ -25,41 +25,51 @@ import java.util.List;
 
 public class ViewOtherUser extends AppCompatActivity {
 
-    private ProfilePictureView otherProfilePictureView;
-    private TextView otherUserName;
+
     private Object animator;
     private RecyclerView mViewOtherUserRecyclerView;
     private DropAdapter mOtherUserAdapter;
     private List<DropItem> mOtherUserList;
-    private String mAuthorId;
+    public ProfilePictureView otherProfilePictureView;
+    public TextView otherNameView;
+    public String mAuthorId;
+    public String mAuthorName;
+    public String mFacebookId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_other_user);
+
         Intent intent = getIntent();
         mAuthorId = intent.getStringExtra("authorId");
-        Log.d("Kevin", "mAuthorId = " + mAuthorId);
-       /* otherProfilePictureView = (ProfilePictureView) findViewById(R.id.ripleProfilePic);
-        otherUserName = (TextView) findViewById(R.id.ripleUserName);*/
+        mAuthorName = intent.getStringExtra("authorName");
+        mFacebookId = intent.getStringExtra("facebookId");
 
-        mViewOtherUserRecyclerView = (RecyclerView) findViewById(R.id.view_riple_recycler_view);
+        Log.d("extra", "mAuthorId = " + mAuthorId);
+        Log.d("extra", "mAuthorName = " + mAuthorName);
+        Log.d("extra", "mFacebookId = " + mFacebookId);
+
+        otherProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_pic);
+        otherNameView = (TextView) findViewById(R.id.profile_name);
+
+
+        mViewOtherUserRecyclerView = (RecyclerView) findViewById(R.id.other_user_recycler_view);
         mViewOtherUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         loadRipleItemsFromParse();
 
         mViewOtherUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //        mRecyclerView.setItemAnimator(animator);
+
+
+//        Set Title of Collapsable Toolbar
+//        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+//        collapsingToolbar.setTitle("UserName");
     }
 
     public void loadRipleItemsFromParse() {
         final List<DropItem> otherUserList = new ArrayList<>();
-
-
-
-//        String currentUser = ParseUser.getCurrentUser().getObjectId();
-          //other user objectID passed from DropAdapter as mAuthorId from the Intent
-
         final ParseQuery<ParseObject> query1 = ParseQuery.getQuery("Drop");
         query1.whereEqualTo("author", mAuthorId);
 
@@ -71,6 +81,8 @@ public class ViewOtherUser extends AppCompatActivity {
         queries.add(query2);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+
+        mainQuery.orderByDescending("createdAt");
 
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -129,7 +141,6 @@ public class ViewOtherUser extends AppCompatActivity {
 
         mOtherUserAdapter = new DropAdapter(this, mOtherUserList, "other");
         mViewOtherUserRecyclerView.setAdapter(mOtherUserAdapter);
-
     }
 
     @Override

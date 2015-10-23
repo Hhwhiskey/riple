@@ -60,6 +60,8 @@ public class DropsTab extends Fragment {
 
         query.whereEqualTo("todo", currentUser);
 
+        query.orderByDescending("createdAt");
+
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {

@@ -176,9 +176,14 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
     public void loadTrickleItemsFromParse() {
         final List<DropItem> trickleList = new ArrayList<>();
 
+        String currentUser = ParseUser.getCurrentUser().getObjectId();
+
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
-//        query.orderByDescending(createdAt);
+        query.whereNotEqualTo("author", currentUser);
+        query.orderByDescending("createdAt");
 //        query.setLimit(25);
+
+
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override

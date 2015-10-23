@@ -1,29 +1,68 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context="com.khfire22gmail.riple.actions.ViewOtherUser">
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.khfire22gmail.riple.actions.ViewOtherUser">
 
-    <include
-        android:id="@+id/view_riple_card"
-        layout="@layout/card_profile"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
-
-    <!--<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
-        android:id="@+id/riple_swipe"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">-->
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/view_riple_recycler_view"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@+id/view_riple_card"/>
-    <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
 
-</RelativeLayout>
+            <!--<android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:fitsSystemWindows="true"
+                app:contentScrim="?attr/colorPrimary"
+                app:expandedTitleMarginEnd="64dp"
+                app:expandedTitleMarginStart="48dp"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">-->
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/view_other_user_tool_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:layout_scrollFlags="scroll|enterAlways"/>
+            <!--</android.support.design.widget.CollapsingToolbarLayout>-->
+
+        </android.support.design.widget.AppBarLayout>
+
+                <!--<com.facebook.login.widget.ProfilePictureView
+                    android:id="@+id/profile_pic"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:foregroundGravity="center_vertical"
+                    android:layout_alignBottom="@+id/profile_riple_count"
+                    android:paddingLeft="8dp"
+                    app:layout_collapseMode="parallax"/>
+-->
+        <!--<include
+            android:id="@+id/view_other_user_card"
+            layout="@layout/card_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>-->
+
+        <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+            android:id="@+id/riple_swipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/view_other_user_card">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/other_user_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/view_other_user_tool_bar"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
+
+</android.support.design.widget.CoordinatorLayout>

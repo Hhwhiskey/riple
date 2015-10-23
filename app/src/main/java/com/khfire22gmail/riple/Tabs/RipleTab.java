@@ -38,8 +38,8 @@ import java.util.List;
  */
 public class RipleTab extends Fragment {
 
-    private ProfilePictureView userProfilePictureView;
-    private TextView userNameView;
+    private ProfilePictureView profilePictureView;
+    private TextView nameView;
     private RecyclerView mRecyclerView;
     private List<DropItem> mRipleList;
     private DropAdapter mRipleAdapter;
@@ -49,9 +49,9 @@ public class RipleTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.tab_riple,container,false);
 
-//        Riple Card
-        userProfilePictureView = (ProfilePictureView) view.findViewById(R.id.ripleProfilePic);
-        userNameView = (TextView) view.findViewById(R.id.ripleUserName);
+//        Profile Card
+        profilePictureView = (ProfilePictureView) view.findViewById(R.id.profile_pic);
+        nameView = (TextView) view.findViewById(R.id.profile_name);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -74,10 +74,10 @@ public class RipleTab extends Fragment {
         final List<DropItem> ripleList = new ArrayList<>();
 
         String currentUser = ParseUser.getCurrentUser().getObjectId();
-//      String viewRiple = ParseUser.getViewRiple().getObjectId();
 
         final ParseQuery<ParseObject> query1 = ParseQuery.getQuery("Drop");
         query1.whereEqualTo("author", currentUser);
+
 
         final ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Drop");
         query2.whereEqualTo("done", currentUser);
@@ -87,6 +87,8 @@ public class RipleTab extends Fragment {
         queries.add(query2);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+
+        mainQuery.orderByDescending("createdAt");
 
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -206,17 +208,17 @@ public class RipleTab extends Fragment {
                 parametersPicture.putString("fields", "picture.width(150).height(150)");
 
                 if (userProfile.has("facebookId")) {
-                    userProfilePictureView.setProfileId(userProfile.getString("facebookId"));
+                    profilePictureView.setProfileId(userProfile.getString("facebookId"));
 
                 } else {
                     // Show the default, blank user profile picture
-                    userProfilePictureView.setProfileId(null);
+                    profilePictureView.setProfileId(null);
                 }
 
                 if (userProfile.has("name")) {
-                    userNameView.setText(userProfile.getString("name"));
+                    nameView.setText(userProfile.getString("name"));
                 } else {
-                    userNameView.setText("");
+                    nameView.setText("");
                 }
 
             } catch (JSONException e) {
