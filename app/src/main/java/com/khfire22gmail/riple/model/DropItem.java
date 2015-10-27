@@ -8,11 +8,11 @@ import java.util.Date;
 public class DropItem {
 
     public Date createdAt;
-    public String objectId;
+    public String dropId;
     public String authorId;
     public String authorName;
     public String facebookId;
-    public String title;
+//    public String title;
     public String description;
     public String commenter;
     public String comment;
@@ -35,12 +35,12 @@ public class DropItem {
         this.comment = comment;
     }
 
-    public String getObjectId() {
-        return objectId;
+    public String getDropId() {
+        return dropId;
     }
 
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
+    public void setDropId(String dropId) {
+        this.dropId = dropId;
     }
 
     public String getAuthorId() {
@@ -75,13 +75,13 @@ public class DropItem {
         this.createdAt = createdAt;
     }
 
-    public String getTitle() {
+   /* public String getTitle() {
         return title;
-    }
+    }*/
 
-    public void setTitle(String title) {
+    /*public void setTitle(String title) {
         this.title = title;
-    }
+    }*/
 
     public String getDescription() {
         return description;

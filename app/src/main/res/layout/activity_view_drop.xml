@@ -14,11 +14,9 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/view_drop_recycler_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_above="@+id/writeComment"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="false"
         android:layout_below="@+id/card_view_drop"
         />
 

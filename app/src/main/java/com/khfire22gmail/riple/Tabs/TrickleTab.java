@@ -211,7 +211,7 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
                         //Drop Title
-                        dropItem.setTitle(list.get(i).getString("title"));
+//                        dropItem.setTitle(list.get(i).getString("title"));
 
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));

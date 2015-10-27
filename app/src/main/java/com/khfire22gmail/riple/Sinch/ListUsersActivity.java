@@ -36,7 +36,7 @@ public class ListUsersActivity extends AppCompatActivity {
         names = new ArrayList<>();
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         //don't include yourself
-        query.whereNotEqualTo("objectId", currentUserId);
+        query.whereNotEqualTo("dropId", currentUserId);
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> userList, com.parse.ParseException e) {
                 if (e == null) {

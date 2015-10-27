@@ -42,7 +42,7 @@
                 android:width="100dp"
                 android:paddingLeft="8dp"
                 android:paddingTop="8dp"
-                android:text="Kevin Hodges"
+                android:text="Name"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="24sp"

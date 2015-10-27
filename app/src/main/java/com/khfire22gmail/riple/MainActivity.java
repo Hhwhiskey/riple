@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     CharSequence Titles[] = {"Riple", "Drops", "Trickle", "Friends"};
     int numOfTabs = 4;
 
-    private String dropTitle;
+//    private String dropTitle;
     private String dropDescription;
-    private AutoCompleteTextView dropTitleView;
+//    private AutoCompleteTextView dropTitleView;
     private AutoCompleteTextView dropDescriptionView;
 
     @Override
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.myFAB);
+        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 showPopup(view);
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button postDropButton = (Button) popupView.findViewById(R.id.button_post_drop);
         dropDescriptionView = (AutoCompleteTextView) popupView.findViewById(R.id.drop_description);
-        dropTitleView = (AutoCompleteTextView) popupView.findViewById(R.id.drop_title);
+//        dropTitleView = (AutoCompleteTextView) popupView.findViewById(R.id.drop_title);
 
         popupWindow.showAtLocation(findViewById(R.id.root_layout), 30, 30, 30);
 
@@ -128,21 +128,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
 
-                dropTitle = dropTitleView.getEditableText().toString();
+//                dropTitle = dropTitleView.getEditableText().toString();
                 dropDescription = dropDescriptionView.getEditableText().toString();
-                createDrop(dropTitle, dropDescription);
+                createDrop(dropDescription);
                 popupWindow.dismiss();
 
-                Log.d("Kevin", "Title = " + dropTitle);
+//                Log.d("Kevin", "Title = " + dropTitle);
             }
         });
     }
 
     // Take user input and post the Drop
-    public void createDrop(String dropTitle, String dropDescription) {
-
-        Log.d("Kevin", "Title = " + dropTitle);
-        Log.d("Kevin", "Description = " + dropDescription);
+    public void createDrop(String dropDescription) {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseObject drop = new ParseObject("Drop");
@@ -150,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drop.put("author", currentUser.getObjectId());
         drop.put("facebookId", currentUser.get("facebookId"));
         drop.put("name", currentUser.get("name"));
-        drop.put("title", dropTitle);
         drop.put("description", dropDescription);
 
 

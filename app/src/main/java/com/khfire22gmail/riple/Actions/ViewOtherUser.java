@@ -2,6 +2,10 @@ package com.khfire22gmail.riple.actions;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
@@ -25,30 +30,53 @@ import java.util.List;
 
 public class ViewOtherUser extends AppCompatActivity {
 
-
     private Object animator;
     private RecyclerView mViewOtherUserRecyclerView;
     private DropAdapter mOtherUserAdapter;
     private List<DropItem> mOtherUserList;
-    public ProfilePictureView otherProfilePictureView;
-    public TextView otherNameView;
+    String EXTRA_IMAGE;
+
     public String mAuthorId;
     public String mAuthorName;
     public String mFacebookId;
+    private ProfilePictureView otherProfilePictureView;
+    private TextView otherNameView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_other_user);
 
+        ViewCompat.setTransitionName(findViewById(R.id.appbar), EXTRA_IMAGE);
+
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.other_user_collapsing_tool_bar);
+            collapsingToolbar.setTitle(mAuthorName);
+
+
+        collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
+//        collapsingToolbar.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
+
+        FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
+        messageFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Log.d("Message", "You are trying to send a new message");
+            }
+        });
+            /*messageFab.setRippleColor(lightVibrantColor);
+            messageFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));*/
+
         Intent intent = getIntent();
-        mAuthorId = intent.getStringExtra("authorId");
-        mAuthorName = intent.getStringExtra("authorName");
+        mAuthorId = intent.getStringExtra("author");
+        mAuthorName = intent.getStringExtra("name");
         mFacebookId = intent.getStringExtra("facebookId");
 
-        Log.d("extra", "mAuthorId = " + mAuthorId);
-        Log.d("extra", "mAuthorName = " + mAuthorName);
-        Log.d("extra", "mFacebookId = " + mFacebookId);
+        Log.d("extraUser", "mAuthorId = " + mAuthorId);
+        Log.d("extraUser", "mAuthorName = " + mAuthorName);
+        Log.d("extraUser", "mFacebookId = " + mFacebookId);
+
+//        Using the "Extra Intent" I want to pass the clicked User info to the ViewOtherUser activity.
+//        It should show that users facebook picture and name in place of the "Title"
 
         otherProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_pic);
         otherNameView = (TextView) findViewById(R.id.profile_name);
@@ -64,8 +92,7 @@ public class ViewOtherUser extends AppCompatActivity {
 
 
 //        Set Title of Collapsable Toolbar
-//        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-//        collapsingToolbar.setTitle("UserName");
+
     }
 
     public void loadRipleItemsFromParse() {
@@ -110,7 +137,7 @@ public class ViewOtherUser extends AppCompatActivity {
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
                         //Drop Title
-                        dropItem.setTitle(list.get(i).getString("title"));
+//                        dropItem.setTitle(list.get(i).getString("title"));
 
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));

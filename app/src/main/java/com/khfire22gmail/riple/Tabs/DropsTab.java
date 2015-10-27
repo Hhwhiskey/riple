@@ -76,6 +76,7 @@ public class DropsTab extends Fragment {
 
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
+
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
 
@@ -88,7 +89,7 @@ public class DropsTab extends Fragment {
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
                         //Drop Title
-                        dropItem.setTitle(list.get(i).getString("title"));
+//                        dropItem.setTitle(list.get(i).getString("title"));
 
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
