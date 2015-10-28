@@ -8,7 +8,7 @@ import java.util.Date;
 public class DropItem {
 
     public Date createdAt;
-    public String dropId;
+    public String objectId;
     public String authorId;
     public String authorName;
     public String facebookId;
@@ -35,12 +35,12 @@ public class DropItem {
         this.comment = comment;
     }
 
-    public String getDropId() {
-        return dropId;
+    public String getObjectId() {
+        return objectId;
     }
 
-    public void setDropId(String dropId) {
-        this.dropId = dropId;
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 
     public String getAuthorId() {

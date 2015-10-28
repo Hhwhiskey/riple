@@ -21,15 +21,15 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewDrop extends AppCompatActivity {
+public class ViewDropActivity extends AppCompatActivity {
 
     private String mAuthorId;
     private String mAuthorName;
     private String mFacebookId;
-    private String mDropId;
+    private String mObjectId;
     private Object animator;
     private RecyclerView mRecyclerView;
-    private List<CommentItem> mViewDropList;
+    private List<CommentItem> mCommentList;
     private CommentAdapter mCommenterAdapter;
     private RecyclerView.Adapter mCommentAdapter;
     private String mDescription;
@@ -41,19 +41,19 @@ public class ViewDrop extends AppCompatActivity {
         setContentView(R.layout.activity_view_drop);
 
         Intent intent = getIntent();
-        mDropId = intent.getStringExtra("DropId");
+        mObjectId = intent.getStringExtra("objectId");
         mAuthorId = intent.getStringExtra("authorId");
         mAuthorName = intent.getStringExtra("authorName");
         mFacebookId = intent.getStringExtra("facebookId");
         mDescription = intent.getStringExtra("description");
 
-        currentDrop = mDropId;
+        currentDrop = mObjectId;
 
-        Log.d("dropExtra", "mDropId = " + mDropId);
-        Log.d("dropExtra", "mAuthorId = " + mAuthorId);
-        Log.d("dropExtra", "mAuthorName = " + mAuthorName);
-        Log.d("dropExtra", "mFacebookId = " + mFacebookId);
-        Log.d("dropExtra", "mDescription = " + mDescription);
+        Log.d("viewDropExtra", "mObjectId = " + mObjectId);
+        Log.d("viewDropExtra", "mAuthorId = " + mAuthorId);
+        Log.d("viewDropExtra", "mAuthorName = " + mAuthorName);
+        Log.d("viewDropExtra", "mFacebookId = " + mFacebookId);
+        Log.d("viewDropExtra", "mDescription = " + mDescription);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.view_drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -62,18 +62,15 @@ public class ViewDrop extends AppCompatActivity {
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setItemAnimator((RecyclerView.ItemAnimator) animator);
-
-
     }
 
     public void loadCommentsFromParse() {
-        final List<CommentItem> viewDropList = new ArrayList<>();
+        final List<CommentItem> commentList = new ArrayList<>();
 
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Comment");
-        query.whereEqualTo("DropId", "currentDrop");
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Comments");
+        query.whereEqualTo("dropId", currentDrop);
         query.orderByDescending("createdAt");
 //        query.setLimit(25);
-
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -88,7 +85,7 @@ public class ViewDrop extends AppCompatActivity {
                         CommentItem commentItem = new CommentItem();
 
                         // DropId
-//                        commentItem.setDropId(list.get(i).getString("objectId"));
+//                        commentItem.setObjectId(list.get(i).getString("objectId"));
                         //Picture
                         commentItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name
@@ -101,7 +98,7 @@ public class ViewDrop extends AppCompatActivity {
                         commentItem.setCreatedAt(list.get(i).getCreatedAt());
 
                         //Comment
-                        commentItem.setComment(list.get(i).getString("comment"));
+                        commentItem.setComment(list.get(i).getString("commentText"));
 
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
@@ -120,11 +117,11 @@ public class ViewDrop extends AppCompatActivity {
                         //Id that connects commenter to drop
 //                              dropItem.setCommenter(list.get(i).getString("commenter"));
 
-                        viewDropList.add(commentItem);
+                       commentList.add(commentItem);
                     }
 
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + viewDropList.size());
-                    updateRecyclerView(viewDropList);
+                    Log.i("KEVIN", "PARSE LIST SIZE: " + commentList.size());
+                    updateRecyclerView(commentList);
                 }
             }
         });
@@ -133,9 +130,9 @@ public class ViewDrop extends AppCompatActivity {
     private void updateRecyclerView(List<CommentItem> items) {
         Log.d("KEVIN", "VIEWDROP LIST SIZE: " + items.size());
 
-        mViewDropList = items;
+        mCommentList = items;
 
-        mCommenterAdapter = new CommentAdapter(this, mViewDropList);
+        mCommentAdapter = new CommentAdapter(this, mCommentList);
         mRecyclerView.setAdapter(mCommentAdapter);
     }
 

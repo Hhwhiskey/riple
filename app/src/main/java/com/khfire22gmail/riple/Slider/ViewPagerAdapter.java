@@ -4,10 +4,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.khfire22gmail.riple.tabs.FriendsTab;
-import com.khfire22gmail.riple.tabs.DropsTab;
-import com.khfire22gmail.riple.tabs.RipleTab;
-import com.khfire22gmail.riple.tabs.TrickleTab;
+import com.khfire22gmail.riple.tabs.FriendsTabFragment;
+import com.khfire22gmail.riple.tabs.DropsTabFragment;
+import com.khfire22gmail.riple.tabs.RipleTabFragment;
+import com.khfire22gmail.riple.tabs.TrickleTabFragment;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -36,21 +36,21 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter{
         // if the position is 0 we are returning the First tab
 
         if (position == 0) {
-            RipleTab ripleTab = new RipleTab();
+            RipleTabFragment ripleTab = new RipleTabFragment();
             return ripleTab;
         }
 
         if (position == 1) {
-            DropsTab dropsTab = new DropsTab();
+            DropsTabFragment dropsTab = new DropsTabFragment();
             return dropsTab;
         }
 
         if (position == 2) {
-            TrickleTab trickleTab = new TrickleTab();
+            TrickleTabFragment trickleTab = new TrickleTabFragment();
             return trickleTab;
         }
         if (position == 3) {
-            FriendsTab friendsTab = new FriendsTab();
+            FriendsTabFragment friendsTab = new FriendsTabFragment();
             return friendsTab;
         }
         return null;

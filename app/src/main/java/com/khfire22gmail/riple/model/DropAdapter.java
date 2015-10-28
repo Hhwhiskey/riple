@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.actions.ViewDrop;
-import com.khfire22gmail.riple.actions.ViewOtherUser;
+import com.khfire22gmail.riple.actions.ViewDropActivity;
+import com.khfire22gmail.riple.actions.ViewOtherUserActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -132,14 +132,20 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     private void viewDrop(int position) {
-        String mDropId = (data.get(position).getDropId());
+        String mObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
         String mDescription = (data.get(position).getDescription());
 
-        Intent intent = new Intent(mContext, ViewDrop.class);
-            intent.putExtra("dropId", mDropId);
+        Log.d("CLICKEDDROPEXTRA", "Clicked drop's objectId = " + mObjectId);
+        Log.d("CLICKEDDROPEXTRA", "Clicked drop's authorId = " + mAuthorId);
+        Log.d("CLICKEDDROPEXTRA", "Clicked drop's authorName = " + mAuthorName);
+        Log.d("CLICKEDDROPEXTRA", "Clicked drop's facebookId = " + mFacebookId);
+        Log.d("CLICKEDDROPEXTRA", "Clicked drop's description = " + mDescription);
+
+        Intent intent = new Intent(mContext, ViewDropActivity.class);
+            intent.putExtra("objectId", mObjectId);
             intent.putExtra("authorId", mAuthorId);
             intent.putExtra("authorName", mAuthorName);
             intent.putExtra("facebookId", mFacebookId);
@@ -149,24 +155,27 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     /*private void shareDrop(int position) {
-        String mDropId = (data.get(position).getDropId());
+        String mDropId = (data.get(position).getObjectId());
 
         Intent intent = new Intent(mContext, ShareDrop.class);
-        intent.putExtra("dropId", mDropId);
+        intent.putExtra("objectId", mDropId);
         mContext.startActivity(intent);
     }*/
 
     // onClick action for viewing other user
     private void viewOtherUser(int position) {
+//        String mObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
 
-        Log.d("Kevin", "Clicked User's authorId = " + mAuthorId);
-        Log.d("Kevin", "Clicked User's authorName = " + mAuthorName);
-        Log.d("Kevin", "Clicked User's facebookId = " + mFacebookId);
+//        Log.d("OTHERUSEREXTRA", "Clicked User's objectId = " + mObjectId);
+        Log.d("OTHERUSEREXTRA", "Clicked User's authorId = " + mAuthorId);
+        Log.d("OTHERUSEREXTRA", "Clicked User's authorName = " + mAuthorName);
+        Log.d("OTHERUSEREXTRA", "Clicked User's facebookId = " + mFacebookId);
 
-        Intent intent = new Intent(mContext, ViewOtherUser.class);
+        Intent intent = new Intent(mContext, ViewOtherUserActivity.class);
+//            intent.putExtra("objectId", mObjectId);
             intent.putExtra("author", mAuthorId);
             intent.putExtra("name", mAuthorName);
             intent.putExtra("facebookId", mFacebookId);
@@ -174,7 +183,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     /*public String passClickExtraData(int position) {
-        String mObjectId = (data.get(position).getDropId());
+        String mObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
@@ -227,7 +236,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));
             commentCount.setText(String.valueOf(current.commentCount));
-//            share.setT(current.dropId();
+//            share.setT(current.objectId();
 //            commenter.setText(current.commenter);
 //            comment.setText(current.comment);
         }
@@ -247,7 +256,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         public void onClick(View v) {
 //            Toast.makeText(this, "The Item Clicked is: " + adapterPos, Toast.LENGTH_SHORT).show();
             getDelegate().itemSelected(data.get(getAdapterPosition()));
-           /* Intent intent = new Intent(this, ViewDrop.class);
+           /* Intent intent = new Intent(this, ViewDropActivity.class);
             startActivity(intent);*/
 
 

@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.actions.ViewDrop;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -23,10 +22,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 //    private final String mTabName;
     private LayoutInflater inflater;
     List<CommentItem> data = Collections.emptyList();
-
-    public CommentAdapter(ViewDrop viewDrop, List<CommentItem> mViewDropList) {
-
-    }
 
     public static interface TrickleAdapterDelegate {
         public void itemSelected(Object item);
@@ -48,6 +43,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
     public Object getItem(int position){
         return data.get(position);
+    }
+
+    public CommentAdapter(Context context, List<CommentItem> data){
+
+        this.inflater = LayoutInflater.from(context);
+        this.data = data;
+
     }
 
 
@@ -114,15 +116,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
     }
 
     /*private void viewDrop(int position) {
-        String mDropId = (data.get(position).getDropId());
+        String mDropId = (data.get(position).getObjectId());
 
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
         String mCommenter = (data.get(position).getCommenter());
 
-        Intent intent = new Intent(mContext, ViewDrop.class);
-        intent.putExtra("dropId", mDropId);
+        Intent intent = new Intent(mContext, ViewDropActivity.class);
+        intent.putExtra("objectId", mDropId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("authorName", mAuthorName);
         intent.putExtra("facebookId", mFacebookId);
@@ -131,10 +133,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
     }
 */
     /*private void shareDrop(int position) {
-        String mDropId = (data.get(position).getDropId());
+        String mDropId = (data.get(position).getObjectId());
 
         Intent intent = new Intent(mContext, ShareDrop.class);
-        intent.putExtra("dropId", mDropId);
+        intent.putExtra("objectId", mDropId);
         mContext.startActivity(intent);
     }*/
 
@@ -148,7 +150,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         Log.d("Kevin", "Clicked User's authorName = " + mAuthorName);
         Log.d("Kevin", "Clicked User's facebookId = " + mFacebookId);
 
-        Intent intent = new Intent(mContext, ViewOtherUser.class);
+        Intent intent = new Intent(mContext, ViewOtherUserActivity.class);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("authorName", mAuthorName);
         intent.putExtra("facebookId", mFacebookId);
@@ -156,7 +158,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
     }*/
 
     /*public String passClickExtraData(int position) {
-        String mObjectId = (data.get(position).getDropId());
+        String mObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
@@ -199,7 +201,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
             createdAt.setText(String.valueOf(current.createdAt));
             commenter.setText(current.commenter);
             comment.setText(current.comment);
-//            share.setT(current.dropId();
+//            share.setT(current.objectId();
         }
 
         /*@Override
@@ -217,7 +219,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         public void onClick(View v) {
 //            Toast.makeText(this, "The Item Clicked is: " + adapterPos, Toast.LENGTH_SHORT).show();
             getDelegate().itemSelected(data.get(getAdapterPosition()));
-           /* Intent intent = new Intent(this, ViewDrop.class);
+           /* Intent intent = new Intent(this, ViewDropActivity.class);
             startActivity(intent);*/
 
 

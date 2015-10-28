@@ -52,8 +52,4 @@ public class CommentItem {
     public void setComment(String comment) {
         this.comment = comment;
     }
-
-
-
-
 }

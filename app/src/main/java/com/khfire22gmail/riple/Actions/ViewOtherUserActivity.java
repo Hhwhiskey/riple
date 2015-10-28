@@ -28,7 +28,7 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewOtherUser extends AppCompatActivity {
+public class ViewOtherUserActivity extends AppCompatActivity {
 
     private Object animator;
     private RecyclerView mViewOtherUserRecyclerView;
@@ -41,6 +41,10 @@ public class ViewOtherUser extends AppCompatActivity {
     public String mFacebookId;
     private ProfilePictureView otherProfilePictureView;
     private TextView otherNameView;
+    private ProfilePictureView profilePictureView;
+    private TextView nameView;
+    private String clickedUser;
+    private Object currentUser;
 
 
     @Override
@@ -52,7 +56,6 @@ public class ViewOtherUser extends AppCompatActivity {
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.other_user_collapsing_tool_bar);
             collapsingToolbar.setTitle(mAuthorName);
-
 
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 //        collapsingToolbar.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
@@ -75,12 +78,26 @@ public class ViewOtherUser extends AppCompatActivity {
         Log.d("extraUser", "mAuthorName = " + mAuthorName);
         Log.d("extraUser", "mFacebookId = " + mFacebookId);
 
-//        Using the "Extra Intent" I want to pass the clicked User info to the ViewOtherUser activity.
+
+        profilePictureView = (ProfilePictureView)findViewById(R.id.other_profile_picture);
+        profilePictureView.setProfileId(mFacebookId);
+
+//        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
+        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
+
+
+        /*currentUser = mAuthorId;
+        
+        JSONObject userProfile = currentUser.getJSONObject("profile");
+
+        profilePictureView.setProfileId(userProfile.getString("facebookId"));*/
+
+
+
+//        Using the "Extra Intent" I want to pass the clicked User info to the ViewOtherUserActivity activity.
 //        It should show that users facebook picture and name in place of the "Title"
 
-        otherProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_pic);
-        otherNameView = (TextView) findViewById(R.id.profile_name);
-
+//        updateViewsWithProfileInfo();
 
         mViewOtherUserRecyclerView = (RecyclerView) findViewById(R.id.other_user_recycler_view);
         mViewOtherUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -94,6 +111,37 @@ public class ViewOtherUser extends AppCompatActivity {
 //        Set Title of Collapsable Toolbar
 
     }
+
+
+
+    /*private void updateViewsWithProfileInfo() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser.has("profile")) {
+            JSONObject userProfile = currentUser.getJSONObject("profile");
+            try {
+                String url;
+                Bundle parametersPicture = new Bundle();
+                parametersPicture.putString("fields", "picture.width(150).height(150)");
+
+                if (userProfile.has("facebookId")) {
+                    profilePictureView.setProfileId(userProfile.getString("facebookId"));
+
+                } else {
+                    // Show the default, blank user profile picture
+                    profilePictureView.setProfileId(null);
+                }
+
+                if (userProfile.has("name")) {
+                    nameView.setText(userProfile.getString("name"));
+                } else {
+                    nameView.setText("");
+                }
+
+            } catch (JSONException e) {
+                Log.d(RipleApplication.TAG, "Error parsing saved user data.");
+            }
+        }
+    }*/
 
     public void loadRipleItemsFromParse() {
         final List<DropItem> otherUserList = new ArrayList<>();

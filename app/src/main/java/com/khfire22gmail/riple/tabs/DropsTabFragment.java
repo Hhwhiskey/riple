@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by Kevin on 9/8/2015.
  */
-public class DropsTab extends Fragment {
+public class DropsTabFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private Button button;

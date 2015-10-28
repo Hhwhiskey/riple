@@ -35,9 +35,9 @@ import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
  * Created by Kevin on 9/8/2015.
  */
 // TODO WaveSwipeRefreshLayout
-public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnRefreshListener*/ {
+public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLayout.OnRefreshListener*/ {
 
-    public static final String TAG = TrickleTab.class.getSimpleName();
+    public static final String TAG = TrickleTabFragment.class.getSimpleName();
 
     private ListView mListview;
     private PopupWindow popupWindow;
@@ -197,21 +197,18 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
 
                         DropItem dropItem = new DropItem();
 
-                        //Picture
-                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("name"));
-
+                        //ObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
                         //Author id
                         dropItem.setAuthorId(list.get(i).getString("author"));
-
+                        //Author name
+                        dropItem.setAuthorName(list.get(i).getString("name"));
+                        //Picture
+                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
 
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
-                        //Drop Title
-//                        dropItem.setTitle(list.get(i).getString("title"));
 
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
@@ -228,7 +225,6 @@ public class TrickleTab extends Fragment /*implements WaveSwipeRefreshLayout.OnR
                         trickleList.add(dropItem);
                     }
 
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + trickleList.size());
                     updateRecyclerView(trickleList);
                 }
             }

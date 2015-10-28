@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Created by Kevin on 9/8/2015.
  */
-public class RipleTab extends Fragment {
+public class RipleTabFragment extends Fragment {
 
     private ProfilePictureView profilePictureView;
     private TextView nameView;
@@ -103,7 +103,7 @@ public class RipleTab extends Fragment {
                         DropItem dropItem = new DropItem();
 
                         //DropId
-                        dropItem.setDropId(list.get(i).getString("objectId"));
+                        dropItem.setObjectId(list.get(i).getString("objectId"));
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name

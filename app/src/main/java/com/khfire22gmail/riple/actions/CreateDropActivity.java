@@ -10,7 +10,7 @@ import android.widget.AutoCompleteTextView;
 import com.khfire22gmail.riple.R;
 
 
-public class CreateDrop extends AppCompatActivity {
+public class CreateDropActivity extends AppCompatActivity {
 
     private String dropTitle;
     private String dropDescription;
@@ -40,7 +40,7 @@ public class CreateDrop extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                *//*Intent intent = new Intent(CreateDrop.this, MainActivity.class);
+                *//*Intent intent = new Intent(CreateDropActivity.this, MainActivity.class);
                 startActivity(intent);*//*
                 createDrop();
 
