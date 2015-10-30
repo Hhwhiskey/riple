@@ -3,7 +3,6 @@ package com.khfire22gmail.riple.tabs;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,9 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.LoginActivity;
 import com.khfire22gmail.riple.R;
@@ -32,6 +28,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -55,17 +53,21 @@ public class RipleTabFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
+        //Update Profile Card
+        updateViewsWithProfileInfo();
+        //Query the users created and completed drops
         loadRipleItemsFromParse();
 
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setItemAnimator(animator);
+//        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
+//        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
 
 //        Fetch Facebook user info if it is logged
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        /*ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
             makeMeRequest();
-        }
+        }*/
 
         return view;
     }
@@ -73,14 +75,15 @@ public class RipleTabFragment extends Fragment {
     public void loadRipleItemsFromParse() {
         final List<DropItem> ripleList = new ArrayList<>();
 
-        String currentUser = ParseUser.getCurrentUser().getObjectId();
+        //String currentUser = ParseUser.getCurrentUser().getObjectId();
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
 
         final ParseQuery<ParseObject> query1 = ParseQuery.getQuery("Drop");
         query1.whereEqualTo("author", currentUser);
 
-
         final ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Drop");
-        query2.whereEqualTo("done", currentUser);
+        query2.whereEqualTo("completedBy", currentUser);
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(query1);
@@ -102,19 +105,16 @@ public class RipleTabFragment extends Fragment {
 
                         DropItem dropItem = new DropItem();
 
-                        //DropId
-                        dropItem.setObjectId(list.get(i).getString("objectId"));
+                        //ObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
-
                         //Author id
                         dropItem.setAuthorId(list.get(i).getString("author"));
-
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
-
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
                         //Drop Title
@@ -152,7 +152,7 @@ public class RipleTabFragment extends Fragment {
 
     }
 
-    private void makeMeRequest() {
+    /*private void makeMeRequest() {
 
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONObjectCallback() {
@@ -198,7 +198,7 @@ public class RipleTabFragment extends Fragment {
                 });
 
         request.executeAsync();
-    }
+    }*/
 
     private void updateViewsWithProfileInfo() {
         ParseUser currentUser = ParseUser.getCurrentUser();

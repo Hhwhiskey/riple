@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 
 /**
@@ -77,7 +78,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         loadTrickleItemsFromParse();
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setItemAnimator(animator);
+//        mRecyclerView.setItemAnimator(animator);
+        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
 /*//        This will show a popup window which will contain the activity_clicked_drop
         button.setOnClickListener(new View.OnClickListener() {
@@ -182,8 +184,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         query.whereNotEqualTo("author", currentUser);
         query.orderByDescending("createdAt");
 //        query.setLimit(25);
-
-
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override

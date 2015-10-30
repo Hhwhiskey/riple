@@ -18,8 +18,10 @@ android {
     }
 
     repositories {
+        jcenter()
         maven {
             url "https://jitpack.io"
+
         }
     }
 
@@ -41,6 +43,7 @@ android {
         compile 'com.facebook.android:facebook-android-sdk:4.x.x'
         compile 'de.hdodenhof:circleimageview:2.0.0'
         compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.2'
+        compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
     }
 }
 

@@ -7,12 +7,13 @@ import java.util.Date;
  */
 public class DropItem {
 
+    public static final String DROP_KEY = "Drop";
+
     public Date createdAt;
     public String objectId;
     public String authorId;
     public String authorName;
     public String facebookId;
-//    public String title;
     public String description;
     public String commenter;
     public String comment;

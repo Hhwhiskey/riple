@@ -9,7 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
@@ -19,14 +21,12 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ViewDropActivity extends AppCompatActivity {
 
-    private String mAuthorId;
-    private String mAuthorName;
-    private String mFacebookId;
-    private String mObjectId;
+
     private Object animator;
     private RecyclerView mRecyclerView;
     private List<CommentItem> mCommentList;
@@ -34,29 +34,71 @@ public class ViewDropActivity extends AppCompatActivity {
     private RecyclerView.Adapter mCommentAdapter;
     private String mDescription;
     private String currentDrop;
+    private String mAuthorId;
+    private String mAuthorName;
+    private String mFacebookId;
+    private String mObjectId;
+    private String mRipleCount;
+    private String mCommentCount;
+    private Date mCreatedAt;
+    private ProfilePictureView profilePictureView;
+    private TextView nameView;
+    private TextView descriptionView;
+    private TextView ripleCountView;
+    private TextView commentCountView;
+    private TextView createdAtView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_drop);
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.view_drop_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Author and Drop Information
         Intent intent = getIntent();
         mObjectId = intent.getStringExtra("objectId");
         mAuthorId = intent.getStringExtra("authorId");
         mAuthorName = intent.getStringExtra("authorName");
         mFacebookId = intent.getStringExtra("facebookId");
         mDescription = intent.getStringExtra("description");
+        mRipleCount = intent.getStringExtra("ripleCount");
+        mCommentCount = intent.getStringExtra("commentCount");
+        mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
 
+        Log.d("rDropExtra", "mObjectId = " + mObjectId);
+        Log.d("rDropExtra", "mAuthorId = " + mAuthorId);
+        Log.d("rDropExtra", "mAuthorName = " + mAuthorName);
+        Log.d("rDropExtra", "mFacebookId = " + mFacebookId);
+        Log.d("rDropExtra", "mDescription = " + mDescription);
+        Log.d("rDropExtra", "mDescription = " + mRipleCount);
+        Log.d("rDropExtra", "mDescription = " + mCommentCount);
+        Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
+
+        profilePictureView = (ProfilePictureView)findViewById(R.id.profile_picture);
+        profilePictureView.setProfileId(mFacebookId);
+
+        nameView = (TextView) findViewById(R.id.name);
+        nameView.setText(mAuthorName);
+
+        descriptionView = (TextView) findViewById(R.id.description);
+        descriptionView.setText(mDescription);
+
+        ripleCountView = (TextView) findViewById(R.id.riple_count);
+        ripleCountView.setText(mRipleCount);
+
+        commentCountView = (TextView) findViewById(R.id.comment_count);
+        commentCountView.setText(mCommentCount);
+
+        createdAtView = (TextView) findViewById(R.id.created_at);
+        createdAtView.setText(String.valueOf(mCreatedAt));
+
+        //Allows the query of the viewed drop
         currentDrop = mObjectId;
 
-        Log.d("viewDropExtra", "mObjectId = " + mObjectId);
-        Log.d("viewDropExtra", "mAuthorId = " + mAuthorId);
-        Log.d("viewDropExtra", "mAuthorName = " + mAuthorName);
-        Log.d("viewDropExtra", "mFacebookId = " + mFacebookId);
-        Log.d("viewDropExtra", "mDescription = " + mDescription);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.view_drop_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
+//        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
 
         loadCommentsFromParse();
 

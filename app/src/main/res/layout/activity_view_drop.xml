@@ -5,11 +5,17 @@
                 android:orientation="vertical"
                 android:weightSum="1">
 
+
+    <!--TODO Have the use of card_trickle display without the ellipsize in this Activity -->
     <include
         android:id="@+id/card_view_drop"
-        layout="@layout/card_trickle"
         android:layout_width="fill_parent"
-        android:layout_height="180dp"/>
+        android:layout_height="wrap_content"
+        android:maxLines="20"
+        android:ellipsize="none"
+        android:enabled="false"
+        android:checked="true"
+        layout="@layout/card_trickle"/>
 
 
     <android.support.v7.widget.RecyclerView

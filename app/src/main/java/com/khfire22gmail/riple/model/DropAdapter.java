@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,9 +16,12 @@ import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.actions.ViewDropActivity;
 import com.khfire22gmail.riple.actions.ViewOtherUserActivity;
+import com.parse.ParseUser;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> {
@@ -26,8 +31,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     private final String mTabName;
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
-
-
 
     public static interface TrickleAdapterDelegate {
         public void itemSelected(Object item);
@@ -51,16 +54,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         return data.get(position);
     }
 
-
-    public static final String RIPLE = "riple";
-    public static final String DROP = "drop";
-    public static final String TRICKLE = "trickle";
-    public static final String OTHER = "other";
-
-
-
-    /*  One idea is to pass a param where you can choose which
-     xml layout you want inflated by the adapter*/
+    public static final String riple = "riple";
+    public static final String drop = "drop";
+    public static final String trickle = "trickle";
+    public static final String otherUser = "other";
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
         mContext = context;
@@ -74,16 +71,16 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
         int xmlLayoutId = -1;
 
-        if (mTabName.equals(RIPLE)) {
+        if (mTabName.equals(riple)) {
             xmlLayoutId = R.layout.card_riple;
 
-        } else if (mTabName.equals(DROP)) {
+        } else if (mTabName.equals(drop)) {
             xmlLayoutId = R.layout.card_drop;
 
-        } else if (mTabName.equals(TRICKLE)) {
+        } else if (mTabName.equals(trickle)) {
             xmlLayoutId = R.layout.card_trickle;
 
-        } else if (mTabName.equals(OTHER)) {
+        } else if (mTabName.equals(otherUser)) {
             xmlLayoutId = R.layout.card_riple;
         }
 
@@ -93,11 +90,72 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         return viewHolder;
     }
 
+      /*// THIS IS GONNA BE THE CODE
+        ParseUser userCompletedDrop1 = //the user who completed the drop?
+
+
+        // ToDo: Use public static final fields of some class to represent these Strings (THIS IS TO PREVENT ERRORS)
+        ParseObject dropInQuestion = new ParseObject("Drop");
+
+        // The "tricky" part
+        ParseRelation<ParseUser> completedBy = dropInQuestion.getRelation("completedBy");
+
+        completedBy.add(userCompletedDrop1);
+        completedBy.add(userCompletedDrop2);
+
+        completedBy.saveInBackground();*/
+
+    public void completeDrop(String dropId){
+
+       /* ParseObject drop = ...;
+
+        ParseObject drop = new ParseObject("Drop");
+
+        ParseRelation<ParseUser> completed = currentDrop.getRelation("completed");
+        completed.add(drop);
+        completed.saveInBackground();*/
+
+        ArrayList<String> users = new ArrayList<>();
+        users.add(dropId);
+        // Create a pointer to an object of class Drop with id dropId
+        //ParseObject drop = ParseObject.createWithoutData("Drop", dropId);
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser.put("completedDrops", dropId);
+        currentUser.saveInBackground();
+        // Set a new value on quantity
+        //drop.add("completedBy", currentUser);
+
+        //ParseObject drop = new ParseObject("Drop");
+
+        //drop.addUnique("completedBy", "eB1IvPyGkX");*/
+        //drop.saveInBackground();
+//        drop.removeAll("todo", Arrays.asList(currentUser));
+    }
 
     @Override
-    public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
+        if (viewHolder.completeCheckBox != null) {
+            viewHolder.completeCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                        completeDrop(getDropIdFromRow(position));
+                        Log.d("checkbox", "Checked");
+                    } else {
+                        Log.d("checkbox", "UnChecked");
+                    }
+
+
+                }
+            });
+
+        }
+
+        // View Drop Clicks
         viewHolder.description.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,17 +163,28 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             }
         });
 
-
-
-        /*Button button = (Button) findViewById(R.id.share_button);
-
-        viewHolder.shareButton.setOnClickListener(new View.OnClickListener() {
+        viewHolder.ripleCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareDrop(position);
+                viewDrop(position);
             }
-        });*/
+        });
 
+        viewHolder.commentCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewDrop(position);
+            }
+        });
+
+        viewHolder.createdAt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewDrop(position);
+            }
+        });
+
+        // View otherUser Clicks
         viewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,18 +200,31 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         });
     }
 
+    private String getDropIdFromRow(int position) {
+        String dropObjectId = (data.get(position).getObjectId());
+        //Log.d("Kevin", "this drop's objectId = " + dropObjectId);
+        return dropObjectId;
+    }
+
+
     private void viewDrop(int position) {
         String mObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
         String mDescription = (data.get(position).getDescription());
+        String mRipleCount = (data.get(position).getRipleCount());
+        String mCommentCount = (data.get(position).getCommentCount());
+        Date mCreatedAt = (data.get(position).getCreatedAt());
 
-        Log.d("CLICKEDDROPEXTRA", "Clicked drop's objectId = " + mObjectId);
-        Log.d("CLICKEDDROPEXTRA", "Clicked drop's authorId = " + mAuthorId);
-        Log.d("CLICKEDDROPEXTRA", "Clicked drop's authorName = " + mAuthorName);
-        Log.d("CLICKEDDROPEXTRA", "Clicked drop's facebookId = " + mFacebookId);
-        Log.d("CLICKEDDROPEXTRA", "Clicked drop's description = " + mDescription);
+        Log.d("sDropExtra", "Send drop's objectId = " + mObjectId);
+        Log.d("sDropExtra", "Send drop's authorId = " + mAuthorId);
+        Log.d("sDropExtra", "Send drop's authorName = " + mAuthorName);
+        Log.d("sDropExtra", "Send drop's facebookId = " + mFacebookId);
+        Log.d("sDropExtra", "Send drop's description = " + mDescription);
+        Log.d("sDropExtra", "Send drop's ripleCount = " + mRipleCount);
+        Log.d("sDropExtra", "Send drop's commentCount = " + mCommentCount);
+        Log.d("sDropExtra", "Send drop's createdAt = " + mCreatedAt);
 
         Intent intent = new Intent(mContext, ViewDropActivity.class);
             intent.putExtra("objectId", mObjectId);
@@ -150,6 +232,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             intent.putExtra("authorName", mAuthorName);
             intent.putExtra("facebookId", mFacebookId);
             intent.putExtra("description", mDescription);
+            intent.putExtra("ripleCount", mRipleCount);
+            intent.putExtra("commentCount", mCommentCount);
+            intent.putExtra("createdAt", mCreatedAt);
+/*
+        Bundle bundle = new Bundle(mContext, ViewDropActivity.class);
+            bundle.putSerializable("createdAt", mCreatedAt);*/
 
         mContext.startActivity(intent);
     }
@@ -196,8 +284,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         return data.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class MyViewHolder extends RecyclerView.ViewHolder {
 
+        private final CheckBox completeCheckBox;
         public ProfilePictureView profilePicture;
         public TextView authorName;
         public TextView createdAt;
@@ -212,19 +301,23 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
             super(itemView);
 
+            completeCheckBox = (CheckBox) itemView.findViewById(R.id.checkbox_complete);
             profilePicture = (ProfilePictureView) itemView.findViewById(R.id.profile_picture);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             authorName = (TextView) itemView.findViewById(R.id.name);
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+
 //            share = (ImageView) itemView.findViewById(R.id.share_button);
 
 //            commenter = (TextView) itemView.findViewById(R.id.commenter);
 //            comment = (TextView) itemView.findViewById(R.id.comment);
 
-            itemView.setOnClickListener(this);
+//            itemView.setOnClickListener(this);
         }
+
+
 
         public void update(int position){
 
@@ -239,27 +332,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 //            share.setT(current.objectId();
 //            commenter.setText(current.commenter);
 //            comment.setText(current.comment);
-        }
-
-        /*@Override
-        public void onClick(View v) {
-            if (View v ){
-                mListener.onTomato((ImageView)v)
-            } else {
-                mListener.onPotato(v);
-            }
-        }*/
-
-        String adapterPos = String.valueOf((getAdapterPosition()));
-
-        @Override
-        public void onClick(View v) {
-//            Toast.makeText(this, "The Item Clicked is: " + adapterPos, Toast.LENGTH_SHORT).show();
-            getDelegate().itemSelected(data.get(getAdapterPosition()));
-           /* Intent intent = new Intent(this, ViewDropActivity.class);
-            startActivity(intent);*/
-
-
         }
     }
 }

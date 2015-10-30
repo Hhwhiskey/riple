@@ -77,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(adapter);
 
+        // Sets default tab on app load
+        mPager.setCurrentItem(2);
+
         // Allow fragments to stay in memory
         mPager.setOffscreenPageLimit(4);
 
@@ -148,8 +151,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drop.put("facebookId", currentUser.get("facebookId"));
         drop.put("name", currentUser.get("name"));
         drop.put("description", dropDescription);
-
-
         drop.saveInBackground();
     }
 

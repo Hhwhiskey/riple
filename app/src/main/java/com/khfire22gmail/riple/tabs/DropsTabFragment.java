@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
@@ -35,6 +36,7 @@ public class DropsTabFragment extends Fragment {
     private List<DropItem> dropList;
     private DropAdapter mDropAdapter;
     private RecyclerView.ItemAnimator animator;
+    private CheckBox completeCheckBox;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,6 +49,10 @@ public class DropsTabFragment extends Fragment {
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setItemAnimator(animator);
+//        mRecyclerView.setItemAnimator(new SlideInOutLeftDefaultItemAnimator(mRecyclerView));
+
+
+
 
         return view;
     }
@@ -58,7 +64,7 @@ public class DropsTabFragment extends Fragment {
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
 
-        query.whereEqualTo("todo", currentUser);
+        query.whereEqualTo("todoDummy", currentUser);
 
         query.orderByDescending("createdAt");
 
@@ -74,15 +80,15 @@ public class DropsTabFragment extends Fragment {
 
                         DropItem dropItem = new DropItem();
 
+
+                        //ObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
-
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
-
                         //Author id
                         dropItem.setAuthorId(list.get(i).getString("author"));
-
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
 

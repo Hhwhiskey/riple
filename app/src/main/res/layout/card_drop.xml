@@ -152,7 +152,7 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/drop_check"
+                android:id="@+id/checkbox_complete"
                 android:checked="false"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
