@@ -21,6 +21,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import org.json.JSONException;
@@ -75,19 +76,17 @@ public class RipleTabFragment extends Fragment {
     public void loadRipleItemsFromParse() {
         final List<DropItem> ripleList = new ArrayList<>();
 
-        //String currentUser = ParseUser.getCurrentUser().getObjectId();
+        ParseUser user = ParseUser.getCurrentUser();
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseRelation relation1 = user.getRelation("createdDrops");
+        ParseRelation relation2 = user.getRelation("completedDrops");
 
-        final ParseQuery<ParseObject> query1 = ParseQuery.getQuery("Drop");
-        query1.whereEqualTo("author", currentUser);
-
-        final ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Drop");
-        query2.whereEqualTo("completedBy", currentUser);
+        ParseQuery createdQuery = relation1.getQuery();
+        ParseQuery completedQuery = relation2.getQuery();
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(query1);
-        queries.add(query2);
+        queries.add(createdQuery);
+        queries.add(completedQuery);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
 
@@ -142,7 +141,7 @@ public class RipleTabFragment extends Fragment {
         });
     }
 
-    private void updateRecyclerView(List<DropItem> items) {
+    public void updateRecyclerView(List<DropItem> items) {
         Log.d("KEVIN", "RIPLE LIST SIZE: " + items.size());
 
         mRipleList = items;

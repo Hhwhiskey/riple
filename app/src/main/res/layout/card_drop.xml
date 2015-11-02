@@ -130,16 +130,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
-                android:layout_alignBottom="@+id/riple_switch"
-                android:layout_toLeftOf="@+id/riple_switch"
-                android:layout_toStartOf="@+id/riple_switch"
+                android:layout_alignBottom="@+id/switch_todo"
+                android:layout_toLeftOf="@+id/switch_todo"
+                android:layout_toStartOf="@+id/switch_todo"
                 android:layout_below="@+id/description"
                 />
 
             <Switch
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/riple_switch"
+                android:id="@+id/switch_todo"
                 android:checked="true"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -153,6 +153,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/checkbox_complete"
+                android:visibility="visible"
                 android:checked="false"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"

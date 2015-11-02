@@ -68,7 +68,7 @@
             android:label="@string/title_activity_clicked_drop" >
         </activity>
         <activity
-            android:name=".actions.ViewOtherUserActivity"
+            android:name=".actions.ViewUserActivity"
             android:label="@string/title_activity_view_riple" >
         </activity>
     </application>

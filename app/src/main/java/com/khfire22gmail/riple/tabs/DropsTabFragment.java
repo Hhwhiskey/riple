@@ -19,6 +19,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class DropsTabFragment extends Fragment {
     private DropAdapter mDropAdapter;
     private RecyclerView.ItemAnimator animator;
     private CheckBox completeCheckBox;
+    public static List<ParseObject> dropObjectsList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,13 +60,14 @@ public class DropsTabFragment extends Fragment {
     }
 
     public void loadDropItemsFromParse() {
+
         final List<DropItem> dropList = new ArrayList<>();
 
-        String currentUser = ParseUser.getCurrentUser().getObjectId();
+        ParseUser user = ParseUser.getCurrentUser();
 
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+        ParseRelation relation = user.getRelation("todoDrops");
 
-        query.whereEqualTo("todoDummy", currentUser);
+        ParseQuery query = relation.getQuery();
 
         query.orderByDescending("createdAt");
 
@@ -78,8 +81,11 @@ public class DropsTabFragment extends Fragment {
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
-                        DropItem dropItem = new DropItem();
 
+                        dropObjectsList.add(list.get(i));
+
+
+                        DropItem dropItem = new DropItem();
 
                         //ObjectId
                         dropItem.setObjectId(list.get(i).getObjectId());

@@ -150,7 +150,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         Log.d("Kevin", "Clicked User's authorName = " + mAuthorName);
         Log.d("Kevin", "Clicked User's facebookId = " + mFacebookId);
 
-        Intent intent = new Intent(mContext, ViewOtherUserActivity.class);
+        Intent intent = new Intent(mContext, ViewUserActivity.class);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("authorName", mAuthorName);
         intent.putExtra("facebookId", mFacebookId);

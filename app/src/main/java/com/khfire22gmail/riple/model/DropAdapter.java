@@ -10,16 +10,19 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.actions.ViewDropActivity;
-import com.khfire22gmail.riple.actions.ViewOtherUserActivity;
+import com.khfire22gmail.riple.actions.ViewUserActivity;
+import com.khfire22gmail.riple.tabs.DropsTabFragment;
+import com.parse.ParseObject;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -90,61 +93,66 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         return viewHolder;
     }
 
-      /*// THIS IS GONNA BE THE CODE
-        ParseUser userCompletedDrop1 = //the user who completed the drop?
 
 
-        // ToDo: Use public static final fields of some class to represent these Strings (THIS IS TO PREVENT ERRORS)
-        ParseObject dropInQuestion = new ParseObject("Drop");
 
-        // The "tricky" part
-        ParseRelation<ParseUser> completedBy = dropInQuestion.getRelation("completedBy");
 
-        completedBy.add(userCompletedDrop1);
-        completedBy.add(userCompletedDrop2);
+    private ParseObject getDropObjectFromRow(int position) {
+        ParseObject drop = DropsTabFragment.dropObjectsList.get(position);
+        return drop;
+    }
 
-        completedBy.saveInBackground();*/
+    public void todoDrop(ParseObject dropObject) {
 
-    public void completeDrop(String dropId){
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseRelation relation = user.getRelation("todoDrops");
+        relation.add(dropObject);
+    }
 
-       /* ParseObject drop = ...;
+    public void completeDrop(ParseObject dropObject) {
 
-        ParseObject drop = new ParseObject("Drop");
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseRelation relation = user.getRelation("completedDrops");
+        relation.add(dropObject);
+        user.saveInBackground();
 
-        ParseRelation<ParseUser> completed = currentDrop.getRelation("completed");
-        completed.add(drop);
-        completed.saveInBackground();*/
+        //Todo Add completed timestamp and update the data on parse
+        Date date = new Date();
+        Long time = (date.getTime());
 
-        ArrayList<String> users = new ArrayList<>();
-        users.add(dropId);
-        // Create a pointer to an object of class Drop with id dropId
-        //ParseObject drop = ParseObject.createWithoutData("Drop", dropId);
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        currentUser.put("completedDrops", dropId);
-        currentUser.saveInBackground();
-        // Set a new value on quantity
-        //drop.add("completedBy", currentUser);
-
-        //ParseObject drop = new ParseObject("Drop");
-
-        //drop.addUnique("completedBy", "eB1IvPyGkX");*/
-        //drop.saveInBackground();
-//        drop.removeAll("todo", Arrays.asList(currentUser));
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
+        // Complete CheckBox Listener
         if (viewHolder.completeCheckBox != null) {
             viewHolder.completeCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
-                        completeDrop(getDropIdFromRow(position));
+                       completeDrop(getDropObjectFromRow(position));
                         Log.d("checkbox", "Checked");
+
+                    } else {
+                        Log.d("checkbox", "UnChecked");
+                    }
+                }
+            });
+        }
+
+        // To-do Toggle Listener
+        if (viewHolder.todoSwitch != null) {
+            viewHolder.todoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                       todoDrop(getDropObjectFromRow(position));
+                        Log.d("checkbox", "Checked");
+
                     } else {
                         Log.d("checkbox", "UnChecked");
                     }
@@ -198,13 +206,20 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                 viewOtherUser(position);
             }
         });
+
+        /*viewHolder.share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+             //Todo  shareDrop(position);
+            }
+        });*/
     }
 
-    private String getDropIdFromRow(int position) {
-        String dropObjectId = (data.get(position).getObjectId());
-        //Log.d("Kevin", "this drop's objectId = " + dropObjectId);
-        return dropObjectId;
-    }
+    /*private String getDropIdFromRow(int position) {
+        String dropId = (data.get(position).getObjectId());
+        //Log.d("Kevin", "this drop's objectId = " + dropId);
+        return dropId;
+    }*/
 
 
     private void viewDrop(int position) {
@@ -262,7 +277,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         Log.d("OTHERUSEREXTRA", "Clicked User's authorName = " + mAuthorName);
         Log.d("OTHERUSEREXTRA", "Clicked User's facebookId = " + mFacebookId);
 
-        Intent intent = new Intent(mContext, ViewOtherUserActivity.class);
+        Intent intent = new Intent(mContext, ViewUserActivity.class);
 //            intent.putExtra("objectId", mObjectId);
             intent.putExtra("author", mAuthorId);
             intent.putExtra("name", mAuthorName);
@@ -284,8 +299,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         return data.size();
     }
 
+
+
+
+
     class MyViewHolder extends RecyclerView.ViewHolder {
 
+        private final Switch todoSwitch;
         private final CheckBox completeCheckBox;
         public ProfilePictureView profilePicture;
         public TextView authorName;
@@ -294,13 +314,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         public TextView ripleCount;
         public TextView commentCount;
         public ImageView share;
-//        public TextView commenter;
-//        public TextView comment;
 
         public MyViewHolder(View itemView) {
 
             super(itemView);
-
+//            share = (ImageView) itemView.findViewById(R.id.share_button);
+            todoSwitch = (Switch) itemView.findViewById(R.id.switch_todo);
             completeCheckBox = (CheckBox) itemView.findViewById(R.id.checkbox_complete);
             profilePicture = (ProfilePictureView) itemView.findViewById(R.id.profile_picture);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
@@ -308,16 +327,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
-
-//            share = (ImageView) itemView.findViewById(R.id.share_button);
-
-//            commenter = (TextView) itemView.findViewById(R.id.commenter);
-//            comment = (TextView) itemView.findViewById(R.id.comment);
-
-//            itemView.setOnClickListener(this);
         }
-
-
 
         public void update(int position){
 
@@ -329,9 +339,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));
             commentCount.setText(String.valueOf(current.commentCount));
-//            share.setT(current.objectId();
-//            commenter.setText(current.commenter);
-//            comment.setText(current.comment);
         }
     }
 }

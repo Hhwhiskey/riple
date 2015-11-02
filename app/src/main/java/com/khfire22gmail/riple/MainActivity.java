@@ -22,8 +22,11 @@ import android.widget.RelativeLayout;
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setCurrentItem(2);
 
         // Allow fragments to stay in memory
-        mPager.setOffscreenPageLimit(4);
+        mPager.setOffscreenPageLimit(3);
 
         // Assigning the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
@@ -144,15 +147,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Take user input and post the Drop
     public void createDrop(String dropDescription) {
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseObject drop = new ParseObject("Drop");
+        final ParseObject drop = new ParseObject("Drop");
+        final ParseUser user = ParseUser.getCurrentUser();
 
-        drop.put("author", currentUser.getObjectId());
-        drop.put("facebookId", currentUser.get("facebookId"));
-        drop.put("name", currentUser.get("name"));
+        drop.put("author", user.getObjectId());
+        drop.put("facebookId", user.get("facebookId"));
+        drop.put("name", user.get("name"));
         drop.put("description", dropDescription);
-        drop.saveInBackground();
+        drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
+            @Override
+            public void done(ParseException e) {
+                ParseRelation<ParseObject> relation = user.getRelation("createdDrops");
+                relation.add(drop);
+                user.saveInBackground();
+            }
+        });
     }
+
+
 
     @Override
     public void onResume() {

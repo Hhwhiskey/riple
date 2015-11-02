@@ -28,7 +28,7 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewOtherUserActivity extends AppCompatActivity {
+public class ViewUserActivity extends AppCompatActivity {
 
     private Object animator;
     private RecyclerView mViewOtherUserRecyclerView;
@@ -94,7 +94,7 @@ public class ViewOtherUserActivity extends AppCompatActivity {
 
 
 
-//        Using the "Extra Intent" I want to pass the clicked User info to the ViewOtherUserActivity activity.
+//        Using the "Extra Intent" I want to pass the clicked User info to the ViewUserActivity activity.
 //        It should show that users facebook picture and name in place of the "Title"
 
 //        updateViewsWithProfileInfo();

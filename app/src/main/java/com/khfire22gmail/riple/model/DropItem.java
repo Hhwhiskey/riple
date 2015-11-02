@@ -20,6 +20,8 @@ public class DropItem {
     public String ripleCount;
     public String commentCount;
 
+
+
     public String getAuthorName() {
         return authorName;
     }
@@ -107,4 +109,5 @@ public class DropItem {
     public void setCommentCount(String commentCount) {
         this.commentCount = commentCount;
     }
+
 }

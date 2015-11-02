@@ -129,15 +129,15 @@
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
                 android:layout_alignBottom="@+id/comment_count"
-                android:layout_toLeftOf="@+id/riple_switch"
-                android:layout_toStartOf="@+id/riple_switch"
+                android:layout_toLeftOf="@+id/switch_todo"
+                android:layout_toStartOf="@+id/switch_todo"
                 android:layout_marginRight="6dp"
                 android:layout_below="@+id/description"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/riple_switch"
+                android:id="@+id/switch_todo"
                 android:checked="false"
                 android:textSize="20sp"
                 android:textStyle="bold"

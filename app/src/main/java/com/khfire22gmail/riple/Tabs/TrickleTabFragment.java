@@ -242,10 +242,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
 
 //    Adds this Drop to your Drops list
-    public void ripleThisDrop() {
+    public void AddDropToYourList() {
 
-        /*Log.d("Kevin", "Title = " + dropTitle);
-        Log.d("Kevin", "Description = " + dropDescription);*/
+
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
