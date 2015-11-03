@@ -50,7 +50,7 @@ public class ViewUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_other_user);
+        setContentView(R.layout.activity_view_user);
 
         ViewCompat.setTransitionName(findViewById(R.id.appbar), EXTRA_IMAGE);
 

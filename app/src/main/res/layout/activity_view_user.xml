@@ -63,14 +63,15 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="16dp"
         android:src="@drawable/ic_fab_message"
-        app:elevation="8dp" />
+        app:elevation="8dp"/>
+        <!--app:layout_behavior="pl.michalz.hideonscrollexample.ScrollingFABBehavior"/>-->
 </android.support.design.widget.CoordinatorLayout>
 
 
 
     <!--<include
         android:id="@+id/view_other_user_card"
-        layout="@layout/card_profile"
+        layout="@layout/card_riple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>-->
 

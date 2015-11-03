@@ -8,5 +8,6 @@
     <dimen name="fab_size_small">40dp</dimen>
     <dimen name="fab_icon_size">24dp</dimen>
     <dimen name="com_facebook_profilepictureview_preset_size_large">1000dp</dimen>
+    <dimen name ="tabs_height">20dp</dimen>
 
 </resources>

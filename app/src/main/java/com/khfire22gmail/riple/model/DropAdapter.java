@@ -18,6 +18,7 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.actions.ViewDropActivity;
 import com.khfire22gmail.riple.actions.ViewUserActivity;
 import com.khfire22gmail.riple.tabs.DropsTabFragment;
+import com.khfire22gmail.riple.tabs.TrickleTabFragment;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -60,7 +61,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public static final String riple = "riple";
     public static final String drop = "drop";
     public static final String trickle = "trickle";
-    public static final String otherUser = "other";
+    public static final String viewUser = "other";
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
         mContext = context;
@@ -72,10 +73,11 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
+       // Change the inflated card based on which RV is being viewed
         int xmlLayoutId = -1;
 
         if (mTabName.equals(riple)) {
-            xmlLayoutId = R.layout.card_riple;
+            xmlLayoutId = R.layout.card_created;
 
         } else if (mTabName.equals(drop)) {
             xmlLayoutId = R.layout.card_drop;
@@ -83,11 +85,11 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         } else if (mTabName.equals(trickle)) {
             xmlLayoutId = R.layout.card_trickle;
 
-        } else if (mTabName.equals(otherUser)) {
-            xmlLayoutId = R.layout.card_riple;
+        //Todo Show card in ViewDropActivity based on users relation to that Drop
+        } else if (mTabName.equals(viewUser)) {
+            xmlLayoutId = R.layout.card_created;
         }
 
-        // DRY - DON'T REPEAT YOURSELF
         View view = inflater.inflate(xmlLayoutId, parent, false);
         MyViewHolder viewHolder = new MyViewHolder(view);
         return viewHolder;
@@ -95,36 +97,73 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
 
+    // Get drop associacated with click
+    private ParseObject getTrickleObjectFromRow(int position) {
+        ParseObject trickle = TrickleTabFragment.trickleObjectsList.get(position);
+        return trickle;
+    }
+
+    // Add Drop in question to users "Drops" list
+    public void todoDrop(ParseObject trickleObject) {
+
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseRelation relation = user.getRelation("todoDrops");
+        relation.add(trickleObject);
+        user.saveInBackground();
+    }
+
+    public void removeFromTodo(ParseObject dropObject) {
+
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseRelation removeFromRelation = user.getRelation("todoDrops");
+        removeFromRelation.remove(dropObject);
+        user.saveInBackground();
+    }
 
 
+
+    // Get drop associated with action
     private ParseObject getDropObjectFromRow(int position) {
         ParseObject drop = DropsTabFragment.dropObjectsList.get(position);
         return drop;
     }
 
-    public void todoDrop(ParseObject dropObject) {
-
-        ParseUser user = ParseUser.getCurrentUser();
-        ParseRelation relation = user.getRelation("todoDrops");
-        relation.add(dropObject);
-    }
-
+    // Add Drop in question to users "Riple" list
     public void completeDrop(ParseObject dropObject) {
 
         ParseUser user = ParseUser.getCurrentUser();
-        ParseRelation relation = user.getRelation("completedDrops");
-        relation.add(dropObject);
+        ParseRelation addToRelation = user.getRelation("completedDrops");
+        addToRelation.add(dropObject);
+        ParseRelation removeFromRelation = user.getRelation("todoDrops");
+        removeFromRelation.remove(dropObject);
         user.saveInBackground();
 
         //Todo Add completed timestamp and update the data on parse
-        Date date = new Date();
-        Long time = (date.getTime());
-
+       /* Date date = new Date();
+        Long time = (date.getTime());*/
     }
+
+
 
     @Override
     public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
+
+        // To-do Toggle Listener
+        if (viewHolder.todoSwitch != null) {
+            viewHolder.todoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                        todoDrop(getTrickleObjectFromRow(position));
+                        Log.d("checkbox", "Checked");
+                    } else {
+                       removeFromTodo(getDropObjectFromRow(position));
+                    }
+                }
+            });
+        }
 
         // Complete CheckBox Listener
         if (viewHolder.completeCheckBox != null) {
@@ -135,7 +174,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                     if (isChecked) {
                        completeDrop(getDropObjectFromRow(position));
                         Log.d("checkbox", "Checked");
-
                     } else {
                         Log.d("checkbox", "UnChecked");
                     }
@@ -143,27 +181,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             });
         }
 
-        // To-do Toggle Listener
-        if (viewHolder.todoSwitch != null) {
-            viewHolder.todoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked) {
-                       todoDrop(getDropObjectFromRow(position));
-                        Log.d("checkbox", "Checked");
-
-                    } else {
-                        Log.d("checkbox", "UnChecked");
-                    }
-
-
-                }
-            });
-
-        }
-
-        // View Drop Clicks
+        // View all other Drop Clicks
         viewHolder.description.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -141,8 +141,6 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/switch_todo"
                 android:checked="true"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 android:layout_below="@+id/description"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
@@ -52,8 +53,10 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     RecyclerView mRecyclerView;
     List<DropItem> mTrickleList;
     DropAdapter mTrickleAdapter;
-
+    public static ArrayList<ParseObject> trickleObjectsList;
     ProfilePictureView picture;
+    TextView usedText;
+
 
     /*public void onActivityCreated (Bundle savedInstanceState)
     Added in API level 11
@@ -68,6 +71,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_trickle, container, false);
+
+        trickleObjectsList = new ArrayList<>();
 
         setRetainInstance(true);
 
@@ -176,12 +181,16 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     }
 
     public void loadTrickleItemsFromParse() {
+// todo add additonal query that will exclude drops that are completed or marked as todo
         final List<DropItem> trickleList = new ArrayList<>();
 
         String currentUser = ParseUser.getCurrentUser().getObjectId();
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
-        query.whereNotEqualTo("author", currentUser);
+
+
+
+// todo apply this additional query after testing       query.whereNotEqualTo("author", currentUser);
         query.orderByDescending("createdAt");
 //        query.setLimit(25);
 
@@ -194,6 +203,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
                 } else {
                     for (int i = 0; i < list.size(); i++) {
+
+                        trickleObjectsList.add(list.get(i));
 
                         DropItem dropItem = new DropItem();
 

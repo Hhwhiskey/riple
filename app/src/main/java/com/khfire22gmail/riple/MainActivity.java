@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
+import com.khfire22gmail.riple.utils.ScrollingFABBehavior;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ScrollingFABBehavior(this, obtainStyledAttributes(R.attr.toolBarHeight));
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setCurrentItem(2);
 
         // Allow fragments to stay in memory
-        mPager.setOffscreenPageLimit(3);
+//        mPager.setOffscreenPageLimit(3);
 
         // Assigning the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
