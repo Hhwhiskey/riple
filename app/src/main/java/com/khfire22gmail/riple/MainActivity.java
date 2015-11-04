@@ -22,7 +22,6 @@ import android.widget.RelativeLayout;
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
-import com.khfire22gmail.riple.utils.ScrollingFABBehavior;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ScrollingFABBehavior(this, obtainStyledAttributes(R.attr.toolBarHeight));
+//        ScrollingFABBehavior(this, obtainStyledAttributes(R.attr.toolBarHeight));
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {

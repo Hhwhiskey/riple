@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -19,7 +21,7 @@
             android:elevation="2dp"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
             xmlns:android="http://schemas.android.com/apk/res/android"
-            app:layout_scrollFlags="scroll|enterAlways"/>
+            app:layout_scrollFlags="scroll|enterAlways|snap"/>
 
         <com.khfire22gmail.riple.slider.SlidingTabLayout
             android:id="@+id/tabs"
@@ -47,8 +49,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_fab_post_new_drop"
-        app:elevation="8dp"
-        app:layout_behavior="pl.michalz.hideonscrollexample.ScrollingFABBehavior" />
+        app:elevation="8dp"/>
+        <!--app:layout_behavior="pl.michalz.hideonscrollexample.ScrollingFABBehavior"-->
+
 
 </android.support.design.widget.CoordinatorLayout>
 

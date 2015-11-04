@@ -204,6 +204,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
+                        //Collects Drop Objects
                         trickleObjectsList.add(list.get(i));
 
                         DropItem dropItem = new DropItem();
@@ -230,8 +231,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenter to drop
-//                              dropItem.setCommenter(list.get(i).getString("commenter"));
+                        //Id that connects authorName to drop
+//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
 
                         trickleList.add(dropItem);
                     }

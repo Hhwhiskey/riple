@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
+import com.google.gson.Gson;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
@@ -24,6 +25,8 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,7 @@ public class ViewUserActivity extends AppCompatActivity {
     private TextView nameView;
     private String clickedUser;
     private Object currentUser;
+    private String objectId;
 
 
     @Override
@@ -54,8 +58,8 @@ public class ViewUserActivity extends AppCompatActivity {
 
         ViewCompat.setTransitionName(findViewById(R.id.appbar), EXTRA_IMAGE);
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.other_user_collapsing_tool_bar);
-            collapsingToolbar.setTitle(mAuthorName);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
+        collapsingToolbar.setTitle(mAuthorName);
 
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 //        collapsingToolbar.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
@@ -66,21 +70,27 @@ public class ViewUserActivity extends AppCompatActivity {
                 Log.d("Message", "You are trying to send a new message");
             }
         });
-            /*messageFab.setRippleColor(lightVibrantColor);
-            messageFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));*/
 
         Intent intent = getIntent();
+
+        Gson gson = new Gson();
+        String objectId = getIntent().getStringExtra("objectId");
+//        DropAdapter mObjectId = gson.fromJson(objectId, DropAdapter.class);
+
         mAuthorId = intent.getStringExtra("author");
         mAuthorName = intent.getStringExtra("name");
         mFacebookId = intent.getStringExtra("facebookId");
 
-        Log.d("extraUser", "mAuthorId = " + mAuthorId);
-        Log.d("extraUser", "mAuthorName = " + mAuthorName);
-        Log.d("extraUser", "mFacebookId = " + mFacebookId);
+//        Log.d("rExtraIntent", "mFacebookId = " + mObjectId);
+        Log.d("rExtraIntent", "mAuthorId = " + mAuthorId);
+        Log.d("rExtraIntent", "mAuthorName = " + mAuthorName);
+        Log.d("rExtraIntent", "mFacebookId = " + mFacebookId);
 
 
+        // Set collapsable toolbar picture and text
         profilePictureView = (ProfilePictureView)findViewById(R.id.other_profile_picture);
         profilePictureView.setProfileId(mFacebookId);
+        collapsingToolbar.setTitle(mAuthorName);
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
         profilePictureView.setPresetSize(ProfilePictureView.LARGE);
@@ -112,48 +122,48 @@ public class ViewUserActivity extends AppCompatActivity {
 
     }
 
-
-
-    /*private void updateViewsWithProfileInfo() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser.has("profile")) {
-            JSONObject userProfile = currentUser.getJSONObject("profile");
-            try {
-                String url;
-                Bundle parametersPicture = new Bundle();
-                parametersPicture.putString("fields", "picture.width(150).height(150)");
-
-                if (userProfile.has("facebookId")) {
-                    profilePictureView.setProfileId(userProfile.getString("facebookId"));
-
-                } else {
-                    // Show the default, blank user profile picture
-                    profilePictureView.setProfileId(null);
-                }
-
-                if (userProfile.has("name")) {
-                    nameView.setText(userProfile.getString("name"));
-                } else {
-                    nameView.setText("");
-                }
-
-            } catch (JSONException e) {
-                Log.d(RipleApplication.TAG, "Error parsing saved user data.");
-            }
-        }
-    }*/
-
     public void loadRipleItemsFromParse() {
-        final List<DropItem> otherUserList = new ArrayList<>();
-        final ParseQuery<ParseObject> query1 = ParseQuery.getQuery("Drop");
-        query1.whereEqualTo("author", mAuthorId);
+        final List<DropItem> ripleList = new ArrayList<>();
 
-        final ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Drop");
-        query2.whereEqualTo("done", mAuthorId);
+/*
+        ParseObject drop = new ParseObject("Drop");
+
+        ParseRelation createdRelation = drop.getRelation("createdDrops");
+        ParseRelation completedRelation = drop.getRelation("completedDrops");
+*/
+/*
+        ParseQuery<ParseObject> createdQuery = ParseQuery.getQuery("User");
+        createdQuery.whereEqualTo("createdDrops", mAuthorId);
+        createdQuery.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> commentList, ParseException e) {
+
+            }
+        });
+
+        ParseQuery<ParseObject> completedQuery = ParseQuery.getQuery("User");
+        completedQuery.whereEqualTo("completedDrops", mAuthorId);
+        completedQuery.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> commentList, ParseException e) {
+
+            }
+        });
+*/
+        ParseUser clickedUser = ParseUser.getCurrentUser();
+
+        ParseRelation createdRelation = clickedUser.getRelation("createdDrops");
+        ParseRelation completedRelation = clickedUser.getRelation("completedDrops");
+
+        ParseQuery createdQuery = createdRelation.getQuery();
+        ParseQuery completedQuery = completedRelation.getQuery();
+
+        createdQuery.whereEqualTo("CreatedDrops", mAuthorId);
+        completedQuery.whereEqualTo("CompletedDrops", mAuthorId);
+
+        Log.d("viewUserId", "Id is currently " + mAuthorId);
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(query1);
-        queries.add(query2);
+        queries.add(createdQuery);
+        queries.add(completedQuery);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
 
@@ -171,17 +181,16 @@ public class ViewUserActivity extends AppCompatActivity {
 
                         DropItem dropItem = new DropItem();
 
+                        //ObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
-
                         //Author id
                         dropItem.setAuthorId(list.get(i).getString("author"));
-
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
-
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
                         //Drop Title
@@ -196,14 +205,14 @@ public class ViewUserActivity extends AppCompatActivity {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenter to drop
-//                              dropItem.setCommenter(list.get(i).getString("commenter"));
+                        //Id that connects authorName to drop
+//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
 
-                        otherUserList.add(dropItem);
+                        ripleList.add(dropItem);
                     }
 
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + otherUserList.size());
-                    updateRecyclerView(otherUserList);
+                    Log.i("KEVIN", "PARSE LIST SIZE: " + ripleList.size());
+                    updateRecyclerView(ripleList);
                 }
             }
         });

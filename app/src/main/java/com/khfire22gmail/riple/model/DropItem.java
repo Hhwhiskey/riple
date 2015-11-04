@@ -21,7 +21,6 @@ public class DropItem {
     public String commentCount;
 
 
-
     public String getAuthorName() {
         return authorName;
     }

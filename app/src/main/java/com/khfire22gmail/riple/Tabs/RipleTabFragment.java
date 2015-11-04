@@ -78,11 +78,11 @@ public class RipleTabFragment extends Fragment {
 
         ParseUser user = ParseUser.getCurrentUser();
 
-        ParseRelation relation1 = user.getRelation("createdDrops");
-        ParseRelation relation2 = user.getRelation("completedDrops");
+        ParseRelation createdRelation = user.getRelation("createdDrops");
+        ParseRelation completedRelation = user.getRelation("completedDrops");
 
-        ParseQuery createdQuery = relation1.getQuery();
-        ParseQuery completedQuery = relation2.getQuery();
+        ParseQuery createdQuery = createdRelation.getQuery();
+        ParseQuery completedQuery = completedRelation.getQuery();
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(createdQuery);
@@ -128,8 +128,8 @@ public class RipleTabFragment extends Fragment {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenter to drop
-//                              dropItem.setCommenter(list.get(i).getString("commenter"));
+                        //Id that connects authorName to drop
+//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
 
                         ripleList.add(dropItem);
                     }

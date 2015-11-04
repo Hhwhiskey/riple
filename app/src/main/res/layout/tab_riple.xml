@@ -8,8 +8,7 @@
     android:orientation="vertical">
 
     <include
-        layout="@layout/card_riple"
-        android:id="@+id/profile_card"/>
+        layout="@layout/card_riple"/>
 
     <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
         android:id="@+id/riple_swipe"

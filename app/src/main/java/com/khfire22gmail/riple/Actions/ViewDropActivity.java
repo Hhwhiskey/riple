@@ -59,7 +59,7 @@ public class ViewDropActivity extends AppCompatActivity {
         // Author and Drop Information
         Intent intent = getIntent();
         mObjectId = intent.getStringExtra("objectId");
-        mAuthorId = intent.getStringExtra("authorId");
+        mAuthorId = intent.getStringExtra("commenter");
         mAuthorName = intent.getStringExtra("authorName");
         mFacebookId = intent.getStringExtra("facebookId");
         mDescription = intent.getStringExtra("description");
@@ -93,6 +93,7 @@ public class ViewDropActivity extends AppCompatActivity {
 
         createdAtView = (TextView) findViewById(R.id.created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
+        ///////////////
 
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
@@ -126,15 +127,18 @@ public class ViewDropActivity extends AppCompatActivity {
 
                         CommentItem commentItem = new CommentItem();
 
-                        // DropId
-//                        commentItem.setObjectId(list.get(i).getString("objectId"));
+                        // Commenter Id
+                        commentItem.setObjectId(list.get(i).getObjectId());
+
+                        //CommenterId
+                        commentItem.setCommentersID(list.get(i).getString("commentersID"));
                         //Picture
                         commentItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name
                         commentItem.setCommenter(list.get(i).getString("commenter"));
 
                         //Author id
-//                        dropItem.setAuthorId(list.get(i).getString("author"));
+//                        dropItem.setCommenter(list.get(i).getString("author"));
 
                         //Date
                         commentItem.setCreatedAt(list.get(i).getCreatedAt());
@@ -156,8 +160,8 @@ public class ViewDropActivity extends AppCompatActivity {
                         //Comment Count
 //                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenter to drop
-//                              dropItem.setCommenter(list.get(i).getString("commenter"));
+                        //Id that connects authorName to drop
+//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
 
                        commentList.add(commentItem);
                     }

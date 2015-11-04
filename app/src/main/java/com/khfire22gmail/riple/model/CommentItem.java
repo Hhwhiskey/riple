@@ -7,18 +7,38 @@ import java.util.Date;
  */
 public class CommentItem {
 
+
     public Date createdAt;
+    public String objectId;
+    public String commentersID;
+    public String authorName;
     public String authorId;
-    public String facebookId;
     public String commenter;
+    public String facebookId;
     public String comment;
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getCommentersID() {
+        return commentersID;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCommentersID(String commentersID) {
+        this.commentersID = commentersID;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     public String getAuthorId() {
@@ -29,12 +49,13 @@ public class CommentItem {
         this.authorId = authorId;
     }
 
-    public String getFacebookId() {
-        return facebookId;
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getCommenter() {
@@ -45,6 +66,14 @@ public class CommentItem {
         this.commenter = commenter;
     }
 
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -52,4 +81,6 @@ public class CommentItem {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+
 }

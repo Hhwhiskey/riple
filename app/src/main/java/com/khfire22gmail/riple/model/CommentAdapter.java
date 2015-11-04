@@ -1,15 +1,17 @@
 package com.khfire22gmail.riple.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.actions.ViewUserActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -19,7 +21,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
     Context mContext;
 
-//    private final String mTabName;
+    //    private final String mTabName;
     private LayoutInflater inflater;
     List<CommentItem> data = Collections.emptyList();
 
@@ -77,52 +79,49 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         return viewHolder;
     }
 
+    private void viewOtherUser(int position) {
+
+        String mAuthorId = (data.get(position).getCommentersID());
+        String mAuthorName = (data.get(position).getCommenter());
+        String mFacebookId = (data.get(position).getFacebookId());
+
+        Log.d("sOTHERUSEREXTRA", "Clicked User's author = " + mAuthorId);
+        Log.d("sOTHERUSEREXTRA", "Clicked User's authorName = " + mAuthorName);
+        Log.d("sOTHERUSEREXTRA", "Clicked User's facebookId = " + mFacebookId);
+
+        Intent intent = new Intent(mContext, ViewUserActivity.class);
+        intent.putExtra("author", mAuthorId);
+        intent.putExtra("name", mAuthorName);
+        intent.putExtra("facebookId", mFacebookId);
+        mContext.startActivity(intent);
+    }
+
 
     @Override
     public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        /*viewHolder.description.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewDrop(position);
-            }
-        });*/
-
-
-
-        /*Button button = (Button) findViewById(R.id.share_button);
-
-        viewHolder.shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareDrop(position);
-            }
-        });*/
-
         viewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                viewOtherUser(position);
+                viewOtherUser(position);
             }
         });
 
         viewHolder.commenter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                viewOtherUser(position);
+                viewOtherUser(position);
             }
         });
     }
 
     /*private void viewDrop(int position) {
         String mDropId = (data.get(position).getObjectId());
-
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
         String mCommenter = (data.get(position).getCommenter());
-
         Intent intent = new Intent(mContext, ViewDropActivity.class);
         intent.putExtra("objectId", mDropId);
         intent.putExtra("authorId", mAuthorId);
@@ -134,7 +133,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 */
     /*private void shareDrop(int position) {
         String mDropId = (data.get(position).getObjectId());
-
         Intent intent = new Intent(mContext, ShareDrop.class);
         intent.putExtra("objectId", mDropId);
         mContext.startActivity(intent);
@@ -145,11 +143,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
-
         Log.d("Kevin", "Clicked User's authorId = " + mAuthorId);
         Log.d("Kevin", "Clicked User's authorName = " + mAuthorName);
         Log.d("Kevin", "Clicked User's facebookId = " + mFacebookId);
-
         Intent intent = new Intent(mContext, ViewUserActivity.class);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("authorName", mAuthorName);
@@ -162,7 +158,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
         String mFacebookId = (data.get(position).getFacebookId());
-
          return;
     }*/
 
@@ -178,7 +173,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         public TextView description;
         public TextView commenter;
         public TextView comment;
-        public ImageView share;
+
 
         public MyViewHolder(View itemView) {
 
@@ -188,14 +183,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             commenter = (TextView) itemView.findViewById(R.id.commenter);
             comment = (TextView) itemView.findViewById(R.id.comment);
-            //            share = (ImageView) itemView.findViewById(R.id.share_button);
 
             itemView.setOnClickListener(this);
         }
 
         public void update(int position){
 
-           CommentItem current = data.get(position);
+            CommentItem current = data.get(position);
 
             profilePicture.setProfileId(current.facebookId);
             createdAt.setText(String.valueOf(current.createdAt));
@@ -226,5 +220,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         }
     }
 }
+
 
 

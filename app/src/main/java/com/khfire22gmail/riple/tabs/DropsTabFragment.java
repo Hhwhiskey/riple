@@ -80,6 +80,7 @@ public class DropsTabFragment extends Fragment {
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
+                        //Collects Drop Objects
                         dropObjectsList.add(list.get(i));
 
                         DropItem dropItem = new DropItem();
@@ -109,8 +110,8 @@ public class DropsTabFragment extends Fragment {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenter to drop
-//                              dropItem.setCommenter(list.get(i).getString("commenter"));
+                        //Id that connects authorName to drop
+//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
 
                         dropList.add(dropItem);
                     }
