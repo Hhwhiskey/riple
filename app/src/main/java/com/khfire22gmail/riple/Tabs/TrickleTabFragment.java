@@ -188,8 +188,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
 
-
-
 // todo apply this additional query after testing       query.whereNotEqualTo("author", currentUser);
         query.orderByDescending("createdAt");
 //        query.setLimit(25);

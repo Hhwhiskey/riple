@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
-import com.google.gson.Gson;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
@@ -49,6 +48,10 @@ public class ViewUserActivity extends AppCompatActivity {
     private String clickedUser;
     private Object currentUser;
     private String objectId;
+    private String mClickedUserParseId;
+    private String mClickedUserId;
+    private String mClickedUserName;
+    private String mClickedUserFacebookId;
 
 
     @Override
@@ -73,41 +76,21 @@ public class ViewUserActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        Gson gson = new Gson();
-        String objectId = getIntent().getStringExtra("objectId");
-//        DropAdapter mObjectId = gson.fromJson(objectId, DropAdapter.class);
+        mClickedUserId = intent.getStringExtra("clickedUserId");
+        mClickedUserName = intent.getStringExtra("clickedUserName");
+        mClickedUserFacebookId = intent.getStringExtra("clickedUserFacebookId");
 
-        mAuthorId = intent.getStringExtra("author");
-        mAuthorName = intent.getStringExtra("name");
-        mFacebookId = intent.getStringExtra("facebookId");
-
-//        Log.d("rExtraIntent", "mFacebookId = " + mObjectId);
-        Log.d("rExtraIntent", "mAuthorId = " + mAuthorId);
-        Log.d("rExtraIntent", "mAuthorName = " + mAuthorName);
-        Log.d("rExtraIntent", "mFacebookId = " + mFacebookId);
-
+        Log.d("rViewUserAcitivty", "mClickedUserId = " + mClickedUserId);
+        Log.d("rViewUserAcitivty", "mClickedUserName = " + mClickedUserName);
+        Log.d("rViewUserAcitivty", "mClickedUserFacebookId = " + mClickedUserFacebookId);
 
         // Set collapsable toolbar picture and text
         profilePictureView = (ProfilePictureView)findViewById(R.id.other_profile_picture);
-        profilePictureView.setProfileId(mFacebookId);
-        collapsingToolbar.setTitle(mAuthorName);
+        profilePictureView.setProfileId(mClickedUserFacebookId);
+        collapsingToolbar.setTitle(mClickedUserName);
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
         profilePictureView.setPresetSize(ProfilePictureView.LARGE);
-
-
-        /*currentUser = mAuthorId;
-        
-        JSONObject userProfile = currentUser.getJSONObject("profile");
-
-        profilePictureView.setProfileId(userProfile.getString("facebookId"));*/
-
-
-
-//        Using the "Extra Intent" I want to pass the clicked User info to the ViewUserActivity activity.
-//        It should show that users facebook picture and name in place of the "Title"
-
-//        updateViewsWithProfileInfo();
 
         mViewOtherUserRecyclerView = (RecyclerView) findViewById(R.id.other_user_recycler_view);
         mViewOtherUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -116,39 +99,24 @@ public class ViewUserActivity extends AppCompatActivity {
 
         mViewOtherUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //        mRecyclerView.setItemAnimator(animator);
-
-
-//        Set Title of Collapsable Toolbar
-
     }
 
     public void loadRipleItemsFromParse() {
         final List<DropItem> ripleList = new ArrayList<>();
 
-/*
-        ParseObject drop = new ParseObject("Drop");
+        // this block of code is equivalent to some function that findUserById(ParseUserId)
+        ParseUser clickedUser = null;
+        ParseQuery<ParseUser> getClickedUserquery = ParseQuery.getQuery("_User");
+        getClickedUserquery.whereEqualTo("objectId", mClickedUserId);
 
-        ParseRelation createdRelation = drop.getRelation("createdDrops");
-        ParseRelation completedRelation = drop.getRelation("completedDrops");
-*/
-/*
-        ParseQuery<ParseObject> createdQuery = ParseQuery.getQuery("User");
-        createdQuery.whereEqualTo("createdDrops", mAuthorId);
-        createdQuery.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> commentList, ParseException e) {
-
+        // TODO: Change this to findInBackground and pass in a callback to listen to when this inBackground finishes
+        try {
+            if (getClickedUserquery.find().size() != 0) {
+                clickedUser = getClickedUserquery.find().get(0);
             }
-        });
-
-        ParseQuery<ParseObject> completedQuery = ParseQuery.getQuery("User");
-        completedQuery.whereEqualTo("completedDrops", mAuthorId);
-        completedQuery.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> commentList, ParseException e) {
-
-            }
-        });
-*/
-        ParseUser clickedUser = ParseUser.getCurrentUser();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         ParseRelation createdRelation = clickedUser.getRelation("createdDrops");
         ParseRelation completedRelation = clickedUser.getRelation("completedDrops");
@@ -156,10 +124,7 @@ public class ViewUserActivity extends AppCompatActivity {
         ParseQuery createdQuery = createdRelation.getQuery();
         ParseQuery completedQuery = completedRelation.getQuery();
 
-        createdQuery.whereEqualTo("CreatedDrops", mAuthorId);
-        completedQuery.whereEqualTo("CompletedDrops", mAuthorId);
-
-        Log.d("viewUserId", "Id is currently " + mAuthorId);
+        Log.d("viewUserId", "Id is currently " + mClickedUserId);
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(createdQuery);

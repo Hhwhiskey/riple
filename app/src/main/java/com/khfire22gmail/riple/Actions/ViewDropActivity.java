@@ -13,12 +13,17 @@ import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +52,11 @@ public class ViewDropActivity extends AppCompatActivity {
     private TextView ripleCountView;
     private TextView commentCountView;
     private TextView createdAtView;
+    private String mDropObjectId;
+    private String mAuthorFacebookId;
+    private String mDropDescription;
+    private ProfilePictureView commenterProfilePictureView;
+    private ProfilePictureView authorProfilePictureView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,32 +68,32 @@ public class ViewDropActivity extends AppCompatActivity {
 
         // Author and Drop Information
         Intent intent = getIntent();
-        mObjectId = intent.getStringExtra("objectId");
-        mAuthorId = intent.getStringExtra("commenter");
+        mDropObjectId = intent.getStringExtra("dropObjectId");
+        mAuthorId = intent.getStringExtra("authorId");
         mAuthorName = intent.getStringExtra("authorName");
-        mFacebookId = intent.getStringExtra("facebookId");
-        mDescription = intent.getStringExtra("description");
+        mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
+        mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
 
-        Log.d("rDropExtra", "mObjectId = " + mObjectId);
+        Log.d("rDropExtra", "mDropObjectId = " + mDropObjectId);
         Log.d("rDropExtra", "mAuthorId = " + mAuthorId);
         Log.d("rDropExtra", "mAuthorName = " + mAuthorName);
-        Log.d("rDropExtra", "mFacebookId = " + mFacebookId);
-        Log.d("rDropExtra", "mDescription = " + mDescription);
-        Log.d("rDropExtra", "mDescription = " + mRipleCount);
-        Log.d("rDropExtra", "mDescription = " + mCommentCount);
+        Log.d("rDropExtra", "mAuthorFacebookId = " + mFacebookId);
+        Log.d("rDropExtra", "mDropDescription = " + mDescription);
+        Log.d("rDropExtra", "mRipleCount = " + mRipleCount);
+        Log.d("rDropExtra", "mCommentCount = " + mCommentCount);
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
 
-        profilePictureView = (ProfilePictureView)findViewById(R.id.profile_picture);
-        profilePictureView.setProfileId(mFacebookId);
+        authorProfilePictureView = (ProfilePictureView)findViewById(R.id.profile_picture);
+        authorProfilePictureView.setProfileId(mAuthorFacebookId);
 
         nameView = (TextView) findViewById(R.id.name);
         nameView.setText(mAuthorName);
 
         descriptionView = (TextView) findViewById(R.id.description);
-        descriptionView.setText(mDescription);
+        descriptionView.setText(mDropDescription);
 
         ripleCountView = (TextView) findViewById(R.id.riple_count);
         ripleCountView.setText(mRipleCount);
@@ -94,6 +104,15 @@ public class ViewDropActivity extends AppCompatActivity {
         createdAtView = (TextView) findViewById(R.id.created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
         ///////////////
+
+        updateViewsWithProfileInfo();
+
+        commenterProfilePictureView = (ProfilePictureView)findViewById(R.id.commenter_profile_picture);
+
+
+
+
+
 
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
@@ -111,7 +130,7 @@ public class ViewDropActivity extends AppCompatActivity {
         final List<CommentItem> commentList = new ArrayList<>();
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Comments");
-        query.whereEqualTo("dropId", currentDrop);
+        query.whereEqualTo("dropId", mDropObjectId);
         query.orderByDescending("createdAt");
 //        query.setLimit(25);
 
@@ -163,7 +182,7 @@ public class ViewDropActivity extends AppCompatActivity {
                         //Id that connects authorName to drop
 //                              dropItem.setAuthorName(list.get(i).getString("authorName"));
 
-                       commentList.add(commentItem);
+                        commentList.add(commentItem);
                     }
 
                     Log.i("KEVIN", "PARSE LIST SIZE: " + commentList.size());
@@ -180,6 +199,36 @@ public class ViewDropActivity extends AppCompatActivity {
 
         mCommentAdapter = new CommentAdapter(this, mCommentList);
         mRecyclerView.setAdapter(mCommentAdapter);
+    }
+
+
+
+    private void updateViewsWithProfileInfo() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser.has("profile")) {
+            JSONObject userProfile = currentUser.getJSONObject("profile");
+            try {
+                Bundle parametersPicture = new Bundle();
+                parametersPicture.putString("fields", "picture.width(150).height(150)");
+
+                if (userProfile.has("facebookId")) {
+                    commenterProfilePictureView.setProfileId(userProfile.getString("facebookId"));
+
+                } else {
+                    // Show the default, blank user profile picture
+                    commenterProfilePictureView.setProfileId(null);
+                }
+
+                if (userProfile.has("name")) {
+                    nameView.setText(userProfile.getString("name"));
+                } else {
+                    nameView.setText("");
+                }
+
+            } catch (JSONException e) {
+                Log.d(RipleApplication.TAG, "Error parsing saved user data.");
+            }
+        }
     }
 
     @Override

@@ -14,7 +14,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
-import com.google.gson.Gson;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.actions.ViewDropActivity;
 import com.khfire22gmail.riple.actions.ViewUserActivity;
@@ -150,7 +149,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        // To-do Toggle Listener
+        // To-do Toggle Listenerf
         if (viewHolder.todoSwitch != null) {
             viewHolder.todoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -235,36 +234,33 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     private void viewDrop(int position) {
-        String mObjectId = (data.get(position).getObjectId());
+        String mDropObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
-        String mFacebookId = (data.get(position).getFacebookId());
-        String mDescription = (data.get(position).getDescription());
+        String mAuthorFacebookId = (data.get(position).getFacebookId());
+        String mDropDescription = (data.get(position).getDescription());
         String mRipleCount = (data.get(position).getRipleCount());
         String mCommentCount = (data.get(position).getCommentCount());
         Date mCreatedAt = (data.get(position).getCreatedAt());
 
-        Log.d("sDropExtra", "Send drop's objectId = " + mObjectId);
-        Log.d("sDropExtra", "Send drop's commenter = " + mAuthorId);
-        Log.d("sDropExtra", "Send drop's authorName = " + mAuthorName);
-        Log.d("sDropExtra", "Send drop's facebookId = " + mFacebookId);
-        Log.d("sDropExtra", "Send drop's description = " + mDescription);
-        Log.d("sDropExtra", "Send drop's ripleCount = " + mRipleCount);
-        Log.d("sDropExtra", "Send drop's commentCount = " + mCommentCount);
-        Log.d("sDropExtra", "Send drop's createdAt = " + mCreatedAt);
+        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
+        Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
+        Log.d("sViewDropAcitivty", "Send drop's authorName = " + mAuthorName);
+        Log.d("sViewDropAcitivty", "Send drop's authorfacebookId = " + mAuthorFacebookId);
+        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
+        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
+        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
+        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
 
         Intent intent = new Intent(mContext, ViewDropActivity.class);
-            intent.putExtra("objectId", mObjectId);
-            intent.putExtra("commenter", mAuthorId);
-            intent.putExtra("authorName", mAuthorName);
-            intent.putExtra("facebookId", mFacebookId);
-            intent.putExtra("description", mDescription);
-            intent.putExtra("ripleCount", mRipleCount);
-            intent.putExtra("commentCount", mCommentCount);
-            intent.putExtra("createdAt", mCreatedAt);
-/*
-        Bundle bundle = new Bundle(mContext, ViewDropActivity.class);
-            bundle.putSerializable("createdAt", mCreatedAt);*/
+        intent.putExtra("dropObjectId", mDropObjectId);
+        intent.putExtra("authorId", mAuthorId);
+        intent.putExtra("authorName", mAuthorName);
+        intent.putExtra("authorFacebookId", mAuthorFacebookId);
+        intent.putExtra("dropDescription", mDropDescription);
+        intent.putExtra("ripleCount", mRipleCount);
+        intent.putExtra("commentCount", mCommentCount);
+        intent.putExtra("createdAt", mCreatedAt);
 
         mContext.startActivity(intent);
     }
@@ -272,23 +268,18 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     // onClick action for viewing other user
     private void viewOtherUser(int position) {
 
-        Object mObjectId = (data.get(position).getObjectId());
-        String mAuthorId = (data.get(position).getAuthorId());
-        String mAuthorName = (data.get(position).getAuthorName());
-        String mFacebookId = (data.get(position).getFacebookId());
+        String mClickedUserId = (data.get(position).getAuthorId());
+        String mClickedUserName = (data.get(position).getAuthorName());
+        String mClickedUserFacebookId = (data.get(position).getFacebookId());
 
-        Log.d("OTHERUSEREXTRA", "Clicked User's objectId = " + mObjectId);
-        Log.d("OTHERUSEREXTRA", "Clicked User's author = " + mAuthorId);
-        Log.d("OTHERUSEREXTRA", "Clicked User's authorName = " + mAuthorName);
-        Log.d("OTHERUSEREXTRA", "Clicked User's facebookId = " + mFacebookId);
+        Log.d("sViewUserActivity", "Clicked User's Id = " + mClickedUserId);
+        Log.d("sViewUserActivity", "Clicked User's Name = " + mClickedUserName);
+        Log.d("sViewUserActivity", "Clicked User's facebookId = " + mClickedUserFacebookId);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-
-            Gson gson = new Gson();
-            intent.putExtra("objectId", gson.toJson(mObjectId));
-            intent.putExtra("author", mAuthorId);
-            intent.putExtra("name", mAuthorName);
-            intent.putExtra("facebookId", mFacebookId);
+            intent.putExtra("clickedUserId", mClickedUserId);
+            intent.putExtra("clickedUserName", mClickedUserName);
+            intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
             mContext.startActivity(intent);
     }
 

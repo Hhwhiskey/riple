@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +18,10 @@ import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
@@ -60,13 +63,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) myFab.getLayoutParams();
+            CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) myFab.getLayoutParams();
             p.setMargins(0, 0, 0, 0); // get rid of margins since shadow area is now the margin
             myFab.setLayoutParams(p);
         }
 
         // Store the current users facebookId
-        storeFacebookId();
+        storeUserOnParse();
 
         // Creating The Toolbar and setting it as the Toolbar for the activity
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -127,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button postDropButton = (Button) popupView.findViewById(R.id.button_post_drop);
         dropDescriptionView = (AutoCompleteTextView) popupView.findViewById(R.id.drop_description);
-//        dropTitleView = (AutoCompleteTextView) popupView.findViewById(R.id.drop_title);
 
         popupWindow.showAtLocation(findViewById(R.id.root_layout), 30, 30, 30);
 
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser user = ParseUser.getCurrentUser();
 
-        drop.put("author", user.getObjectId());
+//        drop.put("author", user.getObjectId());
         drop.put("facebookId", user.get("facebookId"));
         drop.put("name", user.get("name"));
         drop.put("description", dropDescription);
@@ -165,8 +167,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
-
 
     @Override
     public void onResume() {
@@ -205,45 +205,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    private void storeFacebookId() {
+    private void storeUserOnParse() {
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        String fbName = (String) currentUser.get("author");
-        String fbId = (String) currentUser.get("userProfilePictureView");
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                        if (jsonObject != null) {
+                            try {
+                                // Save the user profile info in a user property
+                                final ParseUser currentUser = ParseUser.getCurrentUser();
+                                currentUser.put("facebookId", jsonObject.getString("id"));
+                                currentUser.put("name", jsonObject.getString("name"));
+                                currentUser.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                    }
+                                });
 
+                            } catch (JSONException e) {
+                                Log.d(RipleApplication.TAG,
+                                        "Error parsing returned user data. " + e);
+                            }
+                        } else if (graphResponse.getError() != null) {
+                            switch (graphResponse.getError().getCategory()) {
+                                case LOGIN_RECOVERABLE:
+                                    Log.d(RipleApplication.TAG,
+                                            "Authentication error: " + graphResponse.getError());
+                                    break;
 
-        if (fbId == null || fbName == null) {
+                                case TRANSIENT:
+                                    Log.d(RipleApplication.TAG,
+                                            "Transient error. Try again. " + graphResponse.getError());
+                                    break;
 
-            if (currentUser.has("profile")) {
-
-                JSONObject profile = currentUser.getJSONObject("profile");
-
-                try {
-
-                    if (profile.has("author")) {
-                        String name = profile.getString("author");
-                        currentUser.put("author", name);
-
-                    } else {
-                        currentUser.put("author", "Anonymous User");
+                                case OTHER:
+                                    Log.d(RipleApplication.TAG,
+                                            "Some other error: " + graphResponse.getError());
+                                    break;
+                            }
+                        }
                     }
+                });
 
-                    if (profile.has("userProfilePictureView")) {
-                        String facebookId = profile.getString("userProfilePictureView");
-                        currentUser.put("userProfilePictureView", facebookId);
-
-//                    } else {
-//                         TODO Add default avatar
-//                          Show the default, blank user profile picture
-//                        currentUser.put(R.drawable.ic_user_default);
-                    }
-
-
-                } catch (JSONException jse) {
-                    Log.d(RipleApplication.TAG, "Error parsing saved user data.");
-                }
-            }
-        }
+        request.executeAsync();
     }
 
     @Override

@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.LoginActivity;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.parse.FindCallback;
@@ -23,9 +22,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +40,11 @@ public class RipleTabFragment extends Fragment {
     private DropAdapter mRipleAdapter;
     private RecyclerView.ItemAnimator animator;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.tab_riple,container,false);
+
 
 //        Profile Card
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.profile_pic);
@@ -57,7 +55,8 @@ public class RipleTabFragment extends Fragment {
         mRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
         //Update Profile Card
-        updateViewsWithProfileInfo();
+//        updateViewsWithProfileInfo();
+
         //Query the users created and completed drops
         loadRipleItemsFromParse();
 
@@ -65,10 +64,10 @@ public class RipleTabFragment extends Fragment {
 //        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
 
 //        Fetch Facebook user info if it is logged
-        /*ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
-            makeMeRequest();
-        }*/
+            updateUserInfo();
+        }
 
         return view;
     }
@@ -106,18 +105,19 @@ public class RipleTabFragment extends Fragment {
 
                         //ObjectId
                         dropItem.setObjectId(list.get(i).getObjectId());
+
                         //Picture
                         dropItem.setFacebookId(list.get(i).getString("facebookId"));
+
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
+
                         //Author id
                         dropItem.setAuthorId(list.get(i).getString("author"));
+
                         //Date
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
-                        //Drop Title
-//                        dropItem.setTitle(list.get(i).getString("title"));
 
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
@@ -151,93 +151,27 @@ public class RipleTabFragment extends Fragment {
 
     }
 
-    /*private void makeMeRequest() {
-
-        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                        if (jsonObject != null) {
-                            JSONObject userProfile = new JSONObject();
-
-                            try {
-                                userProfile.put("facebookId", jsonObject.getString("id"));
-                                userProfile.put("name", jsonObject.getString("name"));
-
-                                // Save the user profile info in a user property
-                                ParseUser currentUser = ParseUser.getCurrentUser();
-                                currentUser.put("profile", userProfile);
-                                currentUser.saveInBackground();
-
-                                // Show the user info
-                                updateViewsWithProfileInfo();
-                            } catch (JSONException e) {
-                                Log.d(RipleApplication.TAG,
-                                        "Error parsing returned user data. " + e);
-                            }
-                        } else if (graphResponse.getError() != null) {
-                            switch (graphResponse.getError().getCategory()) {
-                                case LOGIN_RECOVERABLE:
-                                    Log.d(RipleApplication.TAG,
-                                            "Authentication error: " + graphResponse.getError());
-                                    break;
-
-                                case TRANSIENT:
-                                    Log.d(RipleApplication.TAG,
-                                            "Transient error. Try again. " + graphResponse.getError());
-                                    break;
-
-                                case OTHER:
-                                    Log.d(RipleApplication.TAG,
-                                            "Some other error: " + graphResponse.getError());
-                                    break;
-                            }
-                        }
-                    }
-                });
-
-        request.executeAsync();
-    }*/
-
-    private void updateViewsWithProfileInfo() {
+    private void updateUserInfo() {
         ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser.has("profile")) {
-            JSONObject userProfile = currentUser.getJSONObject("profile");
-            try {
-                String url;
-                Bundle parametersPicture = new Bundle();
-                parametersPicture.putString("fields", "picture.width(150).height(150)");
+        String userName = currentUser.getString("name");
+        String facebookId = currentUser.getString("facebookId");
+            Bundle parametersPicture = new Bundle();
+            parametersPicture.putString("fields", "picture.width(150).height(150)");
 
-                if (userProfile.has("facebookId")) {
-                    profilePictureView.setProfileId(userProfile.getString("facebookId"));
+            if (facebookId != null) {
+                profilePictureView.setProfileId(facebookId);
 
-                } else {
-                    // Show the default, blank user profile picture
-                    profilePictureView.setProfileId(null);
-                }
-
-                if (userProfile.has("name")) {
-                    nameView.setText(userProfile.getString("name"));
-                } else {
-                    nameView.setText("");
-                }
-
-            } catch (JSONException e) {
-                Log.d(RipleApplication.TAG, "Error parsing saved user data.");
+            } else {
+                // Show the default, blank user profile picture
+                profilePictureView.setProfileId(null);
             }
-        }
-    }
-    /*public void onLogoutClick(View v) {
-        logout();
-    }
 
-    private void logout() {
-        // Log the user out
-        ParseUser.logOut();
-
-        // Go to the login view
-        startLoginActivity();
-    }*/
+            if (userName != null) {
+                nameView.setText(userName);
+            } else {
+                nameView.setText("");
+            }
+    }
 
     private void startLoginActivity() {
         Intent intent = new Intent(this.getActivity(), LoginActivity.class);
@@ -245,4 +179,12 @@ public class RipleTabFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
+
+
+
+//    Bitmap fbPic = "https://graph.facebook.com/" + fbId + "/picture?width=108&height=108"
+
+
+
 }
