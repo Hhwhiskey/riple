@@ -9,9 +9,13 @@
         android:id="@+id/card_created"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="0dp"
-        card_view:cardElevation="8dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         >
 
         <RelativeLayout
@@ -119,7 +123,7 @@
                 android:layout_alignLeft="@+id/created_at"
                 android:layout_alignStart="@+id/created_at"
                 android:gravity="left"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="4dp"
                 />
 
             <ImageView
@@ -132,7 +136,7 @@
                 android:layout_toLeftOf="@+id/drop_created"
                 android:layout_toStartOf="@+id/drop_created"
                 android:layout_below="@+id/description"
-                />
+                android:layout_marginTop="2dp"/>
 
 
             <TextView

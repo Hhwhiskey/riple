@@ -32,7 +32,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.tab_riple);
+        setContentView(R.layout.fragment_riple_tab);
 
         userProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_pic);
         userNameView = (TextView) findViewById(R.id.profile_name);

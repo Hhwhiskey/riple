@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
@@ -37,18 +36,8 @@ public class ViewUserActivity extends AppCompatActivity {
     private DropAdapter mOtherUserAdapter;
     private List<DropItem> mOtherUserList;
     String EXTRA_IMAGE;
-
-    public String mAuthorId;
     public String mAuthorName;
-    public String mFacebookId;
-    private ProfilePictureView otherProfilePictureView;
-    private TextView otherNameView;
     private ProfilePictureView profilePictureView;
-    private TextView nameView;
-    private String clickedUser;
-    private Object currentUser;
-    private String objectId;
-    private String mClickedUserParseId;
     private String mClickedUserId;
     private String mClickedUserName;
     private String mClickedUserFacebookId;
@@ -62,35 +51,25 @@ public class ViewUserActivity extends AppCompatActivity {
         ViewCompat.setTransitionName(findViewById(R.id.appbar), EXTRA_IMAGE);
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
-        collapsingToolbar.setTitle(mAuthorName);
-
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
-//        collapsingToolbar.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
 
-        FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
-        messageFab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Log.d("Message", "You are trying to send a new message");
-            }
-        });
-
+        //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
 
         mClickedUserId = intent.getStringExtra("clickedUserId");
         mClickedUserName = intent.getStringExtra("clickedUserName");
         mClickedUserFacebookId = intent.getStringExtra("clickedUserFacebookId");
 
-        Log.d("rViewUserAcitivty", "mClickedUserId = " + mClickedUserId);
-        Log.d("rViewUserAcitivty", "mClickedUserName = " + mClickedUserName);
-        Log.d("rViewUserAcitivty", "mClickedUserFacebookId = " + mClickedUserFacebookId);
+        Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
+        Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
+        Log.d("rViewUser", "mClickedUserFacebookId = " + mClickedUserFacebookId);
 
         // Set collapsable toolbar picture and text
         profilePictureView = (ProfilePictureView)findViewById(R.id.other_profile_picture);
         profilePictureView.setProfileId(mClickedUserFacebookId);
-        collapsingToolbar.setTitle(mClickedUserName);
-
-//        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
         profilePictureView.setPresetSize(ProfilePictureView.LARGE);
+
+        collapsingToolbar.setTitle(mClickedUserName);
 
         mViewOtherUserRecyclerView = (RecyclerView) findViewById(R.id.other_user_recycler_view);
         mViewOtherUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -99,6 +78,13 @@ public class ViewUserActivity extends AppCompatActivity {
 
         mViewOtherUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //        mRecyclerView.setItemAnimator(animator);
+
+        FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
+        messageFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Log.d("Message", "You are trying to send a new message");
+            }
+        });
     }
 
     public void loadRipleItemsFromParse() {
@@ -110,6 +96,10 @@ public class ViewUserActivity extends AppCompatActivity {
         getClickedUserquery.whereEqualTo("objectId", mClickedUserId);
 
         // TODO: Change this to findInBackground and pass in a callback to listen to when this inBackground finishes
+       /* getClickedUserquery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {*/
+
         try {
             if (getClickedUserquery.find().size() != 0) {
                 clickedUser = getClickedUserquery.find().get(0);
@@ -170,8 +160,8 @@ public class ViewUserActivity extends AppCompatActivity {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects authorName to drop
-//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
+                        //Id that connects commenterName to drop
+//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         ripleList.add(dropItem);
                     }

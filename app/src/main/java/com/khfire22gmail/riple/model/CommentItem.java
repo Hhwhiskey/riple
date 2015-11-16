@@ -9,20 +9,27 @@ public class CommentItem {
 
 
     public Date createdAt;
+    public String dropId;
     public String objectId;
-    public String commentersID;
-    public String authorName;
-    public String authorId;
-    public String commenter;
+    public String commenterId;
+    public String commenterName;
     public String facebookId;
-    public String comment;
+    public String commentText;
 
-    public String getCommentersID() {
-        return commentersID;
+    public String getDropId() {
+        return dropId;
     }
 
-    public void setCommentersID(String commentersID) {
-        this.commentersID = commentersID;
+    public void setDropId(String dropId) {
+        this.dropId = dropId;
+    }
+
+    public String getCommenterId() {
+        return commenterId;
+    }
+
+    public void setCommenterId(String commenterId) {
+        this.commenterId = commenterId;
     }
 
     public String getObjectId() {
@@ -33,22 +40,13 @@ public class CommentItem {
         this.objectId = objectId;
     }
 
-    public String getAuthorName() {
-        return authorName;
+    public String getCommenterName() {
+        return commenterName;
     }
 
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
+    public void setCommenterName(String commenterName) {
+        this.commenterName = commenterName;
     }
-
-    public String getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
-    }
-
 
     public Date getCreatedAt() {
         return createdAt;
@@ -56,14 +54,6 @@ public class CommentItem {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public String getCommenter() {
-        return commenter;
-    }
-
-    public void setCommenter(String commenter) {
-        this.commenter = commenter;
     }
 
     public String getFacebookId() {
@@ -74,12 +64,12 @@ public class CommentItem {
         this.facebookId = facebookId;
     }
 
-    public String getComment() {
-        return comment;
+    public String getCommentText() {
+        return commentText;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
     }
 
 

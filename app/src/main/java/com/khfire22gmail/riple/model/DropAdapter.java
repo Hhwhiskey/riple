@@ -132,6 +132,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public void completeDrop(ParseObject dropObject) {
 
         ParseUser user = ParseUser.getCurrentUser();
+        user.increment("userRipleCount");
+        user.saveInBackground();
         ParseRelation addToRelation = user.getRelation("completedDrops");
         addToRelation.add(dropObject);
         ParseRelation removeFromRelation = user.getRelation("todoDrops");
@@ -245,7 +247,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
         Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
         Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
-        Log.d("sViewDropAcitivty", "Send drop's authorName = " + mAuthorName);
+        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + mAuthorName);
         Log.d("sViewDropAcitivty", "Send drop's authorfacebookId = " + mAuthorFacebookId);
         Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
         Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
@@ -255,7 +257,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         Intent intent = new Intent(mContext, ViewDropActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
-        intent.putExtra("authorName", mAuthorName);
+        intent.putExtra("commenterName", mAuthorName);
         intent.putExtra("authorFacebookId", mAuthorFacebookId);
         intent.putExtra("dropDescription", mDropDescription);
         intent.putExtra("ripleCount", mRipleCount);
@@ -272,9 +274,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         String mClickedUserName = (data.get(position).getAuthorName());
         String mClickedUserFacebookId = (data.get(position).getFacebookId());
 
-        Log.d("sViewUserActivity", "Clicked User's Id = " + mClickedUserId);
-        Log.d("sViewUserActivity", "Clicked User's Name = " + mClickedUserName);
-        Log.d("sViewUserActivity", "Clicked User's facebookId = " + mClickedUserFacebookId);
+        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
+        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+        Log.d("sDropViewUser", "Clicked User's facebookId = " + mClickedUserFacebookId);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
             intent.putExtra("clickedUserId", mClickedUserId);

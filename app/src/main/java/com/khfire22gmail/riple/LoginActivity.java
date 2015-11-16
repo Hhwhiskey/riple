@@ -1,7 +1,6 @@
 package com.khfire22gmail.riple;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +13,7 @@ import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.application.RipleApplication;
+import com.khfire22gmail.riple.sinch.MessageService;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -27,6 +27,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private Dialog progressDialog;
     private Switch fbSwitch;
+    private Switch parseSwitch;
+    private Intent intent;
+    private Intent serviceIntent;
 
 
     @Override
@@ -34,12 +37,22 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Check if there is a currently logged in use and it's linked to a Facebook account.
+        // Bypass login screen if user is currently logged in
+        intent = new Intent(getApplicationContext(), MainActivity.class);
+        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+
         ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            startActivity(intent);
+            startService(serviceIntent);
+        }
+
+        // Check if there is a currently logged in use and it's linked to a Facebook account.
+        /*ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && ParseFacebookUtils.isLinked(currentUser)) {
             launchMainActivity();
             // If user is not null and ParseFB is linked, then go to app with login completed
-        }
+        }*/
 
         //Calls the keyhash method
         //printKeyHash(this);
@@ -50,17 +63,33 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         }
 
-        //Riple login switch
+
+        //Login Switches///////////////////////////////////////////////////////////////////////
+        //Parse login switch
+        parseSwitch = (Switch) findViewById(R.id.parse_switch);
+        parseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    parseLogin();
+
+                } else {
+
+                }
+            }
+        });
+
+        //Facebook login switch
         fbSwitch = (Switch) findViewById(R.id.fb_switch);
         fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    onLoginClick();
+                    fbLogin();
                 } else {
-                    onLogoutClick();
+                    fbLogout();
                 }
             }
         });
+        /////////////////////////////////////////////////////////////////////////////////////////
     }
 
     @Override
@@ -83,20 +112,25 @@ public class LoginActivity extends AppCompatActivity {
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void onLoginClick() {
-        progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
-        List<String> permissions = Arrays.asList("public_profile", "email");
+    //Login Functions ///////////////////////////////////////////////////////////////////////////
 
+    public void parseLogin() {
+        Intent intent = new Intent(LoginActivity.this, ParseLoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void fbLogin() {
+//        progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
+        List<String> permissions = Arrays.asList("public_profile", "email");
 //      Assigns the current user to Parse.userProfilePictureView
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
-                progressDialog.dismiss();
+//                progressDialog.dismiss();
                 if (user == null) {
                     Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
                     Toast.makeText(getApplicationContext(), "Uh oh. The user cancelled the Facebook login.", Toast.LENGTH_SHORT).show();
                 } else if (user.isNew()) {
-
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
                     Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
@@ -109,20 +143,19 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void launchMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
 
-
-    public void onLogoutClick() {
+    public void fbLogout() {
         // Log the user out
         ParseUser.logOut();
         Toast.makeText(getApplicationContext(), "You have logged out of Riple", Toast.LENGTH_SHORT).show();
     }
 
-    private void launchMainActivity() {
 
-
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -146,40 +179,5 @@ public class LoginActivity extends AppCompatActivity {
         AppEventsLogger.deactivateApp(this);
 
     }
-
-    //This is used to generate a keyhash for facebook
-    /*public static String printKeyHash(Activity context) {
-        PackageInfo packageInfo;
-        String key = null;
-        try {
-            //getting application package author, as defined in manifest
-            String packageName = context.getApplicationContext().getPackageName();
-
-            //Retrieving package info
-            packageInfo = context.getPackageManager().getPackageInfo(packageName,
-                    PackageManager.GET_SIGNATURES);
-
-            Log.e("Package Name=", context.getApplicationContext().getPackageName());
-
-            for (Signature signature : packageInfo.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                key = new String(Base64.encode(md.digest(), 0));
-
-                // String key = new String(Base64.encodeBytes(md.digest()));
-                Log.e("Key Hash=", key);
-            }
-        } catch (PackageManager.NameNotFoundException e1) {
-            Log.e("Name not found", e1.toString());
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("No such an algorithm", e.toString());
-        } catch (Exception e) {
-            Log.e("Exception", e.toString());
-        }
-
-        return key;
-    }*/
-
-
 }
 

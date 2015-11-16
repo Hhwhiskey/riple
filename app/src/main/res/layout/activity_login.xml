@@ -123,7 +123,7 @@ android:id="@+id/Login">
     android:paddingBottom="16dp"/>
 
 <Switch
-    android:id="@+id/switch1"
+    android:id="@+id/parse_switch"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:checked="false"

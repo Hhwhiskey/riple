@@ -8,9 +8,6 @@ import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
-import com.sromku.simple.fb.Permission;
-import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.SimpleFacebookConfiguration;
 
 
 /**
@@ -34,25 +31,6 @@ public class RipleApplication extends Application {
 
         //Saves current parse instance in the background
         ParseInstallation.getCurrentInstallation().saveInBackground();
-
-
-        //Simple Facebook requires these in the application file
-        Permission[] permissions = new Permission[]{
-                Permission.USER_PHOTOS,
-                Permission.EMAIL,
-                Permission.PUBLISH_ACTION,
-                Permission.PUBLIC_PROFILE,
-                Permission.READ_FRIENDLISTS
-        };
-
-        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-                .setAppId(getString(R.string.fb_app_id))
-                .setNamespace(getString(R.string.fb_namespace))
-                .setPermissions(permissions)
-                .build();
-
-        SimpleFacebook.setConfiguration(configuration);
-
 
         /*// Instantiate a SinchClient using the SinchClientBuilder.
         android.content.Context context = this.getApplicationContext();

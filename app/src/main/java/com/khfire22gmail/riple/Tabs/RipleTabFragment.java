@@ -39,16 +39,20 @@ public class RipleTabFragment extends Fragment {
     private List<DropItem> mRipleList;
     private DropAdapter mRipleAdapter;
     private RecyclerView.ItemAnimator animator;
+    private TextView profileRankView;
+    private TextView profileRipleCountView;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.tab_riple,container,false);
+        View view =inflater.inflate(R.layout.fragment_riple_tab,container,false);
 
 
 //        Profile Card
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.profile_pic);
         nameView = (TextView) view.findViewById(R.id.profile_name);
+        profileRankView = (TextView) view.findViewById(R.id.profile_rank);
+        profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -128,8 +132,8 @@ public class RipleTabFragment extends Fragment {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects authorName to drop
-//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
+                        //Id that connects commenterName to drop
+//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         ripleList.add(dropItem);
                     }
@@ -155,9 +159,13 @@ public class RipleTabFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("name");
         String facebookId = currentUser.getString("facebookId");
+        int userRipleCount = currentUser.getInt("userRipleCount");
+        String userRank = currentUser.getString("userRank");
             Bundle parametersPicture = new Bundle();
             parametersPicture.putString("fields", "picture.width(150).height(150)");
 
+
+            // Update User Picture
             if (facebookId != null) {
                 profilePictureView.setProfileId(facebookId);
 
@@ -166,11 +174,46 @@ public class RipleTabFragment extends Fragment {
                 profilePictureView.setProfileId(null);
             }
 
+
+            // Update UserName
             if (userName != null) {
                 nameView.setText(userName);
             } else {
-                nameView.setText("");
+                nameView.setText("Anonymous");
             }
+
+
+
+            // Update User Riple Score
+            if (profileRipleCountView != null| profileRipleCountView != null) {
+                profileRipleCountView.setText(String.valueOf(userRipleCount) + " Riples");
+            }
+
+
+
+            // Update User Rank
+
+            if (userRipleCount <=19){
+                profileRankView.setText("\"Drop\"");//1
+            }if (userRipleCount >39){
+                profileRankView.setText("\"Volunteer\"");//2
+            }if (userRipleCount >79){
+                profileRankView.setText("\"Do-Gooder\"");//3
+            }if (userRipleCount >159){
+                profileRankView.setText("\"Contributor\"");//4
+            }if (userRipleCount >319){
+                profileRankView.setText("\"Patron\"");//5
+            }if (userRipleCount >639){
+                profileRankView.setText("\"Beneficent\"");//6
+            }if (userRipleCount >1279){
+                profileRankView.setText("\"Humanitarian\"");//7
+            }if (userRipleCount >2559){
+                profileRankView.setText("\"Saint\"");//8
+            }if (userRipleCount >5119){
+                profileRankView.setText("\"Gandhi\"");//9
+            }if (userRipleCount >10239) {
+                profileRankView.setText("\"Mother Teresa\"");//10
+        }
     }
 
     private void startLoginActivity() {

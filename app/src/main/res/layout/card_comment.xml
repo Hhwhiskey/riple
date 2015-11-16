@@ -9,10 +9,13 @@
         android:id="@+id/card_comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="0dp"
-        card_view:cardElevation="8dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
 
         <RelativeLayout
             android:id="@+id/top_layout"
@@ -65,13 +68,12 @@
                 android:layout_marginLeft="8dp"/>
 
             <TextView
-                android:id="@+id/comment"
+                android:id="@+id/commentText"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@+id/created_at"
                 android:layout_alignRight="@+id/created_at"
                 android:elegantTextHeight="false"
-                android:ellipsize="end"
                 android:enabled="true"
                 android:focusable="false"
                 android:maxLines="5"

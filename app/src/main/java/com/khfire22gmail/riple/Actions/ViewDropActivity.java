@@ -9,11 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
@@ -21,9 +23,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,8 +54,10 @@ public class ViewDropActivity extends AppCompatActivity {
     private String mDropObjectId;
     private String mAuthorFacebookId;
     private String mDropDescription;
-    private ProfilePictureView commenterProfilePictureView;
     private ProfilePictureView authorProfilePictureView;
+    private ProfilePictureView postCommentProfilePictureView;
+    private String commentText;
+    private AutoCompleteTextView newCommentView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class ViewDropActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
         mAuthorId = intent.getStringExtra("authorId");
-        mAuthorName = intent.getStringExtra("authorName");
+        mAuthorName = intent.getStringExtra("commenterName");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
@@ -89,6 +90,13 @@ public class ViewDropActivity extends AppCompatActivity {
         authorProfilePictureView = (ProfilePictureView)findViewById(R.id.profile_picture);
         authorProfilePictureView.setProfileId(mAuthorFacebookId);
 
+        authorProfilePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewOtherUser(mAuthorId, mAuthorName, mAuthorFacebookId);
+            }
+        });
+
         nameView = (TextView) findViewById(R.id.name);
         nameView.setText(mAuthorName);
 
@@ -105,17 +113,24 @@ public class ViewDropActivity extends AppCompatActivity {
         createdAtView.setText(String.valueOf(mCreatedAt));
         ///////////////
 
-        updateViewsWithProfileInfo();
-
-        commenterProfilePictureView = (ProfilePictureView)findViewById(R.id.commenter_profile_picture);
-
-
-
-
-
+        //Update currentUser Commenter picture
+        updateUserInfo();
 
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
+
+        Button postCommentButton = (Button) findViewById(R.id.button_post_comment);
+        newCommentView = (AutoCompleteTextView) findViewById(R.id.enter_comment_text);
+
+        // Allow user to input Drop
+        postCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                commentText = newCommentView.getEditableText().toString();
+                postNewComment(commentText);
+            }
+        });
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
 //        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
@@ -148,22 +163,18 @@ public class ViewDropActivity extends AppCompatActivity {
 
                         // Commenter Id
                         commentItem.setObjectId(list.get(i).getObjectId());
-
+                        // DropId
+                        commentItem.setDropId(list.get(i).getString("dropId"));
+                        //Comment
+                        commentItem.setCommentText(list.get(i).getString("commentText"));
                         //CommenterId
-                        commentItem.setCommentersID(list.get(i).getString("commentersID"));
+                        commentItem.setCommenterId(list.get(i).getString("commenterId"));
+                        //Author name
+                        commentItem.setCommenterName(list.get(i).getString("commenterName"));
                         //Picture
                         commentItem.setFacebookId(list.get(i).getString("facebookId"));
-                        //Author name
-                        commentItem.setCommenter(list.get(i).getString("commenter"));
-
-                        //Author id
-//                        dropItem.setCommenter(list.get(i).getString("author"));
-
                         //Date
                         commentItem.setCreatedAt(list.get(i).getCreatedAt());
-
-                        //Comment
-                        commentItem.setComment(list.get(i).getString("commentText"));
 
 //                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
 
@@ -179,8 +190,8 @@ public class ViewDropActivity extends AppCompatActivity {
                         //Comment Count
 //                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects authorName to drop
-//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
+                        //Id that connects commenterName to drop
+//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         commentList.add(commentItem);
                     }
@@ -201,34 +212,63 @@ public class ViewDropActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mCommentAdapter);
     }
 
+    public void postNewComment(String commentText){
 
+        final ParseObject drop = new ParseObject("Drop");
+        ParseObject comment = new ParseObject("Comments");
+        final ParseUser user = ParseUser.getCurrentUser();
 
-    private void updateViewsWithProfileInfo() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser.has("profile")) {
-            JSONObject userProfile = currentUser.getJSONObject("profile");
-            try {
-                Bundle parametersPicture = new Bundle();
-                parametersPicture.putString("fields", "picture.width(150).height(150)");
+        comment.put("dropId", mDropObjectId);
+        comment.put("commenterId", user.getObjectId());
+        comment.put("commenterName", user.get("name"));
+        comment.put("facebookId", user.get("facebookId"));
+        comment.put("commentText", commentText);
+        comment.saveInBackground();
 
-                if (userProfile.has("facebookId")) {
-                    commenterProfilePictureView.setProfileId(userProfile.getString("facebookId"));
-
-                } else {
-                    // Show the default, blank user profile picture
-                    commenterProfilePictureView.setProfileId(null);
-                }
-
-                if (userProfile.has("name")) {
-                    nameView.setText(userProfile.getString("name"));
-                } else {
-                    nameView.setText("");
-                }
-
-            } catch (JSONException e) {
-                Log.d(RipleApplication.TAG, "Error parsing saved user data.");
+        /*(new SaveCallback() {// saveInBackground first and then run relation
+            @Override
+            public void done(ParseException e) {
+                ParseRelation<ParseObject> relation = drop.getRelation("comments");
+                relation.add(drop);
+                drop.saveInBackground();
             }
+        });*/
+
+    }
+
+    private void updateUserInfo() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        String facebookId = currentUser.getString("facebookId");
+        Bundle parametersPicture = new Bundle();
+        parametersPicture.putString("fields", "picture.width(150).height(150)");
+
+        if (facebookId != null) {
+           postCommentProfilePictureView = (ProfilePictureView) findViewById(R.id.post_comment_profile_picture);
+            postCommentProfilePictureView.setProfileId(facebookId);
+
+        } else {
+            // Show the default, blank user profile picture
+            postCommentProfilePictureView.setProfileId(null);
         }
+    }
+
+
+    // Allow user to view the Drop's Author's profile
+    private void viewOtherUser(String mAuthorId, String mAuthorName, String mAuthorFacebookId) {
+
+        String mClickedUserId = mAuthorId;
+        String mClickedUserName = mAuthorName;
+        String mClickedUserFacebookId = mAuthorFacebookId;
+
+        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
+        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+        Log.d("sDropViewUser", "Clicked User's facebookId = " + mClickedUserFacebookId);
+
+        Intent intent = new Intent(this, ViewUserActivity.class);
+        intent.putExtra("clickedUserId", mClickedUserId);
+        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
+        this.startActivity(intent);
     }
 
     @Override

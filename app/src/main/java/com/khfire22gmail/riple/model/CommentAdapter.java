@@ -81,18 +81,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
     private void viewOtherUser(int position) {
 
-        String mAuthorId = (data.get(position).getCommentersID());
-        String mAuthorName = (data.get(position).getCommenter());
-        String mFacebookId = (data.get(position).getFacebookId());
+        String mClickedUserId = (data.get(position).getCommenterId());
+        String mClickedUserName = (data.get(position).getCommenterName());
+        String mClickedUserFacebookId = (data.get(position).getFacebookId());
 
-        Log.d("sOTHERUSEREXTRA", "Clicked User's author = " + mAuthorId);
-        Log.d("sOTHERUSEREXTRA", "Clicked User's authorName = " + mAuthorName);
-        Log.d("sOTHERUSEREXTRA", "Clicked User's facebookId = " + mFacebookId);
+        Log.d("sCommentViewUser", "Clicked User's userId = " + mClickedUserId);
+        Log.d("sCommentViewUser", "Clicked User's clickedUserName = " + mClickedUserName);
+        Log.d("sCommentViewUser", "Clicked User's clickedFacebookId = " + mClickedUserFacebookId);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-        intent.putExtra("author", mAuthorId);
-        intent.putExtra("name", mAuthorName);
-        intent.putExtra("facebookId", mFacebookId);
+        intent.putExtra("clickedUserId", mClickedUserId);
+        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
         mContext.startActivity(intent);
     }
 
@@ -108,58 +108,27 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
             }
         });
 
-        viewHolder.commenter.setOnClickListener(new View.OnClickListener() {
+        viewHolder.commenterName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewOtherUser(position);
+            }
+        });
+
+        viewHolder.commentText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewOtherUser(position);
+            }
+        });
+
+        viewHolder.createdAt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 viewOtherUser(position);
             }
         });
     }
-
-    /*private void viewDrop(int position) {
-        String mDropId = (data.get(position).getObjectId());
-        String mAuthorId = (data.get(position).getAuthorId());
-        String mAuthorName = (data.get(position).getAuthorName());
-        String mFacebookId = (data.get(position).getFacebookId());
-        String mCommenter = (data.get(position).getCommenter());
-        Intent intent = new Intent(mContext, ViewDropActivity.class);
-        intent.putExtra("objectId", mDropId);
-        intent.putExtra("authorId", mAuthorId);
-        intent.putExtra("authorName", mAuthorName);
-        intent.putExtra("facebookId", mFacebookId);
-        intent.putExtra("commenter", mCommenter);
-        mContext.startActivity(intent);
-    }
-*/
-    /*private void shareDrop(int position) {
-        String mDropId = (data.get(position).getObjectId());
-        Intent intent = new Intent(mContext, ShareDrop.class);
-        intent.putExtra("objectId", mDropId);
-        mContext.startActivity(intent);
-    }*/
-
-    // onClick action for viewing other user
-    /*private void viewOtherUser(int position) {
-        String mAuthorId = (data.get(position).getAuthorId());
-        String mAuthorName = (data.get(position).getAuthorName());
-        String mFacebookId = (data.get(position).getFacebookId());
-        Log.d("Kevin", "Clicked User's authorId = " + mAuthorId);
-        Log.d("Kevin", "Clicked User's authorName = " + mAuthorName);
-        Log.d("Kevin", "Clicked User's facebookId = " + mFacebookId);
-        Intent intent = new Intent(mContext, ViewUserActivity.class);
-        intent.putExtra("authorId", mAuthorId);
-        intent.putExtra("authorName", mAuthorName);
-        intent.putExtra("facebookId", mFacebookId);
-        mContext.startActivity(intent);
-    }*/
-
-    /*public String passClickExtraData(int position) {
-        String mObjectId = (data.get(position).getObjectId());
-        String mAuthorId = (data.get(position).getAuthorId());
-        String mAuthorName = (data.get(position).getAuthorName());
-        String mFacebookId = (data.get(position).getFacebookId());
-         return;
-    }*/
 
     @Override
     public int getItemCount() {
@@ -170,10 +139,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
         public ProfilePictureView profilePicture;
         public TextView createdAt;
-        public TextView description;
-        public TextView commenter;
-        public TextView comment;
-
+        public TextView commentText;
+        public TextView commenterName;
 
         public MyViewHolder(View itemView) {
 
@@ -181,8 +148,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
             profilePicture = (ProfilePictureView) itemView.findViewById(R.id.commenter_profile_picture);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
-            commenter = (TextView) itemView.findViewById(R.id.commenter);
-            comment = (TextView) itemView.findViewById(R.id.comment);
+            commenterName = (TextView) itemView.findViewById(R.id.commenter);
+            commentText = (TextView) itemView.findViewById(R.id.commentText);
 
             itemView.setOnClickListener(this);
         }
@@ -193,8 +160,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
             profilePicture.setProfileId(current.facebookId);
             createdAt.setText(String.valueOf(current.createdAt));
-            commenter.setText(current.commenter);
-            comment.setText(current.comment);
+            commenterName.setText(current.commenterName);
+            commentText.setText(current.commentText);
 //            share.setT(current.objectId();
         }
 

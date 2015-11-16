@@ -32,8 +32,8 @@ public class Comments extends MainActivity {
     Post
     Video*/
 
-    //One comment
-    //mSimpleFacebook.getComment(commentId, onCommentsListener);
+    //One commentText
+    //mSimpleFacebook.getCommentText(commentId, onCommentsListener);
 
     //Multiple Comments
     //String entityId = ...;

@@ -9,10 +9,13 @@
         android:id="@+id/card_trickle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="0dp"
-        card_view:cardElevation="8dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
 
         <RelativeLayout
             android:id="@+id/top_layout"
@@ -121,7 +124,6 @@
                 android:layout_alignLeft="@+id/created_at"
                 android:layout_alignStart="@+id/created_at"
                 android:gravity="left"
-                android:layout_marginLeft="8dp"
                 />
 
             <ImageView
@@ -130,11 +132,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
-                android:layout_alignBottom="@+id/switch_todo"
-                android:layout_toLeftOf="@+id/switch_todo"
-                android:layout_toStartOf="@+id/switch_todo"
                 android:layout_below="@+id/description"
-                />
+                android:layout_toLeftOf="@+id/checkbox_complete"
+                android:layout_toStartOf="@+id/checkbox_complete"
+                android:layout_alignBottom="@+id/checkbox_complete"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"/>
 
             <Switch
                 android:layout_width="wrap_content"
@@ -145,7 +148,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginRight="16dp"
-                android:layout_marginLeft="24dp"/>
+                android:layout_marginTop="3dp"
+                />
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -153,10 +157,12 @@
                 android:id="@+id/checkbox_complete"
                 android:visibility="visible"
                 android:checked="false"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="8dp"/>
+                android:layout_below="@+id/description"
+                android:layout_alignRight="@+id/name"
+                android:layout_alignEnd="@+id/name"
+                android:layout_toLeftOf="@+id/switch_todo"
+                android:layout_marginRight="45dp"
+                android:layout_marginLeft="10dp"/>
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

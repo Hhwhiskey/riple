@@ -23,6 +23,8 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.khfire22gmail.riple.application.RipleApplication;
+import com.khfire22gmail.riple.settings.Settings;
+import com.khfire22gmail.riple.sinch.MessageService;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
 import com.parse.ParseException;
@@ -30,6 +32,7 @@ import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.sinch.android.rtc.SinchClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,16 +45,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SlidingTabLayout tabs;
     CharSequence Titles[] = {"Riple", "Drops", "Trickle", "Friends"};
     int numOfTabs = 4;
-
-//    private String dropTitle;
     private String dropDescription;
-//    private AutoCompleteTextView dropTitleView;
     private AutoCompleteTextView dropDescriptionView;
+    private SinchClient sinchClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+        startService(serviceIntent);
 
 //        ScrollingFABBehavior(this, obtainStyledAttributes(R.attr.toolBarHeight));
 
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
-        // mViewPager.setCurrentItem(R.layout.tab_drop);
+        // mViewPager.setCurrentItem(R.layout.fragment_drop_tab);
         // mViewPager.setCurrentItem(position);
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setCurrentItem(2);
 
         // Allow fragments to stay in memory
-//        mPager.setOffscreenPageLimit(3);
+        mPager.setOffscreenPageLimit(3);
 
         // Assigning the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
@@ -138,12 +142,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
 
-//                dropTitle = dropTitleView.getEditableText().toString();
                 dropDescription = dropDescriptionView.getEditableText().toString();
                 createDrop(dropDescription);
                 popupWindow.dismiss();
-
-//                Log.d("Kevin", "Title = " + dropTitle);
             }
         });
     }
@@ -154,16 +155,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser user = ParseUser.getCurrentUser();
 
-//        drop.put("author", user.getObjectId());
+        drop.put("author", user.getObjectId());
         drop.put("facebookId", user.get("facebookId"));
         drop.put("name", user.get("name"));
         drop.put("description", dropDescription);
         drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
             @Override
             public void done(ParseException e) {
-                ParseRelation<ParseObject> relation = user.getRelation("createdDrops");
-                relation.add(drop);
+                ParseRelation<ParseObject> relationCreatedDrops = user.getRelation("createdDrops");
+                relationCreatedDrops.add(drop);
                 user.saveInBackground();
+                ParseRelation<ParseObject> relationHasRelationTo = user.getRelation("hasRelationTo");
+                relationHasRelationTo.add(drop);
+                user.saveInBackground();
+
             }
         });
     }
@@ -192,13 +197,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == R.id.settingsButton) {
+            ParseUser.logOut();
+            Intent intentSettings = new Intent(getApplicationContext(), Settings.class);
+            startActivity(intentSettings);
+            return true;
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.logoutButton) {
             ParseUser.logOut();
-            // Go to the login view
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(intent);
-
+            Intent intentLogout = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intentLogout);
             return true;
         }
 
@@ -216,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 // Save the user profile info in a user property
                                 final ParseUser currentUser = ParseUser.getCurrentUser();
                                 currentUser.put("facebookId", jsonObject.getString("id"));
-                                currentUser.put("name", jsonObject.getString("name"));
+                                currentUser.put("userName", jsonObject.getString("name"));
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
@@ -262,6 +272,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*private void logout() {
         // Log the user out
         ParseUser.logOut();
+        //todo Turn off Sinch functions upon logout of Riple
+        sinchClient.stopListeningOnActiveConnection();
+        sinchClient.terminate();
 
         // Go to the login view
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

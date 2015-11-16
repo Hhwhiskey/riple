@@ -42,7 +42,7 @@ public class DropsTabFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tab_drop, container, false);
+        View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
 
         dropObjectsList = new ArrayList<>();
 
@@ -110,8 +110,8 @@ public class DropsTabFragment extends Fragment {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects authorName to drop
-//                              dropItem.setAuthorName(list.get(i).getString("authorName"));
+                        //Id that connects commenterName to drop
+//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         dropList.add(dropItem);
                     }

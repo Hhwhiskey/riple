@@ -15,6 +15,9 @@
     <string name="sinch_key">deb1a018-2618-47b2-ade6-dc028ae98f11</string>
     <string name="sinch_secret">5/DZkA0LnEWBHBaH6bBEhA==</string>
     <string name="sinch_environment_host">sandbox.sinch.com</string>
+    <string name="message_elipses">Message...</string>
+    <string name="username">USERNAME</string>
+    <string name="password">PASSWORD</string>
     <string name="quote">“I alone cannot change the world, but I can cast a stone across the waters to create many ripples.”</string>
     <string name="title_activity_todo_tab">TodoTab</string>
     <string name="title_activity_list_users">ListUsersActivity</string>
@@ -27,5 +30,9 @@
     <string name="title_activity_create_drop">CreateDrop</string>
     <string name="title_activity_clicked_drop">ClickedDrop</string>
     <string name="title_activity_view_riple">ViewRiple</string>
+    <string name="title_activity_messaging">MessagingActivity</string>
+    <string name="title_activity_parse_login_activity">ParseLoginAcitivty</string>
+    <string name="email">E-MAIL</string>
+    <string name="title_activity_edit_profile">EditProfile</string>
 
 </resources>
