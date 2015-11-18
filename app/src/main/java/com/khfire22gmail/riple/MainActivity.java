@@ -23,7 +23,8 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.khfire22gmail.riple.application.RipleApplication;
-import com.khfire22gmail.riple.settings.Settings;
+import com.khfire22gmail.riple.settings.AboutActivity;
+import com.khfire22gmail.riple.settings.SettingsActivity;
 import com.khfire22gmail.riple.sinch.MessageService;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         drop.put("author", user.getObjectId());
         drop.put("facebookId", user.get("facebookId"));
-        drop.put("name", user.get("name"));
+        drop.put("name", user.get("username"));
         drop.put("description", dropDescription);
         drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
             @Override
@@ -199,7 +200,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (id == R.id.settingsButton) {
             ParseUser.logOut();
-            Intent intentSettings = new Intent(getApplicationContext(), Settings.class);
+            Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intentSettings);
+            return true;
+        }
+
+        if (id == R.id.aboutButton) {
+            ParseUser.logOut();
+            Intent intentSettings = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intentSettings);
             return true;
         }
@@ -226,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 // Save the user profile info in a user property
                                 final ParseUser currentUser = ParseUser.getCurrentUser();
                                 currentUser.put("facebookId", jsonObject.getString("id"));
-                                currentUser.put("userName", jsonObject.getString("name"));
+                                currentUser.put("username", jsonObject.getString("name"));
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {

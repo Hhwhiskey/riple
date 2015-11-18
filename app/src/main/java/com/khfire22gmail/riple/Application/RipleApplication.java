@@ -31,15 +31,6 @@ public class RipleApplication extends Application {
 
         //Saves current parse instance in the background
         ParseInstallation.getCurrentInstallation().saveInBackground();
-
-        /*// Instantiate a SinchClient using the SinchClientBuilder.
-        android.content.Context context = this.getApplicationContext();
-        SinchClient sinchClient = Sinch.getSinchClientBuilder().context(context)
-                .applicationKey(getString(R.string.SINCH_APP_KEY))
-                .applicationSecret(getString(R.string.SINCH_APP_SECRET))
-                .environmentHost(getString(R.string.SINCH_ENVIRONMENT_HOST))
-                .userId("<user id>")
-                .build();*/
     }
 
     public static void updateParseInstallation() {

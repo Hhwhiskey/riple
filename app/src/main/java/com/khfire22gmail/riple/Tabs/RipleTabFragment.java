@@ -61,7 +61,7 @@ public class RipleTabFragment extends Fragment {
         //Update Profile Card
 //        updateViewsWithProfileInfo();
 
-        //Query the users created and completed drops
+        //Query the users created and completed drops_blue
         loadRipleItemsFromParse();
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);

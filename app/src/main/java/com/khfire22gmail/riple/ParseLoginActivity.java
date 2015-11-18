@@ -81,7 +81,7 @@ public class ParseLoginActivity extends AppCompatActivity {
 //                user.setEmail(email);
                 user.setUsername(username);
                 user.setPassword(password);
-                user.put("name", username);
+                user.put("username", username);
 
                 user.signUpInBackground(new SignUpCallback() {
                     public void done(com.parse.ParseException e) {

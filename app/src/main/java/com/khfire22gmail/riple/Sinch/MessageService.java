@@ -29,7 +29,7 @@ public class MessageService extends Service implements SinchClientListener {
     private SinchClient sinchClient = null;
     private MessageClient messageClient = null;
     private String currentUserId;
-    private Intent broadcastIntent = new Intent("com.sinch.messagingtutorial.app.ListUsersActivity");
+    private Intent broadcastIntent = new Intent("com.khfire22gmail.riple.tabs.FriendsTabFragment");
     private LocalBroadcastManager broadcaster;
 
 
@@ -45,12 +45,12 @@ public class MessageService extends Service implements SinchClientListener {
     }
     public void startSinchClient(String username) {
         sinchClient = Sinch.getSinchClientBuilder()
-                .context(this)
-                .userId(username)
-                .applicationKey(APP_KEY)
-                .applicationSecret(APP_SECRET)
-                .environmentHost(ENVIRONMENT)
-                .build();
+                           .context(this)
+                           .userId(username)
+                           .applicationKey(APP_KEY)
+                           .applicationSecret(APP_SECRET)
+                           .environmentHost(ENVIRONMENT)
+                           .build();
         //this client listener requires that you define
         //a few methods below
         sinchClient.addSinchClientListener(this);
@@ -72,10 +72,10 @@ public class MessageService extends Service implements SinchClientListener {
     }
     @Override
     public void onClientStarted(SinchClient client) {
-        client.startListeningOnActiveConnection();
-        messageClient = client.getMessageClient();
         broadcastIntent.putExtra("success", true);
         broadcaster.sendBroadcast(broadcastIntent);
+        client.startListeningOnActiveConnection();
+        messageClient = client.getMessageClient();
     }
     @Override
     public void onClientStopped(SinchClient client) {

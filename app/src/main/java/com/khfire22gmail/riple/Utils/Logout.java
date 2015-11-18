@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.settings;
+package com.khfire22gmail.riple.utils;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

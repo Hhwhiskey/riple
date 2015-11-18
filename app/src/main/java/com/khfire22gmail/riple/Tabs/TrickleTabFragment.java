@@ -14,9 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
@@ -28,6 +26,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
@@ -54,9 +53,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     List<DropItem> mTrickleList;
     DropAdapter mTrickleAdapter;
     public static ArrayList<ParseObject> trickleObjectsList;
-    ProfilePictureView picture;
-    TextView usedText;
-    private ArrayList trickleList;
+    public ArrayList <DropItem> trickleList;
+
+
 
 
     /*public void onActivityCreated (Bundle savedInstanceState)
@@ -83,30 +82,20 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         Log.d("KEVIN", "loading items from Parse now");
 //        loadHasRelationToFromParse();
-        loadAllDropsFromParse();
+//        loadAllDropsFromParse();
 
+
+        //Query currentUser "hasRelationTo" and compare to all Drops, showing only no relation Drops.
+        trickleList = filterDrops(loadRelationDropsFromParse(), loadAllDropsFromParse());
+        updateRecyclerView(trickleList);
+//        loadRelationDropsFromParse();
+//        loadAllDropsFromParse();
+
+        Log.d("Kevin", "trickleList = " + trickleList);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //        mRecyclerView.setItemAnimator(animator);
         mRecyclerView.setItemAnimator(new SlideInUpAnimator());
-
-/*//        This will show a popup window which will contain the activity_clicked_drop
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                ViewGroup container = (ViewGroup) layoutInflater.inflate(R.layout.activity_clicked_drop, null);
-                popupWindow = new PopupWindow(container, 500, 500, true);
-                popupWindow.showAtLocation(relativeLayout, Gravity.NO_GRAVITY, 500, 500);
-                container.setOnTouchListener(new View.OnTouchListener() {
-                     @Override
-                     public boolean onTouch(View view, MotionEvent motionEvent) {
-                         popupWindow.dismiss();
-                         return true;
-                     }
-                 });
-            }
-        });*/
 
         return view;
     }
@@ -184,28 +173,21 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadRelationDropsFromParse() {
-        final ArrayList<DropItem> hasRelationDrops = new ArrayList<>();
+    public ArrayList <DropItem> loadRelationDropsFromParse() {
 
-        // We only want to show Drops that have no relation to the user.
-        // In other words, if the user has ToDo'd, Created, or Completed
-        // this drop, we DO NOT want to show it.
+        final ArrayList <DropItem> hasRelationList = new ArrayList<>();
 
-        // 1st: put together query for hasRelationTo
         ParseUser user = ParseUser.getCurrentUser();
 
         ParseRelation relation = user.getRelation("hasRelationTo");
 
-        ParseQuery hasRelationToQuery = relation.getQuery();
+        ParseQuery hasRelationQuery = relation.getQuery();
 
 //        hasRelationToQuery.orderByDescending("createdAt");
 
-        hasRelationToQuery.findInBackground(new FindCallback<ParseObject>() {
+        hasRelationQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
-
-                // 2nd: save the "hasRelationTo" list locally so we don't have
-                // to query it again
 
                 if (e != null) {
                     Log.d("KEVIN", "error error");
@@ -213,30 +195,25 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
-                        Log.d("KEVIN", hasRelationDrops.get(i).getObjectId());
-
                         DropItem dropItemRelation = new DropItem();
 
                         dropItemRelation.setObjectId(list.get(i).getObjectId());
 
-                        hasRelationDrops.add(dropItemRelation);
+                        hasRelationList.add(dropItemRelation);
                     }
                 }
             }
         });
+        return hasRelationList;
     }
-        // 3rd: For each Drop in this Trickle List, check locally (by using ArrayList.contains to see
-        // if the Drop is contained in the "hasRelationTo" list
 
-        // 4th: If the drop is NOT contained, then the user has not interacted with it, and therefore
-        // it should be displayed in this Trickle List
+    public ArrayList <DropItem> loadAllDropsFromParse() {
 
-
-    public void loadAllDropsFromParse() {
-
-        final ArrayList<DropItem> allDropsList = new ArrayList<>();
+        final ArrayList <DropItem> allDropsList  = new ArrayList<>();
 
         final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
+
+        dropQuery.orderByDescending("createdAt");
 
         dropQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -247,8 +224,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
                 } else {
                     for (int i = 0; i < list.size(); i++) {
-
-//                        Log.d("KEVIN", trickleList.get(i).getDescription());
 
                         //Collects Drop Objects
                         trickleObjectsList.add(list.get(i));
@@ -263,74 +238,45 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         dropItemAll.setAuthorName(list.get(i).getString("name"));
                         //Picture
                         dropItemAll.setFacebookId(list.get(i).getString("facebookId"));
-                        //Date
+                        //CreatedAt
                         dropItemAll.setCreatedAt(list.get(i).getCreatedAt());
-
                         //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
                         //Drop description
                         dropItemAll.setDescription(list.get(i).getString("description"));
-
                         //Riple Count
                         dropItemAll.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-
                         //Comment Count
                         dropItemAll.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenterName to drop
-                        //                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
-
                         allDropsList.add(dropItemAll);
                     }
-
-                    updateRecyclerView(allDropsList);
                 }
             }
         });
+        return allDropsList;
     }
 
-   /* public ArrayList FilterDropsBasedOnRelation(ArrayList hasRelationToList , ArrayList allDropsList){
+    public ArrayList<DropItem> filterDrops(ArrayList <DropItem> hasRelationList, ArrayList <DropItem> allDropsList){
+        Iterator<DropItem> allDropsIterator = allDropsList.iterator();
 
-        for(String dropItemRelation  : hasRelationToList) {
+        while(allDropsIterator.hasNext()) {
+            DropItem dropItemAll = allDropsIterator.next();
 
-            for(String dropItemAll : allDropsList) {
-
-                if(dropItemRelation.getObjectId().equals(dropItemAll.getObjectId())) {
-                    allDropsList.remove(dropItemAll);
+            for(DropItem dropItemRelation  : hasRelationList) {
+                if(dropItemAll.getObjectId().equals(dropItemRelation.getObjectId())){
+                    allDropsIterator.remove();
                 }
             }
         }
+        return allDropsList;
+    }
 
-        trickleList = allDropsList;
-
-        return trickleList;
-    }*/
-
-
-    private void updateRecyclerView(List<DropItem> items) {
+    private void updateRecyclerView(ArrayList<DropItem> items) {
         Log.d("KEVIN", "TRICKLE LIST SIZE: " + items.size());
 
         mTrickleList = items;
 
         mTrickleAdapter = new DropAdapter(getActivity(), mTrickleList, "trickle");
         mRecyclerView.setAdapter(mTrickleAdapter);
-    }
-
-
-    //    Adds this Drop to your Drops list
-    public void AddDropToYourList() {
-
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
-        ParseObject drop = new ParseObject("Drop");
-        drop.put("todo", currentUser.getObjectId());
-
-        /*drop.put("facebookId", currentUser.get("facebookId"));
-        drop.put("name", currentUser.get("name"));
-        drop.put("title", dropTitle);
-        drop.put("description", dropDescription);*/
-
-        drop.saveInBackground();
     }
 }

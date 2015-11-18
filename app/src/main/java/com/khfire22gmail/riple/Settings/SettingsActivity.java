@@ -16,7 +16,7 @@ import com.khfire22gmail.riple.R;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 0;
     private static final String TAG = null;
@@ -25,16 +25,17 @@ public class Settings extends AppCompatActivity {
     EditText aboutUserField;
     public ParseUser currentUser = ParseUser.getCurrentUser();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        String facebookId = currentUser.getString("facebookId");
 
         editProfilePicture = (ProfilePictureView) findViewById(R.id.edit_profile_picture);
-        editProfilePicture.setProfileId("");
+        editProfilePicture.setProfileId(facebookId);
         aboutUserField = (EditText)findViewById(R.id.about_user_field);
+
 
 
         editProfilePicture.setOnClickListener(new View.OnClickListener() {

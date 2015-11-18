@@ -9,10 +9,10 @@
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/usersListView"
+              android:id="@+id/users_list_view"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:background="#ffffff"
               android:padding="16dp"
-              tools:context="com.example.messagingtutorial.app.ListUsersActivity" />
+              tools:context="com.khfire22gmail.riple.tabs.FriendsTabFragment"/>
 </LinearLayout>

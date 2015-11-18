@@ -38,35 +38,19 @@ public class FriendsTabFragment extends Fragment {
     private ArrayList<String> names;
     private ArrayAdapter<String> namesArrayAdapter;
     private ProgressDialog progressDialog;
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver receiver = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
+        final View view = inflater.inflate(R.layout.fragment_friends_tab, container, false);
 
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
+        showSpinner();
 
-        //broadcast receiver to listen for the broadcast
-        //from MessageService
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Boolean success = intent.getBooleanExtra("success", false);
-                progressDialog.dismiss();
+        return view;
+    }
 
-                //show a toast message if the Sinch
-                //service failed to start
-                if (!success) {
-                    Toast.makeText(getActivity(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("com.sinch.messagingtutorial.app.ListUsersActivity"));
-
-        //Show list of all users
+    //Show list of all users
+    private void setConversationsList() {
         currentUserId = ParseUser.getCurrentUser().getObjectId();
         names = new ArrayList<>();
         ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -78,8 +62,8 @@ public class FriendsTabFragment extends Fragment {
                     for (int i = 0; i < userList.size(); i++) {
                         names.add(userList.get(i).getUsername());
                     }
-                    usersListView = (ListView) view.findViewById(R.id.usersListView);
-                    namesArrayAdapter = new ArrayAdapter<>(getActivity(),R.layout.user_list_item, names);
+                    usersListView = (ListView) getActivity().findViewById(R.id.users_list_view);
+                    namesArrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.user_list_item, names);
                     usersListView.setAdapter(namesArrayAdapter);
 
                     usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -95,17 +79,17 @@ public class FriendsTabFragment extends Fragment {
                 }
             }
         });
-
-        return view;
     }
+
     // Opens sinch conversation when it is clicked
     public void openConversation(ArrayList<String> names, int pos) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("name", names.get(pos));
+        query.whereEqualTo("username", names.get(pos));
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {
                     Intent intent = new Intent(getActivity(), MessagingActivity.class);
+                    intent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
                     startActivity(intent);
                 } else {
                     Toast.makeText(getActivity(),
@@ -116,12 +100,40 @@ public class FriendsTabFragment extends Fragment {
         });
     }
 
+    //show a loading spinner while the sinch client starts
+    private void showSpinner() {
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Boolean success = intent.getBooleanExtra("success", false);
+                progressDialog.dismiss();
+                if (!success) {
+                    Toast.makeText(getActivity(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, new IntentFilter("com.khfire22gmail.riple.tabs.FriendsTabFragment"));
+
+    }
+
    /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_list_users, menu);
         return true;
     }*/
+
+    @Override
+    public void onResume() {
+        setConversationsList();
+        super.onResume();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

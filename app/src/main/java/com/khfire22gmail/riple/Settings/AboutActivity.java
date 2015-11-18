@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import com.khfire22gmail.riple.R;
 
-public class About extends AppCompatActivity {
+public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

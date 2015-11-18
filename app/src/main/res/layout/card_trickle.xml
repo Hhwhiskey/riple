@@ -25,6 +25,13 @@
             android:paddingBottom="8dp"
             android:alpha="123124">
 
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/trickle_card_tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="#BBDEFB"
+                android:clickable="false"/>
+
             <com.facebook.login.widget.ProfilePictureView
                 android:id="@+id/profile_picture"
                 android:layout_width="65dp"
@@ -49,7 +56,7 @@
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="20sp"
-                android:textColor="@color/PrimaryText"
+                android:textColor="#000000"
                 android:singleLine="true"
                 android:layout_margin="8dp"
                 android:layout_alignTop="@+id/profile_picture"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><color name="ColorPrimary">#2196F3</color>
     <color name="ColorPrimaryDark">#1976D2</color>
-    <color name="AccentColor">#536DFE</color>
+    <color name="AccentColor">#00E5FF</color>
     <color name="PrimaryText">#000</color>
     <color name="tabsScrollColor">#ffffff</color>
     <color name="fab_color_1">#ff5252</color>
@@ -9,7 +9,6 @@
     <color name="fab_color_2">#9c27b0</color>
     <color name="fab_color_2_muted">#a56ab0</color>
     <color name="Primary_Background_Color">#dfdfdf</color>
-
     <color name="parse_login_accent_color">@color/AccentColor</color>
     <color name="off_white">#fffafafa</color>
     <color name="dark_gray">#ffb3b3b3</color>

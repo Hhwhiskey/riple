@@ -2,14 +2,18 @@ package com.khfire22gmail.riple;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.application.RipleApplication;
@@ -36,6 +40,23 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //Remove status bar
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        //Splash Video
+        VideoView drops = (VideoView)findViewById(R.id.login_video);
+        String path = "android.resource://" + getPackageName() + "/" + R.raw.drops_outside;
+        drops.setVideoURI(Uri.parse(path));
+        drops.start();
+
+        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
 
         // Bypass login screen if user is currently logged in
         intent = new Intent(getApplicationContext(), MainActivity.class);
