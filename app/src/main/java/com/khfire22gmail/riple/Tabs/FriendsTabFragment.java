@@ -44,7 +44,7 @@ public class FriendsTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_friends_tab, container, false);
 
-        showSpinner();
+//        showSpinner();
 
         return view;
     }

@@ -38,13 +38,11 @@ public class DropsTabFragment extends Fragment {
     private DropAdapter mDropAdapter;
     private RecyclerView.ItemAnimator animator;
     private CheckBox completeCheckBox;
-    public static ArrayList<ParseObject> dropObjectsList;
+    public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
-
-        dropObjectsList = new ArrayList<>();
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -116,9 +114,9 @@ public class DropsTabFragment extends Fragment {
                         dropList.add(dropItem);
                     }
 
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + dropList.size());
-                    updateRecyclerView(dropList);
+
                 }
+                updateRecyclerView(dropList);
             }
         });
     }

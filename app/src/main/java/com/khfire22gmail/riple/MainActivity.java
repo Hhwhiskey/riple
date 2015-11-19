@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -144,34 +145,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View v) {
 
                 dropDescription = dropDescriptionView.getEditableText().toString();
-                createDrop(dropDescription);
+                try {
+                    createDrop(dropDescription);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 popupWindow.dismiss();
             }
         });
     }
 
     // Take user input and post the Drop
-    public void createDrop(String dropDescription) {
+    public void createDrop(String dropDescription) throws InterruptedException {
 
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser user = ParseUser.getCurrentUser();
 
-        drop.put("author", user.getObjectId());
-        drop.put("facebookId", user.get("facebookId"));
-        drop.put("name", user.get("username"));
-        drop.put("description", dropDescription);
-        drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
-            @Override
-            public void done(ParseException e) {
-                ParseRelation<ParseObject> relationCreatedDrops = user.getRelation("createdDrops");
-                relationCreatedDrops.add(drop);
-                user.saveInBackground();
-                ParseRelation<ParseObject> relationHasRelationTo = user.getRelation("hasRelationTo");
-                relationHasRelationTo.add(drop);
-                user.saveInBackground();
+        if(dropDescription != null) {
+            drop.put("author", user.getObjectId());
+            drop.put("facebookId", user.get("facebookId"));
+            drop.put("name", user.get("username"));
+            drop.put("description", dropDescription);
+            drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
+                @Override
+                public void done(ParseException e) {
+                    ParseRelation<ParseObject> relationCreatedDrops = user.getRelation("createdDrops");
+                    relationCreatedDrops.add(drop);
+                    user.saveInBackground();
+                    ParseRelation<ParseObject> relationHasRelationTo = user.getRelation("hasRelationTo");
+                    relationHasRelationTo.add(drop);
+                    user.saveInBackground();
+                }
+            });
+        }
+//        RipleTabFragment fragment = (RipleTabFragment) getSupportFragmentManager().findFragmentById(R.id.riple_recycler_view);
+//        fragment.RefreshRipleTab();
+        Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
 
-            }
-        });
+        Thread.sleep(250);
+
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+
     }
 
     @Override

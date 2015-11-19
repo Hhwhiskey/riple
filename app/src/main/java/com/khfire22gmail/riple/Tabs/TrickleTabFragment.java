@@ -52,8 +52,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     RecyclerView mRecyclerView;
     List<DropItem> mTrickleList;
     DropAdapter mTrickleAdapter;
-    public static ArrayList<ParseObject> trickleObjectsList;
-    public ArrayList <DropItem> trickleList;
+    public static ArrayList<ParseObject> trickleObjectsList = new ArrayList<>();
+    final ArrayList <DropItem> hasRelationList = new ArrayList<>();
+    public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
 
 
 
@@ -65,16 +66,15 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     savedInstanceState	If the fragment is being re-created from a previous saved state, this is the state.*/
     /*@Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
     }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
-        trickleObjectsList = new ArrayList<>();
 
-        setRetainInstance(true);
+
+
 
 //        Create recyclerView and set it to display list
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
@@ -86,12 +86,13 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
 
         //Query currentUser "hasRelationTo" and compare to all Drops, showing only no relation Drops.
-        trickleList = filterDrops(loadRelationDropsFromParse(), loadAllDropsFromParse());
-        updateRecyclerView(trickleList);
-//        loadRelationDropsFromParse();
-//        loadAllDropsFromParse();
 
-        Log.d("Kevin", "trickleList = " + trickleList);
+        loadAllDropsFromParse();
+//        filterDrops(hasRelationList, allDropsList);
+//        updateRecyclerView(filterDrops(hasRelationList, allDropsList));
+
+
+
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //        mRecyclerView.setItemAnimator(animator);
@@ -100,11 +101,11 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         return view;
     }
 
-    @Override
+   /* @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        /*if (savedInstanceState != null) {
+        if (savedInstanceState != null) {
             //probably orientation change
             myData = (List<String>) savedInstanceState.getSerializable("list");
         } else {
@@ -114,10 +115,10 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 //newly created, compute data
                 myData = computeData();
             }
-        }*/
+        }
 
 
-    }
+    }*/
 
     /*private void initView() {
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) getActivity().findViewById(R.id.main_swipe);
@@ -173,43 +174,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         return super.onOptionsItemSelected(item);
     }
 
-    public ArrayList <DropItem> loadRelationDropsFromParse() {
-
-        final ArrayList <DropItem> hasRelationList = new ArrayList<>();
-
-        ParseUser user = ParseUser.getCurrentUser();
-
-        ParseRelation relation = user.getRelation("hasRelationTo");
-
-        ParseQuery hasRelationQuery = relation.getQuery();
-
-//        hasRelationToQuery.orderByDescending("createdAt");
-
-        hasRelationQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-
-                if (e != null) {
-                    Log.d("KEVIN", "error error");
-
-                } else {
-                    for (int i = 0; i < list.size(); i++) {
-
-                        DropItem dropItemRelation = new DropItem();
-
-                        dropItemRelation.setObjectId(list.get(i).getObjectId());
-
-                        hasRelationList.add(dropItemRelation);
-                    }
-                }
-            }
-        });
-        return hasRelationList;
-    }
-
-    public ArrayList <DropItem> loadAllDropsFromParse() {
-
-        final ArrayList <DropItem> allDropsList  = new ArrayList<>();
+    public void loadAllDropsFromParse() {
 
         final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
 
@@ -251,12 +216,51 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         allDropsList.add(dropItemAll);
                     }
                 }
+
+                loadRelationDropsFromParse();
             }
         });
-        return allDropsList;
+
     }
 
-    public ArrayList<DropItem> filterDrops(ArrayList <DropItem> hasRelationList, ArrayList <DropItem> allDropsList){
+    public void loadRelationDropsFromParse() {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        ParseRelation relation = user.getRelation("hasRelationTo");
+
+        final ParseQuery hasRelationQuery = relation.getQuery();
+
+//        hasRelationToQuery.orderByDescending("createdAt");
+
+        hasRelationQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+
+                if (e != null) {
+                    Log.d("KEVIN", "error error");
+
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+
+                        trickleObjectsList.add(list.get(i));
+
+                        DropItem dropItemRelation = new DropItem();
+
+                        dropItemRelation.setObjectId(list.get(i).getObjectId());
+
+                        hasRelationList.add(dropItemRelation);
+                    }
+                }
+                filterDrops(hasRelationList, allDropsList);
+            }
+        });
+
+    }
+
+
+
+    public void filterDrops(ArrayList <DropItem> hasRelationList, ArrayList <DropItem> allDropsList) {
         Iterator<DropItem> allDropsIterator = allDropsList.iterator();
 
         while(allDropsIterator.hasNext()) {
@@ -268,15 +272,13 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 }
             }
         }
-        return allDropsList;
+        updateRecyclerView(allDropsList);
     }
 
-    private void updateRecyclerView(ArrayList<DropItem> items) {
-        Log.d("KEVIN", "TRICKLE LIST SIZE: " + items.size());
+    private void updateRecyclerView(ArrayList<DropItem> finalTrickleList) {
+        Log.d("KEVIN", "TRICKLE LIST SIZE: " + finalTrickleList.size());
 
-        mTrickleList = items;
-
-        mTrickleAdapter = new DropAdapter(getActivity(), mTrickleList, "trickle");
+        mTrickleAdapter = new DropAdapter(getActivity(), finalTrickleList, "trickle");
         mRecyclerView.setAdapter(mTrickleAdapter);
     }
 }

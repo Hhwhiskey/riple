@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -35,6 +36,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     private final String mTabName;
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
+    private ArrayAdapter adapter;
 
     public static interface TrickleAdapterDelegate {
         public void itemSelected(Object item);
@@ -100,22 +102,25 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
     // Get drop associated with action
     private ParseObject getDropObjectFromRow(int position) {
-        ParseObject mDrop = DropsTabFragment.dropObjectsList.get(position);
-        return mDrop;
+        return DropsTabFragment.dropObjectsList.get(position);
     }
 
     // Get drop associacated with click
     private ParseObject getTrickleObjectFromRow(int position) {
-        ParseObject trickle = TrickleTabFragment.trickleObjectsList.get(position);
-        return trickle;
+        return TrickleTabFragment.trickleObjectsList.get(position);
     }
 
     // Add Drop in question to users "Drops" list
     public void todoDrop(ParseObject trickleObject) {
 
         ParseUser user = ParseUser.getCurrentUser();
-        ParseRelation relation = user.getRelation("todoDrops");
-        relation.add(trickleObject);
+
+        ParseRelation <ParseObject> todoRelation1 = user.getRelation("todoDrops");
+        todoRelation1.add(trickleObject);
+        user.saveInBackground();
+
+        ParseRelation<ParseObject> todoRelation2 = user.getRelation("hasRelationTo");
+        todoRelation2.add(trickleObject);
         user.saveInBackground();
     }
 
@@ -123,8 +128,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public void removeFromTodo(ParseObject dropObject) {
 
         ParseUser user = ParseUser.getCurrentUser();
-        ParseRelation removeFromRelation = user.getRelation("todoDrops");
-        removeFromRelation.remove(dropObject);
+
+        ParseRelation<ParseObject> removeRelation1 = user.getRelation("todoDrops");
+        removeRelation1.remove(dropObject);
+        user.saveInBackground();
+
+        ParseRelation<ParseObject> removeRelation2 = user.getRelation("hasRelationTo");
+        removeRelation2.remove(dropObject);
         user.saveInBackground();
     }
 
@@ -134,11 +144,19 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         ParseUser user = ParseUser.getCurrentUser();
         user.increment("userRipleCount");
         user.saveInBackground();
-        ParseRelation addToRelation = user.getRelation("completedDrops");
-        addToRelation.add(dropObject);
-        ParseRelation removeFromRelation = user.getRelation("todoDrops");
-        removeFromRelation.remove(dropObject);
+
+        ParseRelation completeRelation1 = user.getRelation("completedDrops");
+        completeRelation1.add(dropObject);
+
+        ParseRelation completeRelation2 = user.getRelation("todoDrops");
+        completeRelation2.remove(dropObject);
         user.saveInBackground();
+
+        ParseRelation completeRelation3 = user.getRelation("hasRelationTo");
+        completeRelation3.add(dropObject);
+        user.saveInBackground();
+
+        adapter.notifyDataSetChanged();
 
         //Todo Add completed timestamp and update the data on parse
        /* Date date = new Date();
@@ -331,5 +349,4 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         }
     }
 }
-
 

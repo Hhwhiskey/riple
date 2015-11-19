@@ -76,6 +76,10 @@ public class RipleTabFragment extends Fragment {
         return view;
     }
 
+    public void RefreshRipleTab(){
+        mRipleAdapter.notifyDataSetChanged();
+    }
+
     public void loadRipleItemsFromParse() {
         final List<DropItem> ripleList = new ArrayList<>();
 
@@ -137,17 +141,14 @@ public class RipleTabFragment extends Fragment {
 
                         ripleList.add(dropItem);
                     }
-
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + ripleList.size());
-                    updateRecyclerView(ripleList);
                 }
+
+                updateRecyclerView(ripleList);
             }
         });
     }
 
     public void updateRecyclerView(List<DropItem> items) {
-        Log.d("KEVIN", "RIPLE LIST SIZE: " + items.size());
-
         mRipleList = items;
 
         mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
