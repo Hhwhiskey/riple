@@ -43,6 +43,7 @@ public class RipleTabFragment extends Fragment {
     private RecyclerView.ItemAnimator animator;
     private TextView profileRankView;
     private TextView profileRipleCountView;
+    private TextView parseRankView;
 
 
     @Override
@@ -65,7 +66,7 @@ public class RipleTabFragment extends Fragment {
 
         //Query the users created and completed drops_blue
         loadRipleItemsFromParse();
-
+        updateUserInfo();
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
 //        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
@@ -73,7 +74,7 @@ public class RipleTabFragment extends Fragment {
 //        Fetch Facebook user info if it is logged
         ParseUser currentUser = ParseUser.getCurrentUser();
         if ((currentUser != null) && currentUser.isAuthenticated()) {
-            updateUserInfo();
+
         }
 
         return view;
@@ -163,8 +164,9 @@ public class RipleTabFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("name");
         String facebookId = currentUser.getString("facebookId");
-        int userRipleCount = currentUser.getInt("userRipleCount");
         String parseRank = currentUser.getString("userRank");
+        int userRipleCount = currentUser.getInt("userRipleCount");
+
             Bundle parametersPicture = new Bundle();
             parametersPicture.putString("fields", "picture.width(150).height(150)");
 
@@ -187,6 +189,11 @@ public class RipleTabFragment extends Fragment {
             // Update User Riple Score
             if (profileRipleCountView != null| profileRipleCountView != null) {
                 profileRipleCountView.setText(String.valueOf(userRipleCount) + " Riples");
+            }
+
+            // Update User Rank
+            if (parseRank != null) {
+                profileRankView.setText(parseRank);
             }
 
             // TODO Update User Rank

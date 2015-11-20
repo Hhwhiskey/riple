@@ -55,9 +55,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     private RecyclerView mRecyclerView;
     public static DropAdapter mTrickleAdapter;
     final ArrayList <DropItem> hasRelationList = new ArrayList<>();
-
     public static final ArrayList <ParseObject> trickleObjectsList = new ArrayList<>();
     public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
+    public static ArrayList<DropItem> trickleTabInteractionList;
 
 
 
@@ -195,8 +195,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
                     for (int i = 0; i < list.size(); i++) {
 
-                       /* //Collects Drop Objects
-                        trickleObjectsList.add(list.get(i));*/
+                        //Collects Drop Objects
+                        trickleObjectsList.add(list.get(i));
 
                         DropItem dropItemAll = new DropItem();
 
@@ -252,8 +252,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
-//                        trickleObjectsList.add(list.get(i));
-
                         DropItem dropItemRelation = new DropItem();
 
                         dropItemRelation.setObjectId(list.get(i).getObjectId());
@@ -279,14 +277,11 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
             for(DropItem dropItemRelation  : hasRelationList) {
                 if(dropItemAll.getObjectId().equals(dropItemRelation.getObjectId())){
                     allDropsIterator.remove();
+
+
                 }
             }
         }
-
-
-
-
-
 
 
 
@@ -295,7 +290,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         for(int i = 0; i < filteredDropList.size(); i++) {
             dropObjects.set(filteredDropList.get(i));
         }*/
-
+        trickleTabInteractionList = filteredDropList;
         updateRecyclerView(filteredDropList);
     }
 

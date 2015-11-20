@@ -22,7 +22,10 @@ import com.khfire22gmail.riple.actions.ViewDropActivity;
 import com.khfire22gmail.riple.actions.ViewUserActivity;
 import com.khfire22gmail.riple.tabs.DropsTabFragment;
 import com.khfire22gmail.riple.tabs.TrickleTabFragment;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
@@ -84,7 +87,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-       // Change the inflated card based on which RV is being viewed
+        // Change the inflated card based on which RV is being viewed
         int xmlLayoutId = -1;
 
         if (mTabName.equals(riple)) {
@@ -96,7 +99,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         } else if (mTabName.equals(trickle)) {
             xmlLayoutId = R.layout.card_trickle;
 
-        //Todo Show card in ViewDropActivity based on users relation to that Drop
+            //Todo Show card in ViewDropActivity based on users relation to that Drop
         } else if (mTabName.equals(viewUser)) {
             xmlLayoutId = R.layout.card_created;
         }
@@ -120,13 +123,53 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
     // Get drop associated with action
-    private ParseObject getDropObjectFromRow(int position) {
-        return DropsTabFragment.dropObjectsList.get(position);
+    private void getDropObjectFromRow(int position) {
+        DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
+        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
+        interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    removeFromTodo(object);
+                }
+            }
+        });
     }
 
     // Get drop associacated with click
-    private ParseObject getTrickleObjectFromRow(int position) {
-        return TrickleTabFragment.trickleObjectsList.get(position);
+    private void getTrickleObjectFromRowToAdd(int position) {
+        DropItem interactedDrop = TrickleTabFragment.trickleTabInteractionList.get(position);
+        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
+        interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    todoDrop(object);
+                }
+            }
+        });
+    }
+
+    private void getDropObjectFromRowToRemove(int position) {
+        DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
+        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
+        interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    removeFromTodo(object);
+                }
+            }
+        });
+    }
+
+    private void getDropObjectFromRowToComplete(int position) {
+        DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
+        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
+        interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                   completeDrop(object);
+                }
+            }
+        });
     }
 
     // Add Drop in question to users "Drops" list
@@ -195,10 +238,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
-                        todoDrop(getTrickleObjectFromRow(position));
+                        getTrickleObjectFromRowToAdd(position);
                         Log.d("checkbox", "Checked");
                     } else {
-                       removeFromTodo(getDropObjectFromRow(position));
+                        getDropObjectFromRowToRemove(position);
                     }
                 }
             });
@@ -211,7 +254,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
-                       completeDrop(getDropObjectFromRow(position));
+                        getDropObjectFromRowToComplete(position);
                         Log.d("checkbox", "Checked");
                     } else {
                         Log.d("checkbox", "UnChecked");
@@ -273,16 +316,16 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     // TODO: 11/19/2015 SHare function
-        public void shareDrop(int position) {
+    public void shareDrop(int position) {
 
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("String");// might be text, sound, whatever
-            share.putExtra(Intent.EXTRA_STREAM, (data.get(position).getAuthorId()) + " has shared a Drop from Riple! " +
-                    "A Drop is an idea to make the world a better place. If you have an" +
-                    " adroid phone you can download Riple from the Play Store and" +
-                    " start making Riples right now!" + (data.get(position).getDescription()));
-            mContext.startActivity(Intent.createChooser(share, "share"));
-        }
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("String");// might be text, sound, whatever
+        share.putExtra(Intent.EXTRA_STREAM, (data.get(position).getAuthorId()) + " has shared a Drop from Riple! " +
+                "A Drop is an idea to make the world a better place. If you have an" +
+                " adroid phone you can download Riple from the Play Store and" +
+                " start making Riples right now!" + (data.get(position).getDescription()));
+        mContext.startActivity(Intent.createChooser(share, "share"));
+    }
 
     public void viewDrop(int position) {
         String mDropObjectId = (data.get(position).getObjectId());
@@ -328,10 +371,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         Log.d("sDropViewUser", "Clicked User's facebookId = " + mClickedUserFacebookId);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-            intent.putExtra("clickedUserId", mClickedUserId);
-            intent.putExtra("clickedUserName", mClickedUserName);
-            intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
-            mContext.startActivity(intent);
+        intent.putExtra("clickedUserId", mClickedUserId);
+        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -411,4 +454,3 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
 }
-

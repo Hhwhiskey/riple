@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setAdapter(adapter);
 
         // Sets default tab on app load
-        mPager.setCurrentItem(2);
+        mPager.setCurrentItem(0);
 
         // Allow fragments to stay in memory
         mPager.setOffscreenPageLimit(0);

@@ -41,7 +41,9 @@ public class DropsTabFragment extends Fragment {
     private DropAdapter mDropAdapter;
     private RecyclerView.ItemAnimator animator;
     private CheckBox completeCheckBox;
-    public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();;
+    public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();
+    public static ArrayList<DropItem> dropTabInteractionList;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,7 +63,7 @@ public class DropsTabFragment extends Fragment {
 
     public void loadDropItemsFromParse() {
 
-        final List<DropItem> dropList = new ArrayList<>();
+        final ArrayList<DropItem> dropList = new ArrayList<>();
 
         ParseUser user = ParseUser.getCurrentUser();
 
@@ -122,9 +124,10 @@ public class DropsTabFragment extends Fragment {
         });
     }
 
-    private void updateRecyclerView(List<DropItem> allDropsList) {
+    private void updateRecyclerView(ArrayList<DropItem> dropList) {
 
-        mDropAdapter = new DropAdapter(getActivity(), allDropsList, "drop");
+        dropTabInteractionList = dropList;
+        mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
         scaleAdapter.setDuration(250);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
@@ -136,5 +139,3 @@ public class DropsTabFragment extends Fragment {
         super.onResume();
     }
 }
-
-
