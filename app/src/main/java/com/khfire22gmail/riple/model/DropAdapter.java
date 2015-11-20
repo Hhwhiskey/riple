@@ -2,6 +2,8 @@ package com.khfire22gmail.riple.model;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.holder.AnimateViewHolder;
+
 public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> {
 
     Context mContext;
@@ -37,6 +41,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
     private ArrayAdapter adapter;
+    public String mAuthorId;
+    public String mDropDescription;
 
     public static interface TrickleAdapterDelegate {
         public void itemSelected(Object item);
@@ -66,6 +72,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public static final String viewUser = "other";
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
+
+        Log.d("KEVIN", "this.date.size before setting: " + this.data.size());
+
         mContext = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -95,6 +104,16 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         View view = inflater.inflate(xmlLayoutId, parent, false);
         MyViewHolder viewHolder = new MyViewHolder(view);
         return viewHolder;
+    }
+
+    public void remove(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void add(DropItem dropItem, int position) {
+        data.add(position, dropItem);
+        notifyItemInserted(position);
     }
 
 
@@ -156,7 +175,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         completeRelation3.add(dropObject);
         user.saveInBackground();
 
-        adapter.notifyDataSetChanged();
+//        adapter.notifyDataSetChanged();
 
         //Todo Add completed timestamp and update the data on parse
        /* Date date = new Date();
@@ -169,7 +188,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        // To-do Toggle Listenerf
+        // To-do Toggle Listener
         if (viewHolder.todoSwitch != null) {
             viewHolder.todoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -245,15 +264,27 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             }
         });
 
-        /*viewHolder.share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-             //Todo  shareDrop(position);
-            }
-        });*/
+//        viewHolder.share.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//               shareDrop(position);
+//            }
+//        });
     }
 
-    private void viewDrop(int position) {
+    // TODO: 11/19/2015 SHare function
+        public void shareDrop(int position) {
+
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("String");// might be text, sound, whatever
+            share.putExtra(Intent.EXTRA_STREAM, (data.get(position).getAuthorId()) + " has shared a Drop from Riple! " +
+                    "A Drop is an idea to make the world a better place. If you have an" +
+                    " adroid phone you can download Riple from the Play Store and" +
+                    " start making Riples right now!" + (data.get(position).getDescription()));
+            mContext.startActivity(Intent.createChooser(share, "share"));
+        }
+
+    public void viewDrop(int position) {
         String mDropObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
@@ -310,7 +341,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+
+
+    class MyViewHolder extends AnimateViewHolder {
 
         private final Switch todoSwitch;
         private final CheckBox completeCheckBox;
@@ -321,6 +354,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         public TextView ripleCount;
         public TextView commentCount;
         public ImageView share;
+        private ViewPropertyAnimatorListener listener;
 
         public MyViewHolder(View itemView) {
 
@@ -347,6 +381,34 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             ripleCount.setText(String.valueOf(current.ripleCount));
             commentCount.setText(String.valueOf(current.commentCount));
         }
+
+        @Override
+        public void animateAddImpl(ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
+            ViewCompat.animate(itemView)
+                    .translationY(-itemView.getHeight() * 0.3f)
+                    .alpha(0)
+                    .setDuration(300)
+                    .setListener(listener)
+                    .start();
+        }
+
+        @Override
+        public void preAnimateAddImpl() {
+            ViewCompat.setTranslationY(itemView, -itemView.getHeight() * 0.3f);
+            ViewCompat.setAlpha(itemView, 0);
+        }
+
+        @Override
+        public void animateRemoveImpl(ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
+            ViewCompat.animate(itemView)
+                    .translationY(0)
+                    .alpha(1)
+                    .setDuration(300)
+                    .setListener(listener)
+                    .start();
+        }
     }
+
+
 }
 

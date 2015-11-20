@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -63,6 +65,7 @@ public class RipleTabFragment extends Fragment {
 
         //Query the users created and completed drops_blue
         loadRipleItemsFromParse();
+
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
 //        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
@@ -148,12 +151,12 @@ public class RipleTabFragment extends Fragment {
         });
     }
 
-    public void updateRecyclerView(List<DropItem> items) {
-        mRipleList = items;
+    public void updateRecyclerView(List<DropItem> mRipleList) {
 
         mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
-        mRecyclerView.setAdapter(mRipleAdapter);
-
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mRipleAdapter);
+        scaleAdapter.setDuration(250);
+        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
     }
 
     private void updateUserInfo() {
@@ -161,10 +164,9 @@ public class RipleTabFragment extends Fragment {
         String userName = currentUser.getString("name");
         String facebookId = currentUser.getString("facebookId");
         int userRipleCount = currentUser.getInt("userRipleCount");
-        String userRank = currentUser.getString("userRank");
+        String parseRank = currentUser.getString("userRank");
             Bundle parametersPicture = new Bundle();
             parametersPicture.putString("fields", "picture.width(150).height(150)");
-
 
             // Update User Picture
             if (facebookId != null) {
@@ -175,7 +177,6 @@ public class RipleTabFragment extends Fragment {
                 profilePictureView.setProfileId(null);
             }
 
-
             // Update UserName
             if (userName != null) {
                 nameView.setText(userName);
@@ -183,16 +184,16 @@ public class RipleTabFragment extends Fragment {
                 nameView.setText("Anonymous");
             }
 
-
-
             // Update User Riple Score
             if (profileRipleCountView != null| profileRipleCountView != null) {
                 profileRipleCountView.setText(String.valueOf(userRipleCount) + " Riples");
             }
 
-
-
-            // Update User Rank
+            // TODO Update User Rank
+//            String currentRank = (String) profileRankView.getText();
+//            if(parseRank != currentRank) {
+//                currentUser.put("userRank", currentRank);
+//            }
 
             if (userRipleCount <=19){
                 profileRankView.setText("\"Drop\"");//1
@@ -214,7 +215,7 @@ public class RipleTabFragment extends Fragment {
                 profileRankView.setText("\"Gandhi\"");//9
             }if (userRipleCount >10239) {
                 profileRankView.setText("\"Mother Teresa\"");//10
-        }
+            }
     }
 
     private void startLoginActivity() {
@@ -224,11 +225,6 @@ public class RipleTabFragment extends Fragment {
         startActivity(intent);
     }
 
-
-
-
 //    Bitmap fbPic = "https://graph.facebook.com/" + fbId + "/picture?width=108&height=108"
-
-
 
 }

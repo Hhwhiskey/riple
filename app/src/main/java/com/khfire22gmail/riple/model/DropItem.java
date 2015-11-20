@@ -1,5 +1,7 @@
 package com.khfire22gmail.riple.model;
 
+import com.parse.ParseObject;
+
 import java.util.Date;
 
 /**
@@ -19,7 +21,19 @@ public class DropItem {
     public String comment;
     public String ripleCount;
     public String commentCount;
+    public ParseObject drop;
 
+    public ParseObject getDrop() {
+        return drop;
+    }
+
+    public void setDrop(ParseObject drop) {
+        this.drop = drop;
+    }
+
+    public static String getDropKey() {
+        return DROP_KEY;
+    }
 
     public String getAuthorName() {
         return authorName;

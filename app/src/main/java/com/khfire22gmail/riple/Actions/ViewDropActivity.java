@@ -161,18 +161,24 @@ public class ViewDropActivity extends AppCompatActivity {
 
                         CommentItem commentItem = new CommentItem();
 
-                        // Commenter Id
-                        commentItem.setObjectId(list.get(i).getObjectId());
+                        // Comment Id
+//                        commentItem.setObjectId(list.get(i).getObjectId());
+
                         // DropId
                         commentItem.setDropId(list.get(i).getString("dropId"));
-                        //Comment
-                        commentItem.setCommentText(list.get(i).getString("commentText"));
+
                         //CommenterId
                         commentItem.setCommenterId(list.get(i).getString("commenterId"));
+
                         //Author name
                         commentItem.setCommenterName(list.get(i).getString("commenterName"));
-                        //Picture
-                        commentItem.setFacebookId(list.get(i).getString("facebookId"));
+
+                        //Commenter Picture
+                        commentItem.setCommenterFacebookId(list.get(i).getString("facebookId"));
+
+                        //Comment
+                        commentItem.setCommentText(list.get(i).getString("commentText"));
+
                         //Date
                         commentItem.setCreatedAt(list.get(i).getCreatedAt());
 
@@ -214,26 +220,25 @@ public class ViewDropActivity extends AppCompatActivity {
 
     public void postNewComment(String commentText){
 
-        final ParseObject drop = new ParseObject("Drop");
-        ParseObject comment = new ParseObject("Comments");
+//        final ParseObject drop = new ParseObject("Drop");
+        final ParseObject comment = new ParseObject("Comments");
         final ParseUser user = ParseUser.getCurrentUser();
 
-        comment.put("dropId", mDropObjectId);
-        comment.put("commenterId", user.getObjectId());
-        comment.put("commenterName", user.get("name"));
-        comment.put("facebookId", user.get("facebookId"));
-        comment.put("commentText", commentText);
-        comment.saveInBackground();
-
-        /*(new SaveCallback() {// saveInBackground first and then run relation
-            @Override
-            public void done(ParseException e) {
-                ParseRelation<ParseObject> relation = drop.getRelation("comments");
-                relation.add(drop);
-                drop.saveInBackground();
-            }
-        });*/
-
+        if(commentText != null) {
+            comment.put("dropId", mDropObjectId);
+            comment.put("commenterFacebookId", user.getObjectId());
+            comment.put("commenterName", user.get("name"));
+            comment.put("facebookId", user.get("facebookId"));
+            comment.put("commentText", commentText);
+            /*comment.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
+                @Override
+                public void done(ParseException e) {
+                    ParseRelation<ParseObject> commentRelation = drop.getRelation("comments");
+                    commentRelation.add(comment);
+                    drop.saveInBackground(mDropObjectId);
+                }
+            });*/
+        }
     }
 
     private void updateUserInfo() {

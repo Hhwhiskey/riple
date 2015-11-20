@@ -25,6 +25,9 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
+
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -113,21 +116,18 @@ public class DropsTabFragment extends Fragment {
 
                         dropList.add(dropItem);
                     }
-
-
                 }
                 updateRecyclerView(dropList);
             }
         });
     }
 
-    private void updateRecyclerView(List<DropItem> items) {
-        Log.d("KEVIN", "DROP LIST SIZE: " + items.size());
+    private void updateRecyclerView(List<DropItem> allDropsList) {
 
-        mDropList = items;
-
-        mDropAdapter = new DropAdapter(getActivity(), mDropList, "drop");
-        mRecyclerView.setAdapter(mDropAdapter);
+        mDropAdapter = new DropAdapter(getActivity(), allDropsList, "drop");
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
+        scaleAdapter.setDuration(250);
+        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
 
     }
 

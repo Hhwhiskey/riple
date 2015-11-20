@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setCurrentItem(2);
 
         // Allow fragments to stay in memory
-        mPager.setOffscreenPageLimit(3);
+        mPager.setOffscreenPageLimit(0);
 
         // Assigning the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     ParseRelation<ParseObject> relationCreatedDrops = user.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
                     user.saveInBackground();
+
                     ParseRelation<ParseObject> relationHasRelationTo = user.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
                     user.saveInBackground();
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        fragment.RefreshRipleTab();
         Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
 
-        Thread.sleep(250);
+        Thread.sleep(500);
 
         Intent intent = getIntent();
         finish();

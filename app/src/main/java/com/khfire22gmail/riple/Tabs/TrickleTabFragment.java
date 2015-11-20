@@ -30,7 +30,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 
 /**
@@ -49,13 +52,12 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     private String currentUserObject;
     private String currentUserName;
     private RecyclerView.ItemAnimator animator;
-    RecyclerView mRecyclerView;
-    List<DropItem> mTrickleList;
-    DropAdapter mTrickleAdapter;
-    public static ArrayList<ParseObject> trickleObjectsList = new ArrayList<>();
+    private RecyclerView mRecyclerView;
+    public static DropAdapter mTrickleAdapter;
     final ArrayList <DropItem> hasRelationList = new ArrayList<>();
-    public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
 
+    public static final ArrayList <ParseObject> trickleObjectsList = new ArrayList<>();
+    public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
 
 
 
@@ -188,13 +190,18 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                     Log.d("KEVIN", "error error");
 
                 } else {
+
+                    allDropsList.clear();
+
                     for (int i = 0; i < list.size(); i++) {
 
-                        //Collects Drop Objects
-                        trickleObjectsList.add(list.get(i));
+                       /* //Collects Drop Objects
+                        trickleObjectsList.add(list.get(i));*/
 
                         DropItem dropItemAll = new DropItem();
 
+                        //DropObject
+//                        dropItemAll.setDrop(list.get(i).getParseObject("objectId"));
                         //ObjectId
                         dropItemAll.setObjectId(list.get(i).getObjectId());
                         //Author id
@@ -214,6 +221,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         dropItemAll.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
                         allDropsList.add(dropItemAll);
+
+
                     }
                 }
 
@@ -243,7 +252,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
-                        trickleObjectsList.add(list.get(i));
+//                        trickleObjectsList.add(list.get(i));
 
                         DropItem dropItemRelation = new DropItem();
 
@@ -260,8 +269,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
 
 
-    public void filterDrops(ArrayList <DropItem> hasRelationList, ArrayList <DropItem> allDropsList) {
-        Iterator<DropItem> allDropsIterator = allDropsList.iterator();
+    public void filterDrops(ArrayList <DropItem> hasRelationList, ArrayList <DropItem> filteredDropList) {
+        Iterator<DropItem> allDropsIterator = filteredDropList.iterator();
+
 
         while(allDropsIterator.hasNext()) {
             DropItem dropItemAll = allDropsIterator.next();
@@ -272,13 +282,30 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 }
             }
         }
-        updateRecyclerView(allDropsList);
+
+
+
+
+
+
+
+
+        /*ArrayList <ParseObject> dropObjects = new ArrayList<>();
+
+        for(int i = 0; i < filteredDropList.size(); i++) {
+            dropObjects.set(filteredDropList.get(i));
+        }*/
+
+        updateRecyclerView(filteredDropList);
     }
 
-    private void updateRecyclerView(ArrayList<DropItem> finalTrickleList) {
-        Log.d("KEVIN", "TRICKLE LIST SIZE: " + finalTrickleList.size());
+    private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
+        Log.d("KEVIN", "TRICKLE LIST SIZE: " + filteredDropList.size());
 
-        mTrickleAdapter = new DropAdapter(getActivity(), finalTrickleList, "trickle");
-        mRecyclerView.setAdapter(mTrickleAdapter);
+        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
+        scaleAdapter.setDuration(250);
+        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 }

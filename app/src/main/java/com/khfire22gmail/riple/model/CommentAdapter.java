@@ -83,7 +83,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
         String mClickedUserId = (data.get(position).getCommenterId());
         String mClickedUserName = (data.get(position).getCommenterName());
-        String mClickedUserFacebookId = (data.get(position).getFacebookId());
+        String mClickedUserFacebookId = (data.get(position).getCommenterFacebookId());
 
         Log.d("sCommentViewUser", "Clicked User's userId = " + mClickedUserId);
         Log.d("sCommentViewUser", "Clicked User's clickedUserName = " + mClickedUserName);
@@ -158,11 +158,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
             CommentItem current = data.get(position);
 
-            profilePicture.setProfileId(current.facebookId);
-            createdAt.setText(String.valueOf(current.createdAt));
+            profilePicture.setProfileId(current.commenterFacebookId);
             commenterName.setText(current.commenterName);
             commentText.setText(current.commentText);
-//            share.setT(current.objectId();
+            createdAt.setText(String.valueOf(current.createdAt));
         }
 
         /*@Override

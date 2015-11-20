@@ -11,9 +11,18 @@ public class CommentItem {
     public Date createdAt;
     public String dropId;
     public String objectId;
-    public String commenterId;
+    public String commenterFacebookId;
     public String commenterName;
-    public String facebookId;
+
+    public String getCommenterId() {
+        return commenterId;
+    }
+
+    public void setCommenterId(String commenterId) {
+        this.commenterId = commenterId;
+    }
+
+    public String commenterId;
     public String commentText;
 
     public String getDropId() {
@@ -24,12 +33,12 @@ public class CommentItem {
         this.dropId = dropId;
     }
 
-    public String getCommenterId() {
-        return commenterId;
+    public String getCommenterFacebookId() {
+        return commenterFacebookId;
     }
 
-    public void setCommenterId(String commenterId) {
-        this.commenterId = commenterId;
+    public void setCommenterFacebookId(String commenterFacebookId) {
+        this.commenterFacebookId = commenterFacebookId;
     }
 
     public String getObjectId() {
@@ -54,14 +63,6 @@ public class CommentItem {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public String getFacebookId() {
-        return facebookId;
-    }
-
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
     }
 
     public String getCommentText() {
