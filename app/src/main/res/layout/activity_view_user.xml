@@ -9,15 +9,15 @@
     android:fitsSystemWindows="true">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/other_user_recycler_view"
+        android:id="@+id/view_user_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/view_other_user_tool_bar"
+        android:layout_below="@+id/view_user_user_tool_bar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:background="@color/Primary_Background_Color"/>
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/appbar_view_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
@@ -39,7 +39,7 @@
                 android:minHeight="100dp"/>-->
 
             <com.facebook.login.widget.ProfilePictureView
-                android:id="@+id/other_profile_picture"
+                android:id="@+id/view_user_profile_picture"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
@@ -58,7 +58,7 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_message"
-        app:layout_anchor="@id/appbar"
+        app:layout_anchor="@id/appbar_view_user"
         app:backgroundTint="@color/AccentColor"
         app:layout_anchorGravity="bottom|right|end"
         android:layout_width="wrap_content"

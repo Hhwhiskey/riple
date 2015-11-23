@@ -29,12 +29,15 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
+
 public class ViewUserActivity extends AppCompatActivity {
 
     private Object animator;
-    private RecyclerView mViewOtherUserRecyclerView;
-    private DropAdapter mOtherUserAdapter;
-    private List<DropItem> mOtherUserList;
+    private RecyclerView mViewUserRecyclerView;
+    private DropAdapter mViewUserAdapter;
+    private List<DropItem> mViewUserList;
     String EXTRA_IMAGE;
     public String mAuthorName;
     private ProfilePictureView profilePictureView;
@@ -48,7 +51,7 @@ public class ViewUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_user);
 
-        ViewCompat.setTransitionName(findViewById(R.id.appbar), EXTRA_IMAGE);
+        ViewCompat.setTransitionName(findViewById(R.id.appbar_view_user), EXTRA_IMAGE);
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
@@ -65,32 +68,30 @@ public class ViewUserActivity extends AppCompatActivity {
         Log.d("rViewUser", "mClickedUserFacebookId = " + mClickedUserFacebookId);
 
         // Set collapsable toolbar picture and text
-        profilePictureView = (ProfilePictureView)findViewById(R.id.other_profile_picture);
+        profilePictureView = (ProfilePictureView)findViewById(R.id.view_user_profile_picture);
         profilePictureView.setProfileId(mClickedUserFacebookId);
         profilePictureView.setPresetSize(ProfilePictureView.LARGE);
 
         collapsingToolbar.setTitle(mClickedUserName);
 
-        mViewOtherUserRecyclerView = (RecyclerView) findViewById(R.id.other_user_recycler_view);
-        mViewOtherUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mViewUserRecyclerView = (RecyclerView) findViewById(R.id.view_user_recycler_view);
+        mViewUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         loadRipleItemsFromParse();
 
-        mViewOtherUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //        mRecyclerView.setItemAnimator(animator);
 
         FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
         messageFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Log.d("Message", "You are trying to send a new message");
             }
         });
     }
 
     public void loadRipleItemsFromParse() {
-        final List<DropItem> ripleList = new ArrayList<>();
+        final ArrayList<DropItem> clickedUsersActivity = new ArrayList<>();
 
-        // this block of code is equivalent to some function that findUserById(ParseUserId)
         ParseUser clickedUser = null;
         ParseQuery<ParseUser> getClickedUserquery = ParseQuery.getQuery("_User");
         getClickedUserquery.whereEqualTo("objectId", mClickedUserId);
@@ -163,23 +164,28 @@ public class ViewUserActivity extends AppCompatActivity {
                         //Id that connects commenterName to drop
 //                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
-                        ripleList.add(dropItem);
+                        clickedUsersActivity.add(dropItem);
                     }
 
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + ripleList.size());
-                    updateRecyclerView(ripleList);
+                    Log.i("KEVIN", "PARSE LIST SIZE: " + clickedUsersActivity.size());
+                    updateRecyclerView(clickedUsersActivity);
                 }
             }
         });
     }
 
-    private void updateRecyclerView(List<DropItem> items) {
-        Log.d("KEVIN", "RIPLE LIST SIZE: " + items.size());
+    private void updateRecyclerView(ArrayList<DropItem> clickedUsersActivity) {
+        Log.d("KEVIN", "RIPLE LIST SIZE: " + clickedUsersActivity.size());
 
-        mOtherUserList = items;
+        mViewUserAdapter = new DropAdapter(this, clickedUsersActivity, "riple");
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);
+        scaleAdapter.setDuration(250);
+        mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
 
-        mOtherUserAdapter = new DropAdapter(this, mOtherUserList, "other");
-        mViewOtherUserRecyclerView.setAdapter(mOtherUserAdapter);
+        /* mViewUserView = items;
+
+        mOtherUserAdapter = new DropAdapter(this, mViewUserView, "other");
+        mViewUserRecyclerView.setAdapter(mOtherUserAdapterrAdapter);*/
     }
 
     @Override

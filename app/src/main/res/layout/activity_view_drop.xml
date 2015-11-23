@@ -2,21 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/Primary_Background_Color"
                 android:orientation="vertical"
-                android:weightSum="1"
-                android:background="@color/Primary_Background_Color">
+                android:weightSum="1">
 
 
-    <!--TODO Have the use of card_trickle display without the ellipsize in this Activity -->
     <include
         android:id="@+id/card_view_drop"
+        layout="@layout/card_view_drop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:maxLines="20"
-        android:ellipsize="none"
-        android:enabled="false"
         android:checked="true"
-        layout="@layout/card_trickle"/>
+        android:ellipsize="none"
+        android:enabled="false"/>
 
 
     <android.support.v7.widget.RecyclerView
@@ -33,13 +31,14 @@
         android:layout_width="235dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignTop="@+id/button_post_comment"
         android:layout_toLeftOf="@+id/button_post_comment"
         android:layout_toRightOf="@+id/post_comment_profile_picture"
         android:layout_toStartOf="@+id/button_post_comment"
-        android:inputType="textAutoComplete|textAutoCorrect"
-        android:hint="Write a Comment..."
         android:background="#ffffff"
-        android:layout_alignTop="@+id/button_post_comment"
+        android:hint="@string/write_comment_hint"
+        android:inputType="textAutoComplete|textAutoCorrect"
+        android:maxLength="250"
         android:paddingLeft="8dp"/>
 
     <com.facebook.login.widget.ProfilePictureView
@@ -49,8 +48,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:foregroundGravity="center_vertical"
-        android:layout_below="@+id/view_drop_recycler_view"/>
+        android:layout_below="@+id/view_drop_recycler_view"
+        android:foregroundGravity="center_vertical"/>
 
     <Button
         android:id="@+id/button_post_comment"
@@ -59,10 +58,265 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:width="50dp"
-        android:text="Post"
-        android:background="@color/AccentColor"
         android:layout_marginTop="10dp"
+        android:width="50dp"
+        android:background="@color/AccentColor"
+        android:text="Post"
         android:textColor="#ffffff"/>
 
 </RelativeLayout>
+
+
+    <!--
+    <?xml version="1.0" encoding="utf-8"?>
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context="com.khfire22gmail.riple.actions.ViewUserActivity">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/Primary_Background_Color"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/appbar_view_drop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                <android.support.design.widget.CollapsingToolbarLayout
+                    android:id="@+id/view_drop_collapsing_tool_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:contentScrim="@color/Primary_Background_Color"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/card_view_drop"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:cardElevation="2dp"
+                        card_view:cardUseCompatPadding="true">
+
+                        <RelativeLayout
+                            android:id="@+id/top_layout"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:alpha="123124"
+                            android:background="#ffffff"
+                            android:paddingBottom="8dp">
+
+                            <android.support.v7.widget.Toolbar
+                                android:id="@+id/view_drop_card_tool_bar"
+                                android:layout_width="match_parent"
+                                android:layout_height="42dp"
+                                android:background="#BBDEFB"
+                                android:clickable="false"/>
+
+                            <com.facebook.login.widget.ProfilePictureView
+                                android:id="@+id/profile_picture"
+                                android:layout_width="65dp"
+                                android:layout_height="65dp"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginTop="8dp"
+                                android:foregroundGravity="center_vertical"/>
+
+                            <TextView
+                                android:id="@+id/name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignEnd="@+id/created_at"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignRight="@+id/created_at"
+                                android:layout_alignTop="@+id/profile_picture"
+                                android:layout_margin="8dp"
+                                android:layout_toRightOf="@+id/profile_picture"
+                                android:width="50dp"
+                                android:singleLine="true"
+                                android:text="Kevin Hodges"
+                                android:textAlignment="center"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="#000000"
+                                android:textSize="20sp"/>
+
+                            <TextView
+                                android:id="@+id/created_at"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/name"
+                                android:layout_marginLeft="8dp"
+                                android:layout_toEndOf="@+id/profile_picture"
+                                android:layout_toRightOf="@+id/profile_picture"
+                                android:gravity="top"
+                                android:singleLine="true"
+                                android:text="September 18, 2015 @ 3:32 p.m."
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textSize="10sp"/>
+
+                            <ScrollView
+                                android:id="@+id/scrollView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_above="@+id/comment_count"
+                                android:layout_alignEnd="@+id/description"
+                                android:layout_alignLeft="@+id/profile_picture"
+                                android:layout_alignRight="@+id/description"
+                                android:layout_alignStart="@+id/profile_picture"
+                                android:layout_below="@+id/profile_picture"/>
+
+                            <TextView
+                                android:id="@+id/description"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_alignEnd="@+id/created_at"
+                                android:layout_alignRight="@+id/created_at"
+                                android:layout_below="@+id/profile_picture"
+                                android:layout_marginBottom="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginRight="8dp"
+                                android:layout_marginTop="8dp"
+                                android:elegantTextHeight="false"
+                                android:ellipsize="end"
+                                android:enabled="true"
+                                android:focusable="false"
+                                android:paddingLeft="8dp"
+                                android:paddingRight="8dp"
+                                android:singleLine="false"
+                                android:text="Description"
+                                android:textColor="@color/PrimaryText"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/riple_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true"
+                                android:layout_below="@+id/description"
+                                android:layout_marginBottom="8dp"
+                                android:layout_marginLeft="16dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_toLeftOf="@+id/comment_count"
+                                android:gravity="left"
+                                android:singleLine="true"
+                                android:text="205 riples"
+                                android:textAlignment="textStart"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textSize="10sp"/>
+
+                            <TextView
+                                android:id="@+id/comment_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignLeft="@+id/created_at"
+                                android:layout_alignStart="@+id/created_at"
+                                android:layout_alignTop="@+id/riple_count"
+                                android:layout_marginLeft="4dp"
+                                android:gravity="left"
+                                android:singleLine="true"
+                                android:text="12 comments"
+                                android:textAlignment="textStart"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textSize="10sp"
+                                />
+
+                            <ImageView
+                                android:id="@+id/trickle_share"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignBottom="@+id/switch_todo"
+                                android:layout_below="@+id/description"
+                                android:layout_marginTop="2dp"
+                                android:layout_toLeftOf="@+id/switch_todo"
+                                android:layout_toStartOf="@+id/switch_todo"
+                                android:background="#ffffff"
+                                android:src="@mipmap/ic_share_button"/>
+
+                            <Switch
+                                android:id="@+id/switch_todo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_below="@+id/description"
+                                android:layout_marginLeft="24dp"
+                                android:layout_marginRight="16dp"
+                                android:checked="false"/>
+
+                        </RelativeLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/view_drop_tool_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"/>
+
+                </android.support.design.widget.CollapsingToolbarLayout>
+            </android.support.design.widget.AppBarLayout>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/view_drop_recycler_view"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_above="@+id/enter_comment_text"
+                android:layout_below="@+id/appbar_view_drop"
+                android:background="@color/Primary_Background_Color"
+                />
+
+            <AutoCompleteTextView
+                android:id="@+id/enter_comment_text"
+                android:layout_width="235dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignTop="@+id/button_post_comment"
+                android:layout_toLeftOf="@+id/button_post_comment"
+                android:layout_toRightOf="@+id/post_comment_profile_picture"
+                android:layout_toStartOf="@+id/button_post_comment"
+                android:background="#ffffff"
+                android:hint="Write a Comment..."
+                android:inputType="textAutoComplete|textAutoCorrect"
+                android:maxLength="250"
+                android:paddingLeft="8dp"/>
+
+            <com.facebook.login.widget.ProfilePictureView
+                android:id="@+id/post_comment_profile_picture"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/view_drop_recycler_view"
+                android:foregroundGravity="center_vertical"/>
+
+            <Button
+                android:id="@+id/button_post_comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
+                android:width="50dp"
+                android:background="@color/AccentColor"
+                android:text="Post"
+                android:textColor="#ffffff"/>
+
+        </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>-->

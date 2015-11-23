@@ -23,6 +23,8 @@
             android:layout_height="wrap_content"
             android:background="#FFFFFF">
 
+
+
             <!--<de.hdodenhof.circleimageview.CircleImageView-->
             <com.facebook.login.widget.ProfilePictureView
                 android:id="@+id/profile_pic"

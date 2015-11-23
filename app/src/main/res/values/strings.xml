@@ -34,5 +34,6 @@
     <string name="title_activity_parse_login_activity">ParseLoginAcitivty</string>
     <string name="email">E-MAIL</string>
     <string name="title_activity_edit_profile">EditProfile</string>
+    <string name="write_comment_hint">Write a Comment...</string>
 
 </resources>

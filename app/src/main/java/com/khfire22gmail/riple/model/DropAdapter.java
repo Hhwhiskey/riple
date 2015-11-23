@@ -121,20 +121,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
 
-
-    // Get drop associated with action
-    private void getDropObjectFromRow(int position) {
-        DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
-        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
-        interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    removeFromTodo(object);
-                }
-            }
-        });
-    }
-
     // Get drop associacated with click
     private void getTrickleObjectFromRowToAdd(int position) {
         DropItem interactedDrop = TrickleTabFragment.trickleTabInteractionList.get(position);
@@ -173,7 +159,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     // Add Drop in question to users "Drops" list
-    public void todoDrop(ParseObject trickleObject) {
+    public static void todoDrop(ParseObject trickleObject) {
 
         ParseUser user = ParseUser.getCurrentUser();
 
@@ -203,9 +189,14 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     // Add Drop in question to users "Riple" list
     public void completeDrop(ParseObject dropObject) {
 
+        //Increment the user
         ParseUser user = ParseUser.getCurrentUser();
         user.increment("userRipleCount");
         user.saveInBackground();
+
+        //Increment the Drop
+        dropObject.increment("ripleCount");
+        dropObject.saveInBackground();
 
         ParseRelation completeRelation1 = user.getRelation("completedDrops");
         completeRelation1.add(dropObject);

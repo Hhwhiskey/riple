@@ -141,6 +141,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
         public TextView createdAt;
         public TextView commentText;
         public TextView commenterName;
+//        public TextView commentCount;
 
         public MyViewHolder(View itemView) {
 
@@ -150,6 +151,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             commenterName = (TextView) itemView.findViewById(R.id.commenter);
             commentText = (TextView) itemView.findViewById(R.id.commentText);
+//            commentCount = (TextView) itemView.findViewById(R.id.comment_count);
 
             itemView.setOnClickListener(this);
         }
@@ -162,6 +164,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
             commenterName.setText(current.commenterName);
             commentText.setText(current.commentText);
             createdAt.setText(String.valueOf(current.createdAt));
+
         }
 
         /*@Override

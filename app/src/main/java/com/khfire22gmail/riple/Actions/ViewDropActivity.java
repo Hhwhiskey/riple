@@ -12,16 +12,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -51,13 +57,15 @@ public class ViewDropActivity extends AppCompatActivity {
     private TextView ripleCountView;
     private TextView commentCountView;
     private TextView createdAtView;
-    private String mDropObjectId;
+    public String mDropObjectId;
     private String mAuthorFacebookId;
     private String mDropDescription;
     private ProfilePictureView authorProfilePictureView;
     private ProfilePictureView postCommentProfilePictureView;
     private String commentText;
     private AutoCompleteTextView newCommentView;
+    private Switch viewedDropTodoSwitch;
+    private CheckBox viewedDropCompleteCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +95,7 @@ public class ViewDropActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mCommentCount = " + mCommentCount);
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
 
-        authorProfilePictureView = (ProfilePictureView)findViewById(R.id.profile_picture);
+        authorProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_picture);
         authorProfilePictureView.setProfileId(mAuthorFacebookId);
 
         authorProfilePictureView.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +136,11 @@ public class ViewDropActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 commentText = newCommentView.getEditableText().toString();
-                postNewComment(commentText);
+                try {
+                    postNewComment(commentText);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -139,7 +151,128 @@ public class ViewDropActivity extends AppCompatActivity {
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setItemAnimator((RecyclerView.ItemAnimator) animator);
+
+
+/////////Add/Remove/Complete Drop from within ViewDrop//////////////////////////////////////////////////
+        //To do Switch
+//        if (viewedDropTodoSwitch != null) {
+            viewedDropTodoSwitch = (Switch) findViewById(R.id.switch_todo);
+            viewedDropTodoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        getDropObjectToAdd(mDropObjectId);
+                    } else {
+                        getDropObjectToRemove(mDropObjectId);
+                    }
+                }
+            });
+//        }
+
+        // Complete CheckBox Listener
+        if (viewedDropCompleteCheckBox != null) {
+            viewedDropCompleteCheckBox = (CheckBox) findViewById(R.id.checkbox_complete);
+            viewedDropCompleteCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        getDropObjectToComplete(mDropObjectId);
+                    }
+                }
+            });
+        }
     }
+
+    private void getDropObjectToAdd(String mDropObjectId) {
+
+        ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
+        viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    todoDrop(object);
+                }
+            }
+        });
+    }
+
+    private void getDropObjectToRemove(String mDropObjectId) {
+
+        ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
+        viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    removeFromTodo(object);
+                }
+            }
+        });
+    }
+
+    private void getDropObjectToComplete(String mDropObjectId) {
+
+        ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
+        viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    completeDrop(object);
+                }
+            }
+        });
+    }
+
+    public static void todoDrop(ParseObject viewedDropObject) {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        ParseRelation<ParseObject> todoRelation1 = user.getRelation("todoDrops");
+        todoRelation1.add(viewedDropObject);
+        user.saveInBackground();
+
+        ParseRelation<ParseObject> todoRelation2 = user.getRelation("hasRelationTo");
+        todoRelation2.add(viewedDropObject);
+        user.saveInBackground();
+    }
+
+    public void removeFromTodo(ParseObject viewedDropObject) {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        ParseRelation<ParseObject> removeRelation1 = user.getRelation("todoDrops");
+        removeRelation1.remove(viewedDropObject);
+        user.saveInBackground();
+
+        ParseRelation<ParseObject> removeRelation2 = user.getRelation("hasRelationTo");
+        removeRelation2.remove(viewedDropObject);
+        user.saveInBackground();
+    }
+
+    public void completeDrop(ParseObject viewedDropObject) {
+
+        //Increment the user
+        ParseUser user = ParseUser.getCurrentUser();
+        user.increment("userRipleCount");
+        user.saveInBackground();
+
+        //Increment the Drop
+        viewedDropObject.increment("ripleCount");
+        viewedDropObject.saveInBackground();
+
+        ParseRelation completeRelation1 = user.getRelation("completedDrops");
+        completeRelation1.add(viewedDropObject);
+
+        ParseRelation completeRelation2 = user.getRelation("todoDrops");
+        completeRelation2.remove(viewedDropObject);
+        user.saveInBackground();
+
+        ParseRelation completeRelation3 = user.getRelation("hasRelationTo");
+        completeRelation3.add(viewedDropObject);
+        user.saveInBackground();
+
+        //Todo Add completed timestamp and update the data on parse
+       /* Date date = new Date();
+        Long time = (date.getTime());*/
+    }
+/////////////////////////////////////////////////////////////////////
+
 
     public void loadCommentsFromParse() {
         final List<CommentItem> commentList = new ArrayList<>();
@@ -174,7 +307,7 @@ public class ViewDropActivity extends AppCompatActivity {
                         commentItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         //Commenter Picture
-                        commentItem.setCommenterFacebookId(list.get(i).getString("facebookId"));
+                        commentItem.setCommenterFacebookId(list.get(i).getString("commenterFacebookId"));
 
                         //Comment
                         commentItem.setCommentText(list.get(i).getString("commentText"));
@@ -218,27 +351,44 @@ public class ViewDropActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mCommentAdapter);
     }
 
-    public void postNewComment(String commentText){
+    public void postNewComment(final String commentText) throws InterruptedException {
 
-//        final ParseObject drop = new ParseObject("Drop");
-        final ParseObject comment = new ParseObject("Comments");
         final ParseUser user = ParseUser.getCurrentUser();
+        final ParseObject comment = new ParseObject("Comments");
 
-        if(commentText != null) {
+        if (commentText != null) {
             comment.put("dropId", mDropObjectId);
-            comment.put("commenterFacebookId", user.getObjectId());
+            comment.put("commenterId", user.getObjectId());
             comment.put("commenterName", user.get("name"));
-            comment.put("facebookId", user.get("facebookId"));
+            comment.put("commenterFacebookId", user.get("facebookId"));
             comment.put("commentText", commentText);
-            /*comment.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
-                @Override
-                public void done(ParseException e) {
-                    ParseRelation<ParseObject> commentRelation = drop.getRelation("comments");
-                    commentRelation.add(comment);
-                    drop.saveInBackground(mDropObjectId);
-                }
-            });*/
+            comment.saveInBackground();
         }
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+
+        query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject drop, ParseException e) {
+                if (e == null) {
+
+                    drop.increment("commentCount");
+                    drop.saveInBackground();
+                }
+
+                Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+
+            }
+        });
     }
 
     private void updateUserInfo() {
@@ -248,7 +398,7 @@ public class ViewDropActivity extends AppCompatActivity {
         parametersPicture.putString("fields", "picture.width(150).height(150)");
 
         if (facebookId != null) {
-           postCommentProfilePictureView = (ProfilePictureView) findViewById(R.id.post_comment_profile_picture);
+            postCommentProfilePictureView = (ProfilePictureView) findViewById(R.id.post_comment_profile_picture);
             postCommentProfilePictureView.setProfileId(facebookId);
 
         } else {

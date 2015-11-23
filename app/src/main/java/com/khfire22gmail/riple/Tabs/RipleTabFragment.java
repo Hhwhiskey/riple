@@ -65,24 +65,23 @@ public class RipleTabFragment extends Fragment {
 //        updateViewsWithProfileInfo();
 
         //Query the users created and completed drops_blue
-        loadRipleItemsFromParse();
         updateUserInfo();
+        loadRipleItemsFromParse();
+
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
 //        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
 
 //        Fetch Facebook user info if it is logged
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if ((currentUser != null) && currentUser.isAuthenticated()) {
-
-        }
+//        ParseUser currentUser = ParseUser.getCurrentUser();
+//        if ((currentUser != null) && currentUser.isAuthenticated()) {
+//
+//        }
 
         return view;
     }
 
-    public void RefreshRipleTab(){
-        mRipleAdapter.notifyDataSetChanged();
-    }
+
 
     public void loadRipleItemsFromParse() {
         final List<DropItem> ripleList = new ArrayList<>();
@@ -161,69 +160,76 @@ public class RipleTabFragment extends Fragment {
     }
 
     private void updateUserInfo() {
+
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("name");
         String facebookId = currentUser.getString("facebookId");
-        String parseRank = currentUser.getString("userRank");
-        int userRipleCount = currentUser.getInt("userRipleCount");
 
-            Bundle parametersPicture = new Bundle();
-            parametersPicture.putString("fields", "picture.width(150).height(150)");
+        Bundle parametersPicture = new Bundle();
+        parametersPicture.putString("fields", "picture.width(150).height(150)");
 
-            // Update User Picture
-            if (facebookId != null) {
-                profilePictureView.setProfileId(facebookId);
+        // Update User Picture
+        if (facebookId != null) {
+            profilePictureView.setProfileId(facebookId);
 
-            } else {
-                // Show the default, blank user profile picture
-                profilePictureView.setProfileId(null);
-            }
+        } else {
+            // Show the default, blank user profile picture
+            profilePictureView.setProfileId(null);
+        }
 
-            // Update UserName
-            if (userName != null) {
-                nameView.setText(userName);
-            } else {
-                nameView.setText("Anonymous");
-            }
+        // Update UserName
+        if (userName != null) {
+            nameView.setText(userName);
+        } else {
+            nameView.setText("Anonymous");
+        }
 
-            // Update User Riple Score
-            if (profileRipleCountView != null| profileRipleCountView != null) {
-                profileRipleCountView.setText(String.valueOf(userRipleCount) + " Riples");
-            }
 
-            // Update User Rank
-            if (parseRank != null) {
-                profileRankView.setText(parseRank);
-            }
 
-            // TODO Update User Rank
-//            String currentRank = (String) profileRankView.getText();
-//            if(parseRank != currentRank) {
-//                currentUser.put("userRank", currentRank);
-//            }
 
-            if (userRipleCount <=19){
-                profileRankView.setText("\"Drop\"");//1
-            }if (userRipleCount >39){
-                profileRankView.setText("\"Volunteer\"");//2
-            }if (userRipleCount >79){
-                profileRankView.setText("\"Do-Gooder\"");//3
-            }if (userRipleCount >159){
-                profileRankView.setText("\"Contributor\"");//4
-            }if (userRipleCount >319){
-                profileRankView.setText("\"Patron\"");//5
-            }if (userRipleCount >639){
-                profileRankView.setText("\"Beneficent\"");//6
-            }if (userRipleCount >1279){
-                profileRankView.setText("\"Humanitarian\"");//7
-            }if (userRipleCount >2559){
-                profileRankView.setText("\"Saint\"");//8
-            }if (userRipleCount >5119){
-                profileRankView.setText("\"Gandhi\"");//9
-            }if (userRipleCount >10239) {
-                profileRankView.setText("\"Mother Teresa\"");//10
-            }
+
+        String localRank = "\"Drop\"";
+        int parseRipleCount = currentUser.getInt("userRipleCount");
+
+        if (parseRipleCount > 19) {
+            localRank = ("\"Volunteer\"");//2
+        }
+        if (parseRipleCount > 39) {
+            localRank = ("\"Do-Gooder\"");//3
+        }
+        if (parseRipleCount > 79) {
+            localRank = ("\"Contributor\"");//4
+        }
+        if (parseRipleCount > 159) {
+            localRank = ("\"Patron\"");//5
+        }
+        if (parseRipleCount > 319) {
+            localRank = ("\"Beneficent\"");//6
+        }
+        if (parseRipleCount > 639) {
+            localRank = ("\"Humanitarian\"");//7
+        }
+        if (parseRipleCount > 1279) {
+            localRank = ("\"Saint\"");//8
+        }
+        if (parseRipleCount > 2559) {
+            localRank = ("\"Gandhi\"");//9
+        }
+        if (parseRipleCount > 5119) {
+            localRank = ("\"Mother Teresa\"");//10
+        }
+
+        if (localRank != null) {
+            currentUser.put("userRank", localRank);
+        }
+
+        profileRipleCountView.setText(String.valueOf(parseRipleCount) + " Riples");
+
+        if (localRank != null) {
+            profileRankView.setText(localRank);
+        }
     }
+
 
     private void startLoginActivity() {
         Intent intent = new Intent(this.getActivity(), LoginActivity.class);
