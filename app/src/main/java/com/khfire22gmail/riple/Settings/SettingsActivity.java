@@ -1,99 +1,253 @@
 package com.khfire22gmail.riple.settings;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
-import com.facebook.login.widget.ProfilePictureView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
-import com.parse.ParseObject;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE = 0;
+    private static final int REQUEST_CODE = 1;
     private static final String TAG = null;
-    private ProfilePictureView editProfilePicture;
+    private ImageView editProfilePicture;
     String aboutUserText;
     EditText aboutUserField;
-    public ParseUser currentUser = ParseUser.getCurrentUser();
+    public ParseUser currentUser;
+    private ParseFile parseProfilePicture;
+    private Bitmap compressedBitmap;
+    private Bitmap smallBitmap;
+    private Context context;
+    private String facebookId;
+    private ImageView editProfilePictureView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        String facebookId = currentUser.getString("facebookId");
-
-        editProfilePicture = (ProfilePictureView) findViewById(R.id.edit_profile_picture);
-        editProfilePicture.setProfileId(facebookId);
-        aboutUserField = (EditText)findViewById(R.id.about_user_field);
+        currentUser = ParseUser.getCurrentUser();
 
 
+        if ((currentUser != null) && currentUser.isAuthenticated()) {
 
-        editProfilePicture.setOnClickListener(new View.OnClickListener() {
+            editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
+            parseProfilePicture = currentUser.getParseFile("parseProfilePicture");
+            facebookId = (String) currentUser.get("facebookId");
 
-            public void onClick(View arg0) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_CODE);
+        }
+        // Facebook picture code
+        if(parseProfilePicture != null) {
+            Glide.with(this)
+                    .load(parseProfilePicture.getUrl())
+                    .crossFade()
+                    .fallback(R.drawable.ic_user_default)
+                    .error(R.drawable.ic_user_default)
+                    .signature(new StringSignature(UUID.randomUUID().toString()))
+                    .into(editProfilePictureView);
+        } else {
+            if (facebookId != null){
+                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
+                new DownloadImageTask((ImageView) findViewById(R.id.edit_profile_picture))
+                        .execute("https://graph.facebook.com/" + facebookId+ "/picture?type=large");
             }
-        });
-
-        Button saveAllSettingsButton = (Button) findViewById(R.id.save_all_settings);
-        saveAllSettingsButton.setOnClickListener(new View.OnClickListener() {
+        }
+        ImageView image = (ImageView) findViewById(R.id.edit_profile_picture);
+        image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: 11/11/2015 Allow the "SAVE" button press to save all current settings to parse.
-                aboutUserText = aboutUserField.getText().toString();
-                aboutUser(aboutUserText);
+                selectImage();
 
             }
         });
     }
 
-    /*public String aboutUserInput() {
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
 
-        return aboutUser;
-    }*/
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            switch (requestCode) {
 
-                case REQUEST_CODE:
-                    if (resultCode == Activity.RESULT_OK) {
-                        //data gives you the image uri. Try to convert that to bitmap
-                        break;
-                    } else if (resultCode == Activity.RESULT_CANCELED) {
-                        Log.i("Kevin", "Selecting picture cancelled");
-                    }
-                    break;
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("MyApp", e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Log.i("Kevin", "Exception in onActivityResult : " + e.getMessage());
+            return mIcon;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            if (bmImage != null) {
+                bmImage.setImageBitmap(result);
+                //convert bitmap to byte array and upload to Parse
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                result.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+
+                final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
+                file.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            currentUser.put("parseProfilePicture", file);
+                            currentUser.saveInBackground();
+                        }
+                    }
+                });
+            }
         }
     }
 
-    public void uploadProfilePicture(){
 
-        ParseObject user = new ParseObject("_User");
 
+    // User uploaded picture code
+    private void selectImage() {
+        Intent intent = new Intent();
+        // Show only images, no videos or anything else
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        // Always show the chooser (if there are multiple options available)
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CODE);
     }
 
-    public void aboutUser(String aboutUserText){
 
-        currentUser.put("aboutUser", aboutUserText);
-        currentUser.saveInBackground();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                Log.d("MyApp", String.valueOf(bitmap));
+
+                smallBitmap = getResizedBitmap(bitmap);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                smallBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                Log.d("MyApp", "smallBitmap compressed stream size = " + byteArray.length);
+
+//                rotateImageIfRequired();
+
+                ImageView imageView = (ImageView) findViewById(R.id.edit_profile_picture);
+                imageView.setImageBitmap(bitmap);
+
+                if (byteArray.length > 10485759) {
+                    Log.d("MyApp", "Picture is too large");
+                    compressedBitmap = Bitmap.createScaledBitmap(smallBitmap, 240, 240, true);
+                    stream = new ByteArrayOutputStream();
+                    compressedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byteArray = stream.toByteArray();
+                    Log.d("MyApp", "byteArray = " + byteArray.length);
+                    saveImageToParse(byteArray);
+
+                } else {
+                    saveImageToParse(byteArray);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        recreate();
+    }
+
+    //Rotate Image////////////////////////////////////////////////
+    private static Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+
+        ExifInterface ei = new ExifInterface(selectedImage.getPath());
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+/////////////////////////////////////////////////////////////////////////
+    public Bitmap getResizedBitmap(Bitmap image) {
+        Bitmap originalImage = image;
+        Bitmap background = Bitmap.createBitmap(240, 240, Bitmap.Config.ARGB_8888);
+        float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
+        Canvas canvas = new Canvas(background);
+        float scale = 240/originalWidth;
+        float xTranslation = 0.0f, yTranslation = (240 - originalHeight * scale)/2.0f;
+        Matrix transformation = new Matrix();
+//        transformation.postRotate(degree);
+        transformation.postTranslate(xTranslation, yTranslation);
+        transformation.preScale(scale, scale);
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+        canvas.drawBitmap(originalImage, transformation, paint);
+        return background;
+    }
+
+    private void saveImageToParse(byte[] byteArray) {
+        final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
+        file.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    currentUser.put("parseProfilePicture", file);
+                    currentUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            recreate();
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     @Override

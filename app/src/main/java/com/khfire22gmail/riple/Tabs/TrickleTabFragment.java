@@ -1,9 +1,10 @@
 package com.khfire22gmail.riple.tabs;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,7 +20,9 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -30,8 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -59,68 +61,18 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
     public static ArrayList<DropItem> trickleTabInteractionList;
 
-
-
-    /*public void onActivityCreated (Bundle savedInstanceState)
-    Added in API level 11
-    Called when the fragment's activity has been created and this fragment's view hierarchy instantiated. It can be used to do final initialization once these pieces are in place, such as retrieving views or restoring state. It is also useful for fragments that use setRetainInstance(boolean) to retain their instance, as this callback tells the fragment when it is fully associated with the new activity instance. This is called after onCreateView(LayoutInflater, ViewGroup, Bundle) and before onViewStateRestored(Bundle).
-    Parameters
-    savedInstanceState	If the fragment is being re-created from a previous saved state, this is the state.*/
-    /*@Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-    }*/
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
-
-
-
-
-//        Create recyclerView and set it to display list
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
+        mRecyclerView.setItemAnimator(new FadeInLeftAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        Log.d("KEVIN", "loading items from Parse now");
-//        loadHasRelationToFromParse();
-//        loadAllDropsFromParse();
-
-
-        //Query currentUser "hasRelationTo" and compare to all Drops, showing only no relation Drops.
-
         loadAllDropsFromParse();
-//        filterDrops(hasRelationList, allDropsList);
-//        updateRecyclerView(filterDrops(hasRelationList, allDropsList));
-
-
-
-
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        mRecyclerView.setItemAnimator(animator);
-        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
         return view;
     }
-
-   /* @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            //probably orientation change
-            myData = (List<String>) savedInstanceState.getSerializable("list");
-        } else {
-            if (myData != null) {
-                //returning from backstack, data is fine, do nothing
-            } else {
-                //newly created, compute data
-                myData = computeData();
-            }
-        }
-
-
-    }*/
 
     /*private void initView() {
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) getActivity().findViewById(R.id.main_swipe);
@@ -198,7 +150,22 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         //Collects Drop Objects
                         trickleObjectsList.add(list.get(i));
 
-                        DropItem dropItemAll = new DropItem();
+                        final DropItem dropItemAll = new DropItem();
+
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
+                        if (profilePicture != null) {
+                            profilePicture.getDataInBackground(new GetDataCallback() {
+
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItemAll.setParseProfilePicture(bmp);
+                                    }
+                                }
+                            });
+                        }
 
                         //DropObject
 //                        dropItemAll.setDrop(list.get(i).getParseObject("objectId"));
@@ -208,8 +175,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         dropItemAll.setAuthorId(list.get(i).getString("author"));
                         //Author name
                         dropItemAll.setAuthorName(list.get(i).getString("name"));
-                        //Picture
-                        dropItemAll.setFacebookId(list.get(i).getString("facebookId"));
                         //CreatedAt
                         dropItemAll.setCreatedAt(list.get(i).getCreatedAt());
                         //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
@@ -277,19 +242,10 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
             for(DropItem dropItemRelation  : hasRelationList) {
                 if(dropItemAll.getObjectId().equals(dropItemRelation.getObjectId())){
                     allDropsIterator.remove();
-
-
                 }
             }
         }
 
-
-
-        /*ArrayList <ParseObject> dropObjects = new ArrayList<>();
-
-        for(int i = 0; i < filteredDropList.size(); i++) {
-            dropObjects.set(filteredDropList.get(i));
-        }*/
         trickleTabInteractionList = filteredDropList;
         updateRecyclerView(filteredDropList);
     }
@@ -301,6 +257,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         scaleAdapter.setDuration(250);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+
     }
 }

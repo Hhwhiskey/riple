@@ -32,7 +32,7 @@
                 android:background="#BBDEFB"
                 android:clickable="false"/>
 
-            <com.facebook.login.widget.ProfilePictureView
+            <ImageView
                 android:id="@+id/profile_picture"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
@@ -41,7 +41,9 @@
                 android:layout_alignParentTop="true"
                 android:foregroundGravity="center_vertical"
                 android:layout_marginTop="8dp"
-                android:layout_marginLeft="8dp"/>
+                android:layout_marginLeft="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_user_default"/>
 
             <TextView
                 android:id="@+id/name"

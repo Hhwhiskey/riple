@@ -7,9 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.actions.ViewUserActivity;
 
@@ -83,16 +83,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
         String mClickedUserId = (data.get(position).getCommenterId());
         String mClickedUserName = (data.get(position).getCommenterName());
-        String mClickedUserFacebookId = (data.get(position).getCommenterFacebookId());
 
         Log.d("sCommentViewUser", "Clicked User's userId = " + mClickedUserId);
         Log.d("sCommentViewUser", "Clicked User's clickedUserName = " + mClickedUserName);
-        Log.d("sCommentViewUser", "Clicked User's clickedFacebookId = " + mClickedUserFacebookId);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
         intent.putExtra("clickedUserId", mClickedUserId);
         intent.putExtra("clickedUserName", mClickedUserName);
-        intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
         mContext.startActivity(intent);
     }
 
@@ -101,7 +98,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
     public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        viewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
+        viewHolder.parseProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 viewOtherUser(position);
@@ -137,21 +134,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public ProfilePictureView profilePicture;
         public TextView createdAt;
         public TextView commentText;
         public TextView commenterName;
-//        public TextView commentCount;
+        public ImageView parseProfilePicture;
 
         public MyViewHolder(View itemView) {
 
             super(itemView);
 
-            profilePicture = (ProfilePictureView) itemView.findViewById(R.id.commenter_profile_picture);
+            parseProfilePicture = (ImageView) itemView.findViewById(R.id.commenter_profile_picture);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             commenterName = (TextView) itemView.findViewById(R.id.commenter);
             commentText = (TextView) itemView.findViewById(R.id.commentText);
-//            commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+
 
             itemView.setOnClickListener(this);
         }
@@ -160,7 +156,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
             CommentItem current = data.get(position);
 
-            profilePicture.setProfileId(current.commenterFacebookId);
+            parseProfilePicture.setImageBitmap(current.parseProfilePicture);
             commenterName.setText(current.commenterName);
             commentText.setText(current.commentText);
             createdAt.setText(String.valueOf(current.createdAt));

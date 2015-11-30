@@ -5,6 +5,7 @@
     <!-- TODO Update permissions for Marshmallow http://guides.codepath.com/android/Understanding-App-Permissions#runtime-permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- <uses-permission android:author="android.Permission.PUBLIC_PROFILE"/> -->
     <application
@@ -12,10 +13,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +26,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -43,23 +46,28 @@
 
         <activity
             android:name=".settings.AboutActivity"
-            android:label="@string/title_activity_about" >
+            android:label="@string/title_activity_about"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".utils.Logout"
-            android:label="@string/title_activity_logout" >
+            android:label="@string/title_activity_logout"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".actions.CreateDropActivity"
-            android:label="@string/title_activity_create_drop" >
+            android:label="@string/title_activity_create_drop"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".actions.ViewDropActivity"
-            android:label="@string/title_activity_clicked_drop" >
+            android:label="@string/title_activity_clicked_drop"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".actions.ViewUserActivity"
-            android:label="@string/title_activity_view_riple" >
+            android:label="@string/title_activity_view_riple"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".sinch.MessagingActivity"
@@ -67,11 +75,18 @@
         </activity>
         <activity
             android:name=".ParseLoginActivity"
-            android:label="@string/title_activity_parse_login_activity" >
+            android:label="@string/title_activity_parse_login_activity"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".settings.SettingsActivity"
-            android:label="@string/title_activity_edit_profile" >
+            android:label="@string/title_activity_edit_profile"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".actions.ViewUserInfoActivity"
+            android:label="@string/title_activity_view_user_info"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

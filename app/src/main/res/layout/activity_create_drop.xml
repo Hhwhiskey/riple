@@ -3,7 +3,6 @@
               xmlns:card_view="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              xmlns:app="http://schemas.android.com/tools"
               android:orientation="vertical">
 
     <android.support.v7.widget.CardView
@@ -25,13 +24,13 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/drop_tool_bar"
                 layout="@layout/tool_bar"
-                android:background="@color/ColorPrimary"
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true">
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:background="@color/ColorPrimary">
 
 
             </android.support.v7.widget.Toolbar>
@@ -40,44 +39,29 @@
                 android:id="@+id/drop_description"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="Description"
-                android:layout_marginTop="30dp"
-                android:layout_below="@+id/drop_tool_bar"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_below="@+id/drop_tool_bar"
+                android:layout_marginBottom="30dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginTop="30dp"
+                android:hint="Description"
                 android:maxLength="500"/>
 
 
             <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Drop"
-                    android:id="@+id/button_post_drop"
-                    android:layout_gravity="center_horizontal"
-                    android:background="@color/AccentColor"
-                    android:textColor="#ffffff"
-                    android:layout_marginTop="28dp"
-                    android:layout_below="@+id/to_text_input_layout"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"/>
-
-
-            <!--<android.support.design.widget.FloatingActionButton
+                android:id="@+id/button_post_drop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:clickable="true"
-                android:src="@drawable/ic_add"
-                app:backgroundTint="@color/AccentColor"
-                app:borderWidth="0dp"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
-                android:id="@+id/view"/>-->
-
-
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/to_text_input_layout"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="28dp"
+                android:background="@color/AccentColor"
+                android:text="Drop"
+                android:textColor="#ffffff"/>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/to_text_input_layout"
@@ -87,23 +71,23 @@
             </android.support.design.widget.TextInputLayout>
 
             <TextView
+                android:id="@+id/create_drop_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Create a new Drop"
-                android:id="@+id/create_drop_header"
-                android:textSize="18sp"
-                android:gravity="left|center_horizontal"
-                android:textStyle="bold|italic"
-                android:paddingTop="16dp"
-                android:paddingLeft="8dp"
-                android:textColor="#ffffff"
-                android:layout_below="@+id/to_text_input_layout"
                 android:layout_alignBottom="@+id/drop_tool_bar"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"/>
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/to_text_input_layout"
+                android:gravity="left|center_horizontal"
+                android:paddingLeft="8dp"
+                android:paddingTop="16dp"
+                android:text="Create a new Drop"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:textStyle="bold|italic"/>
 
 
         </RelativeLayout>

@@ -35,5 +35,9 @@
     <string name="email">E-MAIL</string>
     <string name="title_activity_edit_profile">EditProfile</string>
     <string name="write_comment_hint">Write a Comment...</string>
+    <string name="title_activity_view_user_info">ViewUserInfoActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

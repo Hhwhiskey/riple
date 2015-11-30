@@ -1,6 +1,8 @@
 package com.khfire22gmail.riple.actions;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -14,13 +16,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
-import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -29,6 +34,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -40,10 +46,11 @@ public class ViewUserActivity extends AppCompatActivity {
     private List<DropItem> mViewUserList;
     String EXTRA_IMAGE;
     public String mAuthorName;
-    private ProfilePictureView profilePictureView;
     private String mClickedUserId;
     private String mClickedUserName;
     private String mClickedUserFacebookId;
+    private ParseFile parseProfilePicture;
+    private ImageView profilePictureView;
 
 
     @Override
@@ -56,21 +63,22 @@ public class ViewUserActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 
+
+
         //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
 
         mClickedUserId = intent.getStringExtra("clickedUserId");
         mClickedUserName = intent.getStringExtra("clickedUserName");
-        mClickedUserFacebookId = intent.getStringExtra("clickedUserFacebookId");
 
         Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
         Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
-        Log.d("rViewUser", "mClickedUserFacebookId = " + mClickedUserFacebookId);
+
+
+        getViewedUserProfilePicture(mClickedUserId);
 
         // Set collapsable toolbar picture and text
-        profilePictureView = (ProfilePictureView)findViewById(R.id.view_user_profile_picture);
-        profilePictureView.setProfileId(mClickedUserFacebookId);
-        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
+        profilePictureView = (ImageView)findViewById(R.id.view_user_profile_picture);
 
         collapsingToolbar.setTitle(mClickedUserName);
 
@@ -88,6 +96,42 @@ public class ViewUserActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void getViewedUserProfilePicture(String mClickedUserId) {
+        ParseQuery<ParseUser> viewUserQuery = ParseQuery.getQuery("_User");
+        viewUserQuery.getInBackground(mClickedUserId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser clickedUserObject, ParseException e) {
+                ParseFile viewUserProfilePicture = (ParseFile) clickedUserObject.get("parseProfilePicture");
+                parseProfilePicture = viewUserProfilePicture;
+                if (parseProfilePicture != null) {
+                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
+
+                        @Override
+                        public void done(byte[] data, ParseException e) {
+                            if (e == null) {
+                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 1000, 1000, true);
+                                profilePictureView.setImageBitmap(bmp);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+/*
+        if(parseProfilePicture != null) {
+            Glide.with(this)
+                    .load(parseProfilePicture.getUrl())
+                    .crossFade()
+                    .fallback(R.drawable.ic_user_default)
+                    .error(R.drawable.ic_user_default)
+                    .signature(new StringSignature(UUID.randomUUID().toString()))
+                    .into(profilePictureView);
+        }*/
+    }
+
+
 
     public void loadRipleItemsFromParse() {
         final ArrayList<DropItem> clickedUsersActivity = new ArrayList<>();
@@ -135,12 +179,25 @@ public class ViewUserActivity extends AppCompatActivity {
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
-                        DropItem dropItem = new DropItem();
+                        final DropItem dropItem = new DropItem();
+
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
+                        if (profilePicture != null) {
+                            profilePicture.getDataInBackground(new GetDataCallback() {
+
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(bmp);
+                                    }
+                                }
+                            });
+                        }
 
                         //ObjectId
                         dropItem.setObjectId(list.get(i).getObjectId());
-                        //Picture
-                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
                         //Author id
@@ -174,13 +231,14 @@ public class ViewUserActivity extends AppCompatActivity {
         });
     }
 
-    private void updateRecyclerView(ArrayList<DropItem> clickedUsersActivity) {
-        Log.d("KEVIN", "RIPLE LIST SIZE: " + clickedUsersActivity.size());
+    private void updateRecyclerView(ArrayList<DropItem> viewUsersActivity) {
+        Log.d("KEVIN", "RIPLE LIST SIZE: " + viewUsersActivity.size());
 
-        mViewUserAdapter = new DropAdapter(this, clickedUsersActivity, "riple");
+        mViewUserAdapter = new DropAdapter(this, viewUsersActivity, "viewUser");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);
         scaleAdapter.setDuration(250);
         mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        mViewUserRecyclerView.setItemAnimator(new SlideInLeftAnimator());
 
         /* mViewUserView = items;
 

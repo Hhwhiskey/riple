@@ -1,6 +1,8 @@
 package com.khfire22gmail.riple.actions;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -10,10 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,11 +28,14 @@ import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,12 +67,13 @@ public class ViewDropActivity extends AppCompatActivity {
     public String mDropObjectId;
     private String mAuthorFacebookId;
     private String mDropDescription;
-    private ProfilePictureView authorProfilePictureView;
+    private ImageView authorProfilePictureView;
     private ProfilePictureView postCommentProfilePictureView;
     private String commentText;
     private AutoCompleteTextView newCommentView;
     private Switch viewedDropTodoSwitch;
     private CheckBox viewedDropCompleteCheckBox;
+    private ParseFile parseProfilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +103,9 @@ public class ViewDropActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mCommentCount = " + mCommentCount);
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
 
-        authorProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_picture);
-        authorProfilePictureView.setProfileId(mAuthorFacebookId);
+        getViewedUserProfilePicture(mAuthorId);
+
+        authorProfilePictureView = (ImageView) findViewById(R.id.profile_picture);
 
         authorProfilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,6 +190,30 @@ public class ViewDropActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void getViewedUserProfilePicture(String mAuthorId) {
+        ParseQuery<ParseUser> viewUserQuery = ParseQuery.getQuery("_User");
+        viewUserQuery.getInBackground(mAuthorId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser clickedUserObject, ParseException e) {
+                ParseFile viewUserProfilePicture = (ParseFile) clickedUserObject.get("parseProfilePicture");
+                parseProfilePicture = viewUserProfilePicture;
+                if (parseProfilePicture != null) {
+                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
+
+                        @Override
+                        public void done(byte[] data, ParseException e) {
+                            if (e == null) {
+                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 1000, 1000, true);
+                                authorProfilePictureView.setImageBitmap(bmp);
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void getDropObjectToAdd(String mDropObjectId) {
@@ -292,7 +325,22 @@ public class ViewDropActivity extends AppCompatActivity {
                 } else {
                     for (int i = 0; i < list.size(); i++) {
 
-                        CommentItem commentItem = new CommentItem();
+                        final CommentItem commentItem = new CommentItem();
+
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("commenterProfilePicture");
+                        if (profilePicture != null) {
+                            profilePicture.getDataInBackground(new GetDataCallback() {
+
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                       commentItem.setParseProfilePicture(bmp);
+                                    }
+                                }
+                            });
+                        }
 
                         // Comment Id
 //                        commentItem.setObjectId(list.get(i).getObjectId());
@@ -359,10 +407,16 @@ public class ViewDropActivity extends AppCompatActivity {
         if (commentText != null) {
             comment.put("dropId", mDropObjectId);
             comment.put("commenterId", user.getObjectId());
-            comment.put("commenterName", user.get("name"));
-            comment.put("commenterFacebookId", user.get("facebookId"));
+            comment.put("commenterName", user.get("username"));
+            comment.put("commenterProfilePicture", user.getParseFile("parseProfilePicture"));
             comment.put("commentText", commentText);
-            comment.saveInBackground();
+            comment.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
+                    recreate();
+                }
+            });
         }
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
@@ -374,21 +428,10 @@ public class ViewDropActivity extends AppCompatActivity {
                     drop.increment("commentCount");
                     drop.saveInBackground();
                 }
-
-                Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
-
             }
         });
+
+        hideSoftKeyboard();
     }
 
     private void updateUserInfo() {
@@ -424,6 +467,13 @@ public class ViewDropActivity extends AppCompatActivity {
         intent.putExtra("clickedUserName", mClickedUserName);
         intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
         this.startActivity(intent);
+    }
+
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     @Override

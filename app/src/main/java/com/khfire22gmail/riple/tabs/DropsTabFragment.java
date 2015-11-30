@@ -1,5 +1,7 @@
 package com.khfire22gmail.riple.tabs;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,7 +18,9 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -81,17 +85,33 @@ public class DropsTabFragment extends Fragment {
                     Log.i("KEVIN", "error error");
 
                 } else {
+
                     for (int i = 0; i < list.size(); i++) {
 
                         //Collects Drop Objects
                         dropObjectsList.add(list.get(i));
 
-                        DropItem dropItem = new DropItem();
+                        final DropItem dropItem = new DropItem();
+
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
+                        if (profilePicture != null) {
+                            profilePicture.getDataInBackground(new GetDataCallback() {
+
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(bmp);
+                                    }
+                                }
+                            });
+                        }
 
                         //ObjectId
                         dropItem.setObjectId(list.get(i).getObjectId());
                         //Picture
-                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
+//                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
                         //Author name
                         dropItem.setAuthorName(list.get(i).getString("name"));
                         //Author id
@@ -119,14 +139,16 @@ public class DropsTabFragment extends Fragment {
                         dropList.add(dropItem);
                     }
                 }
+                dropTabInteractionList = dropList;
                 updateRecyclerView(dropList);
+
             }
         });
     }
 
     private void updateRecyclerView(ArrayList<DropItem> dropList) {
+        Log.d("kevinDropList", "Drop LIST SIZE: " + dropList.size());
 
-        dropTabInteractionList = dropList;
         mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
         scaleAdapter.setDuration(250);

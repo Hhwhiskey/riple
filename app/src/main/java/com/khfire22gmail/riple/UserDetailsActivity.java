@@ -34,7 +34,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         setContentView(R.layout.fragment_riple_tab);
 
-        userProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_pic);
+        userProfilePictureView = (ProfilePictureView) findViewById(R.id.profile_picture);
         userNameView = (TextView) findViewById(R.id.profile_name);
         //userGenderView = (TextView) findViewById(R.id.userGender);
         //userEmailView = (TextView) findViewById(R.id.userEmail);

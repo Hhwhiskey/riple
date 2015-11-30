@@ -1,5 +1,7 @@
 package com.khfire22gmail.riple.model;
 
+import android.graphics.Bitmap;
+
 import com.parse.ParseObject;
 
 import java.util.Date;
@@ -22,6 +24,17 @@ public class DropItem {
     public String ripleCount;
     public String commentCount;
     public ParseObject drop;
+    public Bitmap parseProfilePicture;
+
+
+
+    public Bitmap getParseProfilePicture() {
+        return parseProfilePicture;
+    }
+
+    public void setParseProfilePicture(Bitmap parseProfilePicture) {
+        this.parseProfilePicture = parseProfilePicture;
+    }
 
     public ParseObject getDrop() {
         return drop;

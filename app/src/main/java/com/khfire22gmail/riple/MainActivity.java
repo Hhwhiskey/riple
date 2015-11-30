@@ -1,7 +1,10 @@
 package com.khfire22gmail.riple;
 
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +33,7 @@ import com.khfire22gmail.riple.sinch.MessageService;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -50,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String dropDescription;
     private AutoCompleteTextView dropDescriptionView;
     private SinchClient sinchClient;
+    ParseUser currentUser;
+    private View root_layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +66,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startService(serviceIntent);
 
 //        ScrollingFABBehavior(this, obtainStyledAttributes(R.attr.toolBarHeight));
+
+
+
+
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +133,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         popupWindow.setAnimationStyle(R.style.Animation);
 
+//        popupWindow.setBackgroundDrawable(drawable.popup_background);
+
+//        WindowManager.LayoutParams windowManager = getWindow().getAttributes();
+//        windowManager.dimAmount = 0.75f;
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
         // If the PopupWindow should be focusable
         popupWindow.setFocusable(true);
 
@@ -155,17 +171,237 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    private Bitmap takeScreenShot(Activity activity) {
+        View view = this.getWindow().getDecorView();
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        Bitmap b1 = view.getDrawingCache();
+        Rect frame = new Rect();
+        this.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+        int statusBarHeight = frame.top;
+        int width = this.getWindowManager().getDefaultDisplay().getWidth();
+        int height = this.getWindowManager().getDefaultDisplay().getHeight();
+
+        Bitmap b = Bitmap.createBitmap(b1, 0, statusBarHeight, width, height  - statusBarHeight);
+        view.destroyDrawingCache();
+        return b;
+    }
+
+    public Bitmap fastblur(Bitmap sentBitmap, int radius) {
+        Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
+
+        if (radius < 1) {
+            return (null);
+        }
+
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        int[] pix = new int[w * h];
+        Log.e("pix", w + " " + h + " " + pix.length);
+        bitmap.getPixels(pix, 0, w, 0, 0, w, h);
+
+        int wm = w - 1;
+        int hm = h - 1;
+        int wh = w * h;
+        int div = radius + radius + 1;
+
+        int r[] = new int[wh];
+        int g[] = new int[wh];
+        int b[] = new int[wh];
+        int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
+        int vmin[] = new int[Math.max(w, h)];
+
+        int divsum = (div + 1) >> 1;
+        divsum *= divsum;
+        int dv[] = new int[256 * divsum];
+        for (i = 0; i < 256 * divsum; i++) {
+            dv[i] = (i / divsum);
+        }
+
+        yw = yi = 0;
+
+        int[][] stack = new int[div][3];
+        int stackpointer;
+        int stackstart;
+        int[] sir;
+        int rbs;
+        int r1 = radius + 1;
+        int routsum, goutsum, boutsum;
+        int rinsum, ginsum, binsum;
+
+        for (y = 0; y < h; y++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            for (i = -radius; i <= radius; i++) {
+                p = pix[yi + Math.min(wm, Math.max(i, 0))];
+                sir = stack[i + radius];
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = (p & 0x0000ff);
+                rbs = r1 - Math.abs(i);
+                rsum += sir[0] * rbs;
+                gsum += sir[1] * rbs;
+                bsum += sir[2] * rbs;
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+            }
+            stackpointer = radius;
+
+            for (x = 0; x < w; x++) {
+
+                r[yi] = dv[rsum];
+                g[yi] = dv[gsum];
+                b[yi] = dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - radius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (y == 0) {
+                    vmin[x] = Math.min(x + radius + 1, wm);
+                }
+                p = pix[yw + vmin[x]];
+
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = (p & 0x0000ff);
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[(stackpointer) % div];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi++;
+            }
+            yw += w;
+        }
+        for (x = 0; x < w; x++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            yp = -radius * w;
+            for (i = -radius; i <= radius; i++) {
+                yi = Math.max(0, yp) + x;
+
+                sir = stack[i + radius];
+
+                sir[0] = r[yi];
+                sir[1] = g[yi];
+                sir[2] = b[yi];
+
+                rbs = r1 - Math.abs(i);
+
+                rsum += r[yi] * rbs;
+                gsum += g[yi] * rbs;
+                bsum += b[yi] * rbs;
+
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+
+                if (i < hm) {
+                    yp += w;
+                }
+            }
+            yi = x;
+            stackpointer = radius;
+            for (y = 0; y < h; y++) {
+                // Preserve alpha channel: ( 0xff000000 & pix[yi] )
+                pix[yi] = ( 0xff000000 & pix[yi] ) | ( dv[rsum] << 16 ) | ( dv[gsum] << 8 ) | dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - radius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (x == 0) {
+                    vmin[y] = Math.min(y + r1, hm) * w;
+                }
+                p = x + vmin[y];
+
+                sir[0] = r[p];
+                sir[1] = g[p];
+                sir[2] = b[p];
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[stackpointer];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi += w;
+            }
+        }
+
+        Log.e("pix", w + " " + h + " " + pix.length);
+        bitmap.setPixels(pix, 0, w, 0, 0, w, h);
+
+        return (bitmap);
+    }
+
     // Take user input and post the Drop
     public void createDrop(String dropDescription) throws InterruptedException {
 
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser user = ParseUser.getCurrentUser();
+        final ParseFile userPicture = (ParseFile) user.get("parseProfilePicture");
 
         if(dropDescription != null) {
             drop.put("author", user.getObjectId());
-            drop.put("facebookId", user.get("facebookId"));
             drop.put("name", user.get("username"));
             drop.put("description", dropDescription);
+            drop.put("authorPicture", userPicture);
             drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
                 @Override
                 public void done(ParseException e) {
@@ -175,25 +411,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     ParseRelation<ParseObject> relationHasRelationTo = user.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
-                    user.saveInBackground();
+//                    user.saveInBackground();
+                    user.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+
+                                Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
+                                Intent intent = getIntent();
+                                finish();
+                                startActivity(intent);
+                            }
+                        }
+                    });
                 }
             });
         }
 //        RipleTabFragment fragment = (RipleTabFragment) getSupportFragmentManager().findFragmentById(R.id.riple_recycler_view);
 //        fragment.RefreshRipleTab();
-        Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
 
-        Thread.sleep(500);
-
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
     }
 
     @Override
@@ -216,14 +459,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         if (id == R.id.settingsButton) {
-            ParseUser.logOut();
             Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intentSettings);
             return true;
         }
 
         if (id == R.id.aboutButton) {
-            ParseUser.logOut();
             Intent intentSettings = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intentSettings);
             return true;

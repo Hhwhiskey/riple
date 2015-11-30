@@ -1,5 +1,7 @@
 package com.khfire22gmail.riple.model;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 
 /**
@@ -13,6 +15,18 @@ public class CommentItem {
     public String objectId;
     public String commenterFacebookId;
     public String commenterName;
+    public Bitmap parseProfilePicture;
+
+
+
+
+    public Bitmap getParseProfilePicture() {
+        return parseProfilePicture;
+    }
+
+    public void setParseProfilePicture(Bitmap parseProfilePicture) {
+        this.parseProfilePicture = parseProfilePicture;
+    }
 
     public String getCommenterId() {
         return commenterId;

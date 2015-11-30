@@ -37,7 +37,7 @@
         android:layout_toStartOf="@+id/button_post_comment"
         android:background="#ffffff"
         android:hint="@string/write_comment_hint"
-        android:inputType="textAutoComplete|textAutoCorrect"
+        android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|text"
         android:maxLength="250"
         android:paddingLeft="8dp"/>
 
