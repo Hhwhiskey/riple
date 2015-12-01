@@ -1,10 +1,12 @@
 package com.khfire22gmail.riple;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -104,7 +106,29 @@ public class LoginActivity extends AppCompatActivity {
         fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    fbLogin();
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.MyAlertDialogStyle);
+                    builder.setTitle("Not so fast...");
+                    builder.setMessage("I will not post any offensive material and I will report any offensive material I encounter");
+                    builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            moveTaskToBack(true);
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(1);
+                        }
+                    });
+
+
+                    builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            fbLogin();
+                        }
+                    });
+                    builder.show();
+
                 } else {
                     fbLogout();
                 }
@@ -141,20 +165,21 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void fbLogin() {
-//        progressDialog = ProgressDialog.show(LoginActivity.this, "", "Logging in...", true);
         List<String> permissions = Arrays.asList("public_profile", "email");
-//      Assigns the current user to Parse.userProfilePictureView
+
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
-//                progressDialog.dismiss();
+
                 if (user == null) {
                     Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
                     Toast.makeText(getApplicationContext(), "Uh oh. The user cancelled the Facebook login.", Toast.LENGTH_SHORT).show();
+
                 } else if (user.isNew()) {
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
                     Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
+
                 } else {
                     Log.d(RipleApplication.TAG, "You have logged in through Facebook!");
                     Toast.makeText(getApplicationContext(), "User logged in through Facebook!", Toast.LENGTH_SHORT).show();

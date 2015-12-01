@@ -35,6 +35,7 @@
                 android:foregroundGravity="center_vertical"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_user_default"/>
 
             <TextView

@@ -222,11 +222,7 @@ public class RipleTabFragment extends Fragment {
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
-            //facebookId = (String) currentUser.get("facebookId");
         }
-
-        /*Bundle parametersPicture = new Bundle();
-        parametersPicture.putString("fields", "picture.width(150).height(150)");*/
 
         //get parse profile picture if exists, if not, store Facebook picture on Parse and show
 
@@ -247,27 +243,12 @@ public class RipleTabFragment extends Fragment {
             }
         }
 
-
-
-        /*// Update User Picture
-        if (facebookId != null) {
-            profilePictureView.setProfileId(facebookId);
-
-        } else {
-            // Show the default, blank user profile picture
-            profilePictureView.setProfileId(null);
-        }*/
-
         // Update UserName
         if (userName != null) {
             nameView.setText(userName);
         } else {
             nameView.setText("Anonymous");
         }
-
-
-
-
 
         String localRank = "\"Drop\"";
         int parseRipleCount = currentUser.getInt("userRipleCount");

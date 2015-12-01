@@ -5,7 +5,18 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <android.support.v7.widget.CardView
+    <AutoCompleteTextView
+        android:id="@+id/drop_description"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="Description"
+        android:maxLength="500"/>
+
+   <!-- <android.support.v7.widget.CardView
         android:id="@+id/card_create_drop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -87,11 +98,10 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffff"
                 android:textSize="18sp"
-                android:textStyle="bold|italic"/>
+                android:textStyle="bold|italic"/>-->
 
 
-        </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
+
 
 </LinearLayout>

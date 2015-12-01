@@ -29,7 +29,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/trickle_card_tool_bar"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="38dp"
                 android:background="#BBDEFB"
                 android:clickable="false"/>
 

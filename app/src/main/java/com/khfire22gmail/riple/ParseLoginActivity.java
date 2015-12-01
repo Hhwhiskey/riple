@@ -130,15 +130,6 @@ public class ParseLoginActivity extends AppCompatActivity {
                     });
                     builder.show();
 
-
-
-
-
-
-
-
-
-
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "Your Username must be at least 3 characters and your password " +

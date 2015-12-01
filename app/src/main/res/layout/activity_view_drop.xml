@@ -41,7 +41,7 @@
         android:maxLength="250"
         android:paddingLeft="8dp"/>
 
-    <com.facebook.login.widget.ProfilePictureView
+    <ImageView
         android:id="@+id/post_comment_profile_picture"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -49,7 +49,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/view_drop_recycler_view"
-        android:foregroundGravity="center_vertical"/>
+        android:foregroundGravity="center_vertical"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_user_default"/>
 
     <Button
         android:id="@+id/button_post_comment"

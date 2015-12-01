@@ -22,10 +22,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
+import com.khfire22gmail.riple.settings.SettingsActivity;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -40,6 +43,7 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class ViewDropActivity extends AppCompatActivity {
 
@@ -68,7 +72,7 @@ public class ViewDropActivity extends AppCompatActivity {
     private String mAuthorFacebookId;
     private String mDropDescription;
     private ImageView authorProfilePictureView;
-    private ProfilePictureView postCommentProfilePictureView;
+    private ImageView commenterProfilePictureView;
     private String commentText;
     private AutoCompleteTextView newCommentView;
     private Switch viewedDropTodoSwitch;
@@ -104,6 +108,8 @@ public class ViewDropActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
 
         getViewedUserProfilePicture(mAuthorId);
+
+        commenterProfilePictureView = (ImageView) findViewById(R.id.post_comment_profile_picture);
 
         authorProfilePictureView = (ImageView) findViewById(R.id.profile_picture);
 
@@ -147,6 +153,8 @@ public class ViewDropActivity extends AppCompatActivity {
                 commentText = newCommentView.getEditableText().toString();
                 try {
                     postNewComment(commentText);
+                    newCommentView.setText("");
+//                    generatedString = "";
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -414,6 +422,7 @@ public class ViewDropActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
+
                     recreate();
                 }
             });
@@ -436,17 +445,24 @@ public class ViewDropActivity extends AppCompatActivity {
 
     private void updateUserInfo() {
         ParseUser currentUser = ParseUser.getCurrentUser();
-        String facebookId = currentUser.getString("facebookId");
+        parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
         Bundle parametersPicture = new Bundle();
         parametersPicture.putString("fields", "picture.width(150).height(150)");
 
-        if (facebookId != null) {
-            postCommentProfilePictureView = (ProfilePictureView) findViewById(R.id.post_comment_profile_picture);
-            postCommentProfilePictureView.setProfileId(facebookId);
+        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
 
+        if(parseProfilePicture != null) {
+            Glide.with(this)
+                    .load(parseProfilePicture.getUrl())
+                    .crossFade()
+                    .fallback(R.drawable.ic_user_default)
+                    .error(R.drawable.ic_user_default)
+                    .signature(new StringSignature(UUID.randomUUID().toString()))
+                    .into(commenterProfilePictureView);
         } else {
-            // Show the default, blank user profile picture
-            postCommentProfilePictureView.setProfileId(null);
+            Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)",Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
+            startActivity(intent);
         }
     }
 

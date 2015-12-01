@@ -227,10 +227,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         Long time = (date.getTime());*/
     }
 
-    public void removeDropCard(int position) {
+    /*public void removeDropCard(int position) {
         data.remove(position);
         notifyItemRemoved(position);
-    }
+    }*/
 
     public void incrementDropAuthorRipleCount(final ParseUser dropAuthor) {
 
@@ -239,6 +239,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
             @Override
             public void done(ParseException e) {
                 int i = (int) dropAuthor.get("userRipleCount");
+                Log.d("Kevin e", "error = " + e);
             }
         });
     }
@@ -256,7 +257,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getTrickleObjectFromRowToAdd(position);
-                        removeDropCard(position);
+//                        removeDropCard(position);
                         Log.d("checkbox", "Checked");
                     } else {
                         getDropObjectFromRowToRemove(position);
