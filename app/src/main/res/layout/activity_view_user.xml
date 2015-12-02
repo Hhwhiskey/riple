@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.khfire22gmail.riple.actions.ViewUserActivity">
+    tools:context="com.khfire22gmail.riple.activities.ViewUserActivity">
 
     <FrameLayout android:id="@+id/view_user_fragment_container"
                  android:layout_width="match_parent"

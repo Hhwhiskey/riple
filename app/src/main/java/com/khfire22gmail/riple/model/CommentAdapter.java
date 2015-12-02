@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.actions.ViewUserActivity;
+import com.khfire22gmail.riple.activities.ViewUserActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;

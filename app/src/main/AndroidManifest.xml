@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.khfire22gmail.riple" >
+<manifest package="com.khfire22gmail.riple"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- TODO Update permissions for Marshmallow http://guides.codepath.com/android/Understanding-App-Permissions#runtime-permissions -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <!-- <uses-permission android:author="android.Permission.PUBLIC_PROFILE"/> -->
     <application
@@ -15,13 +15,13 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.TitleActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -33,16 +33,16 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/fb_app_id" />
+            android:value="@string/fb_app_id"/>
 
         <provider
             android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider7286154005287291649797728595501"
-            android:exported="true" />
+            android:exported="true"/>
 
         <activity
             android:name=".settings.AboutActivity"
@@ -55,26 +55,26 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".actions.CreateDropActivity"
+            android:name=".activities.CreateDropActivity"
             android:label="@string/title_activity_create_drop"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".actions.ViewDropActivity"
+            android:name=".activities.ViewDropActivity"
             android:label="@string/title_activity_clicked_drop"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".actions.ViewUserActivity"
+            android:name=".activities.ViewUserActivity"
             android:label="@string/title_activity_view_riple"
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".sinch.MessagingActivity"
-            android:label="@string/title_activity_messaging" >
+            android:label="@string/title_activity_messaging">
         </activity>
         <activity
-            android:name=".ParseLoginActivity"
+            android:name=".activities.ParseLoginActivity"
             android:label="@string/title_activity_parse_login_activity"
             android:screenOrientation="portrait">
         </activity>
@@ -84,9 +84,14 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".actions.ViewUserInfoActivity"
+            android:name=".activities.ViewUserInfoActivity"
             android:label="@string/title_activity_view_user_info"
             android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.ParseSignupActivity"
+            android:label="@string/title_activity_parse_signup"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

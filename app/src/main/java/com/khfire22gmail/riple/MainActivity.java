@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.settings.AboutActivity;
 import com.khfire22gmail.riple.settings.SettingsActivity;
@@ -294,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //noinspection SimplifiableIfStatement
         if (id == R.id.logoutButton) {
             ParseUser.logOut();
-            Intent intentLogout = new Intent(getApplicationContext(), LoginActivity.class);
+            Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
             startActivity(intentLogout);
             return true;
         }
@@ -366,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sinchClient.terminate();
 
         // Go to the login view
-        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        Intent intent = new Intent(getApplicationContext(), TitleActivity.class);
         startActivity(intent);
     }*/
 

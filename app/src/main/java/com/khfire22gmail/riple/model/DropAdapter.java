@@ -16,10 +16,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.actions.ViewDropActivity;
-import com.khfire22gmail.riple.actions.ViewUserActivity;
-import com.khfire22gmail.riple.tabs.DropsTabFragment;
-import com.khfire22gmail.riple.tabs.TrickleTabFragment;
+import com.khfire22gmail.riple.activities.ViewDropActivity;
+import com.khfire22gmail.riple.activities.ViewUserActivity;
+import com.khfire22gmail.riple.fragments.DropsTabFragment;
+import com.khfire22gmail.riple.fragments.TrickleTabFragment;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -87,6 +87,17 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
         // Change the inflated card based on which RV is being viewed
         int xmlLayoutId = -1;
+
+
+        /**
+         * THIS ONLY APPLIES TO VIEW USER ADAPTER:
+         * We're going to move this comparison logic into onBindViewHolder,
+         * where we're going to hide or show different components depending on
+         * the relation to the current user.
+         * If it's completed, set Text to ripl'd
+         * If it's createed, set Text to drop'd
+         * and if it's no relation, show the switch
+         */
 
         if (mTabName.equals(created)) {
             xmlLayoutId = R.layout.card_created;

@@ -4,10 +4,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.khfire22gmail.riple.tabs.FriendsTabFragment;
-import com.khfire22gmail.riple.tabs.DropsTabFragment;
-import com.khfire22gmail.riple.tabs.RipleTabFragment;
-import com.khfire22gmail.riple.tabs.TrickleTabFragment;
+import com.khfire22gmail.riple.fragments.FriendsTabFragment;
+import com.khfire22gmail.riple.fragments.DropsTabFragment;
+import com.khfire22gmail.riple.fragments.RipleTabFragment;
+import com.khfire22gmail.riple.fragments.TrickleTabFragment;
 
 /**
  * Created by Kevin on 9/8/2015.

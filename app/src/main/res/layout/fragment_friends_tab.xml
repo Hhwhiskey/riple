@@ -14,5 +14,5 @@
               android:layout_height="match_parent"
               android:background="#ffffff"
               android:padding="16dp"
-              tools:context="com.khfire22gmail.riple.tabs.FriendsTabFragment"/>
+              tools:context="com.khfire22gmail.riple.fragments.FriendsTabFragment"/>
 </LinearLayout>
