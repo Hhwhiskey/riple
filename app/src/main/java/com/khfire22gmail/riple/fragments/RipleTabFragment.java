@@ -1,11 +1,13 @@
 package com.khfire22gmail.riple.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -58,6 +60,7 @@ public class RipleTabFragment extends Fragment {
     private TextView parseRankView;
     private ParseFile parseProfilePicture;
     private ParseUser currentUser;
+    private boolean ripleTips;
 
 
     @Override
@@ -76,6 +79,12 @@ public class RipleTabFragment extends Fragment {
         mRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
         currentUser = ParseUser.getCurrentUser();
+
+        if (ripleTips = true) {
+            ripleTips();
+        }
+
+
 
         //Update Profile Card
 //        updateViewsWithProfileInfo();
@@ -104,10 +113,37 @@ public class RipleTabFragment extends Fragment {
         return view;
     }
 
+    public void ripleTips() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(RipleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
+
+        builder.setTitle("The Riple Tab...");
+        builder.setMessage("This is your Riple headquarters, it's where you will track the Riples you " +
+                "have created. All of your created and completed Drops are listed here. Your Riple" +
+                " count will be tracked and you will be given a Riple Rank, accordingly. Make a " +
+                "bigger Riple to increase your rank. Nobody likes a showoff, but it certainly does " +
+                "feel good to see the impact you have made, doesn't it?");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            ripleTips = false;
+
+            }
+        });
+
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
+    }
+
     private void viewOtherUser() {
 
         String currentUserId = currentUser.getObjectId();
-        String currentUserName = currentUser.getString("username");
+        String currentUserName = currentUser.getString("displayName");
 
         Log.d("sDropViewUser", "Clicked User's Id = " + currentUserId);
         Log.d("sDropViewUser", "Clicked User's Name = " + currentUserName);
@@ -216,7 +252,7 @@ public class RipleTabFragment extends Fragment {
     private void updateUserInfo() {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
-        String userName = currentUser.getString("username");
+        String userName = currentUser.getString("displayName");
         String facebookId = currentUser.getString("facebookId");
 
         if ((currentUser != null) && currentUser.isAuthenticated()) {

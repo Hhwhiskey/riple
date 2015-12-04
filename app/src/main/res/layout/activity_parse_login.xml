@@ -15,32 +15,8 @@
         android:weightSum="1"
         android:baselineAligned="false"
         android:id="@+id/linearLayout2"
-        android:layout_above="@+id/textView6">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/username"
-            android:id="@+id/loginUsernameText"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/AccentColor"
-            android:textSize="20sp"
-            android:layout_marginTop="22dp"/>
-        <EditText
-            android:id="@+id/loginUsername"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:inputType="textCapSentences|text"
-            android:textSize="24sp"
-            android:padding="10dp"
-            android:textColor="@color/parse_login_accent_color"
-            android:background="@drawable/inputbox"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp">
-            <requestFocus/>
-
-        </EditText>
+        android:layout_above="@+id/textView6"
+        android:layout_marginTop="24dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,7 +28,7 @@
             android:textColor="@color/AccentColor"
             android:textSize="20sp"/>
         <EditText
-            android:id="@+id/loginPassword"
+            android:id="@+id/password_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -63,7 +39,8 @@
             android:background="@drawable/inputbox"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_marginBottom="36dp">
+            android:layout_marginBottom="60dp"
+            >
         </EditText>
 
         <LinearLayout
@@ -76,7 +53,7 @@
             >
 
             <Button
-                android:id="@+id/loginButton"
+                android:id="@+id/button_login"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="LOGIN"
@@ -88,7 +65,7 @@
                 android:textSize="20sp"/>
 
             <Button
-                android:id="@+id/signupButton"
+                android:id="@+id/button_signup"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="SIGN UP"
@@ -135,12 +112,12 @@
         android:layout_gravity="center_horizontal"
         android:textColor="@color/AccentColor"
         android:textSize="20sp"
-        android:layout_above="@+id/editText2"
+        android:layout_above="@+id/email_login"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/email_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapSentences|text"

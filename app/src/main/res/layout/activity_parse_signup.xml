@@ -134,12 +134,12 @@
         android:layout_gravity="center_horizontal"
         android:textColor="@color/AccentColor"
         android:textSize="20sp"
-        android:layout_above="@+id/editText2"
+        android:layout_above="@+id/email_login"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/email_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapSentences|text"

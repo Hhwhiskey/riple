@@ -47,20 +47,20 @@ public class ParseLoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_parse_login);
 
-        loginButton = (Button) findViewById(R.id.loginButton);
-        signUpButton = (Button) findViewById(R.id.signupButton);
-//        emailField = (EditText) findViewById(R.id.loginEmail);
-        usernameField = (EditText) findViewById(R.id.loginUsername);
-        passwordField = (EditText) findViewById(R.id.loginPassword);
+        loginButton = (Button) findViewById(R.id.button_login);
+        signUpButton = (Button) findViewById(R.id.button_signup);
+        emailField = (EditText) findViewById(R.id.email_login);
+//        usernameField = (EditText) findViewById(R.id.loginUsername);
+        passwordField = (EditText) findViewById(R.id.password_login);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 email = emailField.getText().toString();
-                username = usernameField.getText().toString();
+//                username = usernameField.getText().toString();
                 password = passwordField.getText().toString();
 
-                ParseUser.logInInBackground(username, password, new LogInCallback() {
+                ParseUser.logInInBackground(email, password, new LogInCallback() {
                     public void done(ParseUser user, com.parse.ParseException e) {
                         if (user != null) {
                             startActivity(intent);
@@ -82,21 +82,22 @@ public class ParseLoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                username = usernameField.getText().toString();
+//                username = usernameField.getText().toString();
                 email = emailField.getText().toString();
                 password = passwordField.getText().toString();
 
-                int usernameLength = usernameField.getText().length();
+//                int usernameLength = emailField.getText().length();
                 int passwordLength = passwordField.getText().length();
 
-                if (usernameLength > 2 && passwordLength > 5) {
+                if ( passwordLength > 5) {
 
                     final ParseUser user = new ParseUser();
-                    user.setUsername(username);
+                    user.setUsername(email);
+                    user.setEmail(email);
                     user.setPassword(password);
-                    user.setEmail(username);
-                    user.put("username", username);
-                    user.put("email", username);
+                    user.put("username", email);
+//                    user.put("displayName", username);
+                    user.put("email", email);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
                     builder.setTitle("Not so fast...");

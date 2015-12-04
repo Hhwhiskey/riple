@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View root_layout;
     private String dropDescription;
     private ParseFile parseProfilePicture;
+    private String displayName;
 
 
     @Override
@@ -71,13 +72,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                showPopup(view);
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
+                displayName = (String) currentUser.get("displayName");
 
-                if (parseProfilePicture != null) {
-                    createDropDialog();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)",Toast.LENGTH_LONG).show();
+                if (parseProfilePicture == null && displayName == null) {
+                    Toast.makeText(getApplicationContext(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                     startActivity(intent);
+                } else if (parseProfilePicture == null) {
+                    Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+
+                } else if (displayName == null) {
+                    Toast.makeText(getApplicationContext(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    createDropDialog();
                 }
             }
         });
@@ -226,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if(dropDescription != null) {
             drop.put("author", user.getObjectId());
-            drop.put("name", user.get("username"));
+            drop.put("name", user.get("displayName"));
             drop.put("description", dropDescription);
             drop.put("authorPicture", userPicture);
             drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
@@ -315,6 +327,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 final ParseUser currentUser = ParseUser.getCurrentUser();
                                 currentUser.put("facebookId", jsonObject.getString("id"));
                                 currentUser.put("username", jsonObject.getString("name"));
+                                currentUser.put("displayName", jsonObject.getString("name"));
+
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {

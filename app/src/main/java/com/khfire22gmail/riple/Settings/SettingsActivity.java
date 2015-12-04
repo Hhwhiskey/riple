@@ -1,6 +1,7 @@
 package com.khfire22gmail.riple.settings;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,13 +13,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
@@ -38,8 +44,6 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
     private static final String TAG = null;
     private ImageView editProfilePicture;
-    String aboutUserText;
-    EditText aboutUserField;
     public ParseUser currentUser;
     private ParseFile parseProfilePicture;
     private Bitmap compressedBitmap;
@@ -47,6 +51,18 @@ public class SettingsActivity extends AppCompatActivity {
     private Context context;
     private String facebookId;
     private ImageView editProfilePictureView;
+    private Button homeButton;
+
+    private String parseDisplayName;
+    private TextView displayNameView;
+    private TextView displayNameEdit;
+    private String displayNameString;
+
+    private TextView userInfoView;
+    private String userInfoEntry;
+
+    private EditText aboutUserField;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +72,17 @@ public class SettingsActivity extends AppCompatActivity {
         currentUser = ParseUser.getCurrentUser();
 
 
+        editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
+        displayNameEdit = (TextView) findViewById(R.id.edit_display_name_tv);
+        displayNameView = (TextView) findViewById(R.id.display_name_tv);
+
+
+
+
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
-            editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
             parseProfilePicture = currentUser.getParseFile("parseProfilePicture");
+            parseDisplayName = (String) currentUser.get("displayName");
             facebookId = (String) currentUser.get("facebookId");
 
         }
@@ -87,6 +110,69 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         });
+        TextView displayNameTV = (TextView) findViewById(R.id.edit_display_name_tv);
+        displayNameTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final View view = getLayoutInflater().inflate(R.layout.activity_edit_display_name, null);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
+                builder.setTitle("Edit your user name...");
+
+                final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.edit_display_name);
+
+                builder.setView(view);
+
+                // Set up the buttons
+                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        displayNameString = input.getText().toString();
+                        int dropTextField = input.getText().length();
+
+                        if (dropTextField > 2) {
+                            currentUser.put("displayName", displayNameString);
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    Toast.makeText(getApplicationContext(), "Your user name has been changed", Toast.LENGTH_SHORT).show();
+                                    Intent intent = getIntent();
+                                    finish();
+                                    startActivity(intent);
+                                }
+                            });
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "User names must be at least 3 characters.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        Toast.makeText(getApplicationContext(), "Your user name was not changed.", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+        homeButton = (Button) findViewById(R.id.button_home);
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        displayNameView.setText(parseDisplayName);
+
+
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
