@@ -12,12 +12,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.sinch.FriendsListAdapter;
 import com.khfire22gmail.riple.sinch.MessagingActivity;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -37,7 +36,7 @@ public class FriendsTabFragment extends Fragment {
     private ListView friendsListView;
     private String currentUserId;
     private ArrayList<String> clickedUserObjectId;
-    private ArrayAdapter friendsListAdapter;
+    private FriendsListAdapter mFriendsListAdapter;
     private ProgressDialog progressDialog;
     private BroadcastReceiver receiver;
     private ArrayList<String> displayNames;
@@ -76,22 +75,22 @@ public class FriendsTabFragment extends Fragment {
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
 
-                    ArrayList friendsList = new ArrayList();
+                    List<ParseObject> friendsList = new ArrayList();
 
                     for (int i = 0; i < list.size(); i++) {
                         friendsList.add(list.get(i));
                     }
 
-                    friendsListView = (ListView) getActivity().findViewById(R.id.users_list_view);
-                    friendsListAdapter = new ArrayAdapter<>(getActivity(), R.layout.user_list_item, friendsList);
-                    friendsListView.setAdapter(friendsListAdapter);
+//                    friendsListView = (ListView) getActivity().findViewById(R.id.friends_list_view);
+//                    mFriendsListAdapter = new FriendsListAdapter(getActivity(), R.layout.friend_list_item, friendsList);
+//                    friendsListView.setAdapter(mFriendsListAdapter);
 
-                    friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                   /* friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int i, long l) {
                             openConversation(clickedUserObjectId, i);
                         }
-                    });
+                    });*/
                 } else {
                     Toast.makeText(getActivity(),
                             "Error loading user list",

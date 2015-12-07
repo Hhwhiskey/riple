@@ -28,7 +28,6 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -42,10 +41,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
 
-
-
-
-    public static interface TrickleAdapterDelegate {
+   /* public static interface TrickleAdapterDelegate {
         public void itemSelected(Object item);
     }
 
@@ -62,10 +58,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         this.delegate = new WeakReference<>(delegate);
     }
 
-
     public Object getItem(int position){
         return data.get(position);
-    }
+    }*/
 
     public static final String created = "created";
     public static final String drop = "drop";
@@ -410,7 +405,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
 
-    class MyViewHolder extends AnimateViewHolder {
+    public class MyViewHolder extends AnimateViewHolder {
 
         private final Switch todoSwitch;
         private final CheckBox completeCheckBox;
