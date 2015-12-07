@@ -21,6 +21,7 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.sinch.MessagingActivity;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -33,43 +34,62 @@ import java.util.List;
 
 public class FriendsTabFragment extends Fragment {
 
-    private ListView usersListView;
+    private ListView friendsListView;
     private String currentUserId;
-    private ArrayList<String> names;
-    private ArrayAdapter<String> namesArrayAdapter;
+    private ArrayList<String> clickedUserObjectId;
+    private ArrayAdapter friendsListAdapter;
     private ProgressDialog progressDialog;
-    private BroadcastReceiver receiver = null;
+    private BroadcastReceiver receiver;
+    private ArrayList<String> displayNames;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_friends_tab, container, false);
 
-//        showSpinner();
+        //showSpinner();
 
         return view;
     }
 
     //Show list of all users
     private void setConversationsList() {
-        currentUserId = ParseUser.getCurrentUser().getObjectId();
-        names = new ArrayList<>();
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        //don't include yourself
-        query.whereNotEqualTo("objectId", currentUserId);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            public void done(List<ParseUser> userList, com.parse.ParseException e) {
-                if (e == null) {
-                    for (int i = 0; i < userList.size(); i++) {
-                        names.add(userList.get(i).getUsername());
-                    }
-                    usersListView = (ListView) getActivity().findViewById(R.id.users_list_view);
-                    namesArrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.user_list_item, names);
-                    usersListView.setAdapter(namesArrayAdapter);
 
-                    usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        ParseQuery senderQuery = ParseQuery.getQuery("Friends");
+        ParseQuery recipientQuery = ParseQuery.getQuery("Friends");
+
+        senderQuery.whereEqualTo("sender", currentUser);
+        recipientQuery.whereEqualTo("recipient", currentUser);
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(senderQuery);
+        queries.add(recipientQuery);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.orderByDescending("updatedAt");
+        mainQuery.include("sender");
+        mainQuery.include("recipient");
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+
+                    ArrayList friendsList = new ArrayList();
+
+                    for (int i = 0; i < list.size(); i++) {
+                        friendsList.add(list.get(i));
+                    }
+
+                    friendsListView = (ListView) getActivity().findViewById(R.id.users_list_view);
+                    friendsListAdapter = new ArrayAdapter<>(getActivity(), R.layout.user_list_item, friendsList);
+                    friendsListView.setAdapter(friendsListAdapter);
+
+                    friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                            openConversation(names, i);
+                            openConversation(clickedUserObjectId, i);
                         }
                     });
                 } else {
@@ -84,7 +104,7 @@ public class FriendsTabFragment extends Fragment {
     // Opens sinch conversation when it is clicked
     public void openConversation(ArrayList<String> names, int pos) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("username", names.get(pos));
+        query.whereEqualTo("objectId", names.get(pos));
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {
@@ -102,7 +122,7 @@ public class FriendsTabFragment extends Fragment {
 
     //show a loading spinner while the sinch client starts
     private void showSpinner() {
-        progressDialog = new ProgressDialog(getContext());
+        progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Loading");
         progressDialog.setMessage("Please wait...");
         progressDialog.show();

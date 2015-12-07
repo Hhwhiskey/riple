@@ -24,7 +24,7 @@ public class MessageAdapter extends BaseAdapter {
 
     public MessageAdapter(Activity activity) {
         layoutInflater = activity.getLayoutInflater();
-        messages = new ArrayList<Pair<WritableMessage, Integer>>();
+        messages = new ArrayList<>();
     }
 
     public void addMessage(WritableMessage message, int direction) {

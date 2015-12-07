@@ -28,7 +28,6 @@ import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
-import com.khfire22gmail.riple.settings.SettingsActivity;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;

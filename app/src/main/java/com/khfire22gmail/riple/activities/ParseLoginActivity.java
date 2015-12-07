@@ -31,6 +31,7 @@ public class ParseLoginActivity extends AppCompatActivity {
     private Intent intent;
     private Intent serviceIntent;
     private Context context;
+    private Boolean emailVerified;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +40,17 @@ public class ParseLoginActivity extends AppCompatActivity {
         intent = new Intent(getApplicationContext(), MainActivity.class);
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            startActivity(intent);
-            startService(serviceIntent);
+        ParseUser user = ParseUser.getCurrentUser();
+
+        if (user != null) {
+            emailVerified = user.getBoolean("emailVerified");
+            if (emailVerified) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
+                                " address before you begin using Riple!",
+                        Toast.LENGTH_LONG ).show();
+            }
         }
 
         setContentView(R.layout.activity_parse_login);
@@ -63,8 +71,15 @@ public class ParseLoginActivity extends AppCompatActivity {
                 ParseUser.logInInBackground(email, password, new LogInCallback() {
                     public void done(ParseUser user, com.parse.ParseException e) {
                         if (user != null) {
-                            startActivity(intent);
-                            startService(serviceIntent);
+                            emailVerified = user.getBoolean("emailVerified");
+                            if (emailVerified) {
+                                startActivity(intent);
+
+                            } else {
+                               Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
+                                       " address before you begin using Riple!",
+                                       Toast.LENGTH_LONG ).show();
+                            }
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "Wrong username/password combo",
@@ -120,11 +135,16 @@ public class ParseLoginActivity extends AppCompatActivity {
                             user.signUpInBackground(new SignUpCallback() {
                                 public void done(com.parse.ParseException e) {
                                     if (e == null) {
-
-                                        startActivity(intent);
-                                        startService(serviceIntent);
-
-
+                                        if (user != null) {
+                                            emailVerified = user.getBoolean("emailVerified");
+                                            if (emailVerified) {
+                                                startActivity(intent);
+                                            } else {
+                                                Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
+                                                                " address before you begin using Riple!",
+                                                        Toast.LENGTH_LONG ).show();
+                                            }
+                                        }
                                     } else {
                                         Toast.makeText(getApplicationContext(),
                                                 "There was an error signing up. User name must be unique"

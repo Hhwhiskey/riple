@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.sinch.MessagingActivity;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -94,6 +95,9 @@ public class ViewUserActivity extends AppCompatActivity {
         FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
         messageFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                Intent intent = new Intent(ViewUserActivity.this, MessagingActivity.class);
+                intent.putExtra("RECIPIENT_ID", mClickedUserId);
+                startActivity(intent);
             }
         });
     }

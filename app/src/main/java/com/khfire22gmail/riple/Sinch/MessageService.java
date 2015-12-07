@@ -29,7 +29,7 @@ public class MessageService extends Service implements SinchClientListener {
     private SinchClient sinchClient = null;
     private MessageClient messageClient = null;
     private String currentUserId;
-    private Intent broadcastIntent = new Intent("com.khfire22gmail.riple.tabs.FriendsTabFragment");
+    private Intent broadcastIntent = new Intent("com.khfire22gmail.riple.MainActivity");
     private LocalBroadcastManager broadcaster;
 
 
@@ -56,8 +56,10 @@ public class MessageService extends Service implements SinchClientListener {
         sinchClient.addSinchClientListener(this);
         //messaging is "turned-on", but calling is not
         sinchClient.setSupportMessaging(true);
+        sinchClient.setSupportPushNotifications(true);
         sinchClient.setSupportActiveConnectionInBackground(true);
-        sinchClient.checkManifest();
+        // checkManifest call is only used during development to see if permissions are correct
+        //sinchClient.checkManifest();
         sinchClient.start();
     }
     private boolean isSinchClientStarted() {
@@ -66,9 +68,10 @@ public class MessageService extends Service implements SinchClientListener {
     //The next 5 methods are for the sinch client listener
     @Override
     public void onClientFailed(SinchClient client, SinchError error) {
-        sinchClient = null;
         broadcastIntent.putExtra("success", false);
         broadcaster.sendBroadcast(broadcastIntent);
+        sinchClient = null;
+
     }
     @Override
     public void onClientStarted(SinchClient client) {

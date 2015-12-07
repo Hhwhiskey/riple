@@ -1,6 +1,8 @@
 package com.khfire22gmail.riple;
 
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -21,10 +23,10 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.khfire22gmail.riple.activities.AboutActivity;
+import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.application.RipleApplication;
-import com.khfire22gmail.riple.settings.AboutActivity;
-import com.khfire22gmail.riple.settings.SettingsActivity;
 import com.khfire22gmail.riple.sinch.MessageService;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
@@ -54,12 +56,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String dropDescription;
     private ParseFile parseProfilePicture;
     private String displayName;
+    private ProgressDialog progressDialog;
+    private BroadcastReceiver receiver;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //uncomment below if you want to test if messaging service is starting
+        /*progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+
+        //broadcast receiver to listen for the broadcast
+        //from MessageService
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Boolean success = intent.getBooleanExtra("success", false);
+                progressDialog.dismiss();
+
+                //show a toast message if the Sinch
+                //service failed to start
+                if (!success) {
+                    Toast.makeText(getApplicationContext(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.khfire22gmail.riple.MainActivity"));*/
+
+
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         startService(serviceIntent);

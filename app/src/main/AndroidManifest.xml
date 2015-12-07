@@ -45,7 +45,7 @@
             android:exported="true"/>
 
         <activity
-            android:name=".settings.AboutActivity"
+            android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
             android:screenOrientation="portrait">
         </activity>
@@ -79,7 +79,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".settings.SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_edit_profile"
             android:screenOrientation="portrait">
         </activity>
@@ -93,6 +93,7 @@
             android:label="@string/title_activity_parse_signup"
             android:theme="@style/AppTheme">
         </activity>
+        <service android:name=".sinch.MessageService" />
     </application>
 
 </manifest>
