@@ -5,21 +5,27 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.sinch.FriendsListAdapter;
+import com.khfire22gmail.riple.model.FriendAdapter;
+import com.khfire22gmail.riple.model.FriendItem;
 import com.khfire22gmail.riple.sinch.MessagingActivity;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -27,16 +33,18 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+
 /**
  * Created by Kevin on 9/8/2015.
  */
 
 public class FriendsTabFragment extends Fragment {
 
-    private ListView friendsListView;
+    private RecyclerView friendsRecyclerView;
     private String currentUserId;
     private ArrayList<String> clickedUserObjectId;
-    private FriendsListAdapter mFriendsListAdapter;
+    private FriendAdapter mFriendAdapter;
     private ProgressDialog progressDialog;
     private BroadcastReceiver receiver;
     private ArrayList<String> displayNames;
@@ -46,13 +54,17 @@ public class FriendsTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_friends_tab, container, false);
 
-        //showSpinner();
+        friendsRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
+        friendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        friendsRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
         return view;
     }
 
     //Show list of all users
     private void setConversationsList() {
+
+        final ArrayList<FriendItem> friendsList = new ArrayList();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -70,34 +82,48 @@ public class FriendsTabFragment extends Fragment {
         mainQuery.orderByDescending("updatedAt");
         mainQuery.include("sender");
         mainQuery.include("recipient");
+
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
 
-                    List<ParseObject> friendsList = new ArrayList();
-
                     for (int i = 0; i < list.size(); i++) {
-                        friendsList.add(list.get(i));
-                    }
 
-//                    friendsListView = (ListView) getActivity().findViewById(R.id.friends_list_view);
-//                    mFriendsListAdapter = new FriendsListAdapter(getActivity(), R.layout.friend_list_item, friendsList);
-//                    friendsListView.setAdapter(mFriendsListAdapter);
+                        final FriendItem friendItem = new FriendItem();
 
-                   /* friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                            openConversation(clickedUserObjectId, i);
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
+                        if (profilePicture != null) {
+                            profilePicture.getDataInBackground(new GetDataCallback() {
+
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        friendItem.setFriendProfilePicture(bmp);
+                                    }
+                                }
+                            });
                         }
-                    });*/
-                } else {
-                    Toast.makeText(getActivity(),
-                            "Error loading user list",
-                            Toast.LENGTH_LONG).show();
+
+                        friendItem.setFriendName(list.get(i).getString("displayName"));
+//                        friendItem.setLastMessage(list.get(i).getString("lastMessage"));
+
+                        friendsList.add(friendItem);
+                    }
                 }
+
+                updateFriendsListRecyclerView(friendsList);
             }
         });
+    }
+
+    public void updateFriendsListRecyclerView(ArrayList <FriendItem> friendsList) {
+
+        friendsRecyclerView = (RecyclerView) getActivity().findViewById(R.id.friends_list_recycler_view);
+        mFriendAdapter = new FriendAdapter(getActivity(), friendsList);
+        friendsRecyclerView.setAdapter(mFriendAdapter);
     }
 
     // Opens sinch conversation when it is clicked

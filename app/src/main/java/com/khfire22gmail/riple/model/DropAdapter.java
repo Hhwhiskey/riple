@@ -34,34 +34,12 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.holder.AnimateViewHolder;
 
-public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> {
+public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder> {
 
     Context mContext;
     private final String mTabName;
     private LayoutInflater inflater;
     List<DropItem> data = Collections.emptyList();
-
-   /* public static interface TrickleAdapterDelegate {
-        public void itemSelected(Object item);
-    }
-
-    WeakReference<TrickleAdapterDelegate> delegate;
-
-    public TrickleAdapterDelegate getDelegate() {
-        if (delegate == null) {
-            return null;
-        }
-        return delegate.get();
-    }
-
-    public void setDelegate(TrickleAdapterDelegate delegate) {
-        this.delegate = new WeakReference<>(delegate);
-    }
-
-    public Object getItem(int position){
-        return data.get(position);
-    }*/
-
     public static final String created = "created";
     public static final String drop = "drop";
     public static final String trickle = "trickle";
@@ -78,7 +56,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DropViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         // Change the inflated card based on which RV is being viewed
         int xmlLayoutId = -1;
@@ -109,12 +87,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         }
 
         View view = inflater.inflate(xmlLayoutId, parent, false);
-        MyViewHolder viewHolder = new MyViewHolder(view);
+        DropViewHolder viewHolder = new DropViewHolder(view);
         return viewHolder;
     }
-
-
-
 
     // Get drop associacated with click
     private void getTrickleObjectFromRowToAdd(int position) {
@@ -250,9 +225,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         });
     }
 
+    public void removeDrop(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
+    }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final DropViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
         // To-do Toggle Listener
@@ -263,7 +242,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getTrickleObjectFromRowToAdd(position);
-//                        removeDropCard(position);
+                        removeDrop(position);
+
                         Log.d("checkbox", "Checked");
                     } else {
                         getDropObjectFromRowToRemove(position);
@@ -280,6 +260,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getDropObjectFromRowToComplete(position);
+                        removeDrop(position);
                         Log.d("checkbox", "Checked");
                     } else {
                         Log.d("checkbox", "UnChecked");
@@ -404,8 +385,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
 
 
 
-
-    public class MyViewHolder extends AnimateViewHolder {
+    //DropViewHolder//////////////////////////////////////////////////////////////////////////////
+    public class DropViewHolder extends AnimateViewHolder {
 
         private final Switch todoSwitch;
         private final CheckBox completeCheckBox;
@@ -419,8 +400,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.MyViewHolder> 
         private ParseUser currentUser;
         private ImageView parseProfilePicture;
 
-        public MyViewHolder(View itemView) {
-
+        public DropViewHolder(View itemView) {
             super(itemView);
 
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
