@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
-import com.khfire22gmail.riple.sinch.MessagingActivity;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;

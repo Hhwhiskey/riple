@@ -21,7 +21,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.application.RipleApplication;
-import com.khfire22gmail.riple.sinch.MessageService;
+import com.khfire22gmail.riple.utils.MessageService;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.parse.LogInCallback;
 import com.parse.ParseException;

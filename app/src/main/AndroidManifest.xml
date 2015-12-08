@@ -70,7 +70,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".sinch.MessagingActivity"
+            android:name=".activities.MessagingActivity"
             android:label="@string/title_activity_messaging">
         </activity>
         <activity
@@ -93,7 +93,7 @@
             android:label="@string/title_activity_parse_signup"
             android:theme="@style/AppTheme">
         </activity>
-        <service android:name=".sinch.MessageService" />
+        <service android:name=".utils.MessageService" />
     </application>
 
 </manifest>

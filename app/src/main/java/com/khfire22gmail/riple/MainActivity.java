@@ -27,7 +27,7 @@ import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.application.RipleApplication;
-import com.khfire22gmail.riple.sinch.MessageService;
+import com.khfire22gmail.riple.utils.MessageService;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
 import com.parse.ParseException;

@@ -33,7 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
-import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -66,7 +66,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
-        mRecyclerView.setItemAnimator(new FadeInLeftAnimator());
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         loadAllDropsFromParse();

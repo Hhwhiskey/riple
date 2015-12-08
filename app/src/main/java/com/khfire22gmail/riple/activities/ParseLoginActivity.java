@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.sinch.MessageService;
+import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;

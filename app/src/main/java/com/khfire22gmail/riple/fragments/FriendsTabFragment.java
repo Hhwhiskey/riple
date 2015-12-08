@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
-import com.khfire22gmail.riple.sinch.MessagingActivity;
+import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
