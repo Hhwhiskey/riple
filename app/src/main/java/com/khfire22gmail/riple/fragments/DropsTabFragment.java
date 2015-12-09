@@ -60,7 +60,7 @@ public class DropsTabFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        loadSavedPreferences();
+//        loadSavedPreferences();
 
         loadDropItemsFromParse();
 
@@ -122,8 +122,8 @@ public class DropsTabFragment extends Fragment {
 
         ParseQuery query = relation.getQuery();
 
+        query.include("authorPointer");
         query.orderByDescending("createdAt");
-
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
@@ -140,7 +140,7 @@ public class DropsTabFragment extends Fragment {
 
                         final DropItem dropItem = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
                         if (profilePicture != null) {
                             profilePicture.getDataInBackground(new GetDataCallback() {
 
@@ -154,29 +154,18 @@ public class DropsTabFragment extends Fragment {
                                 }
                             });
                         }
-
                         //ObjectId
                         dropItem.setObjectId(list.get(i).getObjectId());
-                        //Picture
-//                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("name"));
                         //Author id
-                        dropItem.setAuthorId(list.get(i).getString("author"));
-                        //Date
+                        dropItem.setAuthorId(list.get(i).getString("objectId"));
+                        //Author name
+                        dropItem.setAuthorName(list.get(i).getString("displayName"));
+                        //CreatedAt
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
-
-//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
-                        //Drop Title
-//                        dropItem.setTitle(list.get(i).getString("title"));
-
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
-
                         //Riple Count
                         dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 

@@ -47,8 +47,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
 
-        Log.d("KEVIN", "this.date.size before setting: " + this.data.size());
-
         mContext = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -176,11 +174,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             }
         });
 
-
-
-
-
-       /* user.increment("userRipleCount");
+        /* user.increment("userRipleCount");
         user.saveInBackground();*/
         /*mDropAuthor.increment("userRipleCount",1);
         mDropAuthor.saveInBackground();*/
@@ -201,17 +195,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         completeRelation3.add(mDropObject);
         user.saveInBackground();
 
-//        adapter.notifyDataSetChanged();
-
         //Todo Add completed timestamp and update the data on parse
        /* Date date = new Date();
         Long time = (date.getTime());*/
     }
-
-    /*public void removeDropCard(int position) {
-        data.remove(position);
-        notifyItemRemoved(position);
-    }*/
 
     public void incrementDropAuthorRipleCount(final ParseUser dropAuthor) {
 
@@ -223,11 +210,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 Log.d("Kevin e", "error = " + e);
             }
         });
-    }
-
-    public void removeDrop(int position) {
-        data.remove(position);
-        notifyItemRemoved(position);
     }
 
     @Override
@@ -242,7 +224,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getTrickleObjectFromRowToAdd(position);
-                        removeDrop(position);
+//                        removeDropFromView(position);
 
                         Log.d("checkbox", "Checked");
                     } else {
@@ -260,7 +242,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getDropObjectFromRowToComplete(position);
-                        removeDrop(position);
+//                        removeDropFromView(position);
                         Log.d("checkbox", "Checked");
                     } else {
                         Log.d("checkbox", "UnChecked");
@@ -386,7 +368,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
 
     //DropViewHolder//////////////////////////////////////////////////////////////////////////////
-    public class DropViewHolder extends AnimateViewHolder {
+    public class DropViewHolder extends AnimateViewHolder implements CompoundButton.OnCheckedChangeListener {
 
         private final Switch todoSwitch;
         private final CheckBox completeCheckBox;
@@ -400,18 +382,25 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         private ParseUser currentUser;
         private ImageView parseProfilePicture;
 
+
         public DropViewHolder(View itemView) {
             super(itemView);
 
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
 //            share = (ImageView) itemView.findViewById(R.id.share_button);
             todoSwitch = (Switch) itemView.findViewById(R.id.switch_todo);
+
+            if (todoSwitch != null) {
+                todoSwitch.setOnCheckedChangeListener(this);
+            }
+
             completeCheckBox = (CheckBox) itemView.findViewById(R.id.checkbox_complete);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             authorName = (TextView) itemView.findViewById(R.id.name);
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+
 
         }
 
@@ -451,6 +440,17 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     .setDuration(300)
                     .setListener(listener)
                     .start();
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            removeDropFromView(getAdapterPosition(), this);
+        }
+
+        public void removeDropFromView(int position, DropViewHolder viewholder) {
+            data.remove(position);
+            notifyItemRemoved(position);
+
         }
     }
 

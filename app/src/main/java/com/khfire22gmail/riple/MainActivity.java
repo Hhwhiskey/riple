@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dropDescription = input.getText().toString();
                 int dropTextField = input.getText().length();
 
-                if (dropTextField > 50) {
+                if (dropTextField > 0) {
                     try {
                         createDrop(dropDescription);
                     } catch (InterruptedException e) {
@@ -264,28 +264,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void createDrop(String dropDescription) throws InterruptedException {
 
         final ParseObject drop = new ParseObject("Drop");
-        final ParseUser user = ParseUser.getCurrentUser();
-        final ParseFile userPicture = (ParseFile) user.get("parseProfilePicture");
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+//        final ParseFile userPicture = (ParseFile) user.get("parseProfilePicture");
 
         if(dropDescription != null) {
-            drop.put("author", user.getObjectId());
-            drop.put("name", user.get("displayName"));
+//            drop.put("author", user.getObjectId());
+            drop.put("authorPointer", currentUser);
+//            drop.put("name", user.get("displayName"));
             drop.put("description", dropDescription);
-            drop.put("authorPicture", userPicture);
+//            drop.put("authorPicture", userPicture);
             drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
                 @Override
                 public void done(ParseException e) {
-                    ParseRelation<ParseObject> relationCreatedDrops = user.getRelation("createdDrops");
+                    ParseRelation<ParseObject> relationCreatedDrops = currentUser.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
-                    user.saveInBackground();
+                    currentUser.saveInBackground();
 
-                    ParseRelation<ParseObject> relationHasRelationTo = user.getRelation("hasRelationTo");
+                    ParseRelation<ParseObject> relationHasRelationTo = currentUser.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
-                    user.saveInBackground(new SaveCallback() {
+                    currentUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-
                                 Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
                                 Intent intent = getIntent();
                                 finish();

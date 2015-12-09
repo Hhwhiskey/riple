@@ -75,7 +75,7 @@ public class RipleTabFragment extends Fragment {
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
         savePreferences("ripleTipBoolean", true);
-        loadSavedPreferences();
+//        loadSavedPreferences();
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -183,14 +183,16 @@ public class RipleTabFragment extends Fragment {
         ParseQuery createdQuery = createdRelation.getQuery();
         ParseQuery completedQuery = completedRelation.getQuery();
 
+        /*createdQuery.include("authorPointer");
+        completedQuery.include("authorPointer");*/
+
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(createdQuery);
         queries.add(completedQuery);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-
+        mainQuery.include("authorPointer");
         mainQuery.orderByDescending("createdAt");
-
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
@@ -203,7 +205,7 @@ public class RipleTabFragment extends Fragment {
 
                         final DropItem dropItem = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
                         if (profilePicture != null) {
                             profilePicture.getDataInBackground(new GetDataCallback() {
 
@@ -217,34 +219,21 @@ public class RipleTabFragment extends Fragment {
                                 }
                             });
                         }
-
                         //ObjectId
                         dropItem.setObjectId(list.get(i).getObjectId());
-
-                        //Picture
-//                        dropItem.setFacebookId(list.get(i).getString("facebookId"));
-
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("name"));
-
                         //Author id
-                        dropItem.setAuthorId(list.get(i).getString("author"));
-
-                        //Date
+                        dropItem.setAuthorId(list.get(i).getString("objectId"));
+                        //Author name
+                        dropItem.setAuthorName(list.get(i).getString("displayName"));
+                        //CreatedAt
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
-//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
+                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
-
                         //Riple Count
                         dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-                        //Id that connects commenterName to drop
-//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         ripleList.add(dropItem);
 

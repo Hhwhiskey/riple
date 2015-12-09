@@ -61,7 +61,7 @@ public class FriendsTabFragment extends Fragment {
         friendsRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsRecyclerView.setItemAnimator(new SlideInUpAnimator());
-        loadSavedPreferences();
+//        loadSavedPreferences();
 
         return view;
     }

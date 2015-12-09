@@ -70,9 +70,10 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        loadSavedPreferences();
+
+//        loadSavedPreferences();
         loadAllDropsFromParse();
 
         return view;
@@ -178,6 +179,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
 
         dropQuery.orderByDescending("createdAt");
+        dropQuery.include("authorPointer");
+//        dropQuery.include("objectId");
+//        dropQuery.include("displayName");
 
         dropQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -197,7 +201,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
                         final DropItem dropItemAll = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
+                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
                         if (profilePicture != null) {
                             profilePicture.getDataInBackground(new GetDataCallback() {
 
@@ -212,17 +216,14 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                             });
                         }
 
-                        //DropObject
-//                        dropItemAll.setDrop(list.get(i).getParseObject("objectId"));
                         //ObjectId
                         dropItemAll.setObjectId(list.get(i).getObjectId());
                         //Author id
-                        dropItemAll.setAuthorId(list.get(i).getString("author"));
+                        dropItemAll.setAuthorId(list.get(i).getString("objectId"));
                         //Author name
-                        dropItemAll.setAuthorName(list.get(i).getString("name"));
+                        dropItemAll.setAuthorName(list.get(i).getString("displayName"));
                         //CreatedAt
                         dropItemAll.setCreatedAt(list.get(i).getCreatedAt());
-                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
                         //Drop description
                         dropItemAll.setDescription(list.get(i).getString("description"));
                         //Riple Count
@@ -231,6 +232,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         dropItemAll.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
                         allDropsList.add(dropItemAll);
+                        Log.d("KevinData", "ArrayListContains" + allDropsList);
 
 
                     }
@@ -301,6 +303,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
         scaleAdapter.setDuration(250);
     }
 }
