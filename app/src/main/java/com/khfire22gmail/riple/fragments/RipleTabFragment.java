@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -60,7 +61,7 @@ public class RipleTabFragment extends Fragment {
     private TextView parseRankView;
     private ParseFile parseProfilePicture;
     private ParseUser currentUser;
-    private boolean ripleTips;
+    private boolean ripleTipBoolean;
 
 
     @Override
@@ -73,6 +74,8 @@ public class RipleTabFragment extends Fragment {
         nameView = (TextView) view.findViewById(R.id.profile_name);
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
+        savePreferences("ripleTipBoolean", true);
+        loadSavedPreferences();
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -80,19 +83,9 @@ public class RipleTabFragment extends Fragment {
 
         currentUser = ParseUser.getCurrentUser();
 
-        if (ripleTips = true) {
-            ripleTips();
-        }
-
-
-
-        //Update Profile Card
-//        updateViewsWithProfileInfo();
-
         //Query the users created and completed drops_blue
         updateUserInfo();
         loadRipleItemsFromParse();
-
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -113,21 +106,44 @@ public class RipleTabFragment extends Fragment {
         return view;
     }
 
-    public void ripleTips() {
+    public void loadSavedPreferences() {
+        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean ripleTipBoolean = sharedPreferences.getBoolean("ripleTipBoolean", true);
+        if (ripleTipBoolean) {
+            ripleTip();
+        }
+    }
+
+    public void savePreferences(String key, Boolean value) {
+        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+
+    public void unCheckAllTipsCheckBox(String key, Boolean value) {
+        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public void ripleTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(RipleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
-        builder.setTitle("The Riple Tab...");
-        builder.setMessage("This is your Riple headquarters, it's where you will track the Riples you " +
-                "have created. All of your created and completed Drops are listed here. Your Riple" +
-                " count will be tracked and you will be given a Riple Rank, accordingly. Make a " +
-                "bigger Riple to increase your rank. Nobody likes a showoff, but it certainly does " +
-                "feel good to see the impact you have made, doesn't it?");
+        builder.setTitle("Riple...");
+        builder.setMessage("This is your Riple headquarters, all of your created and " +
+                "completed Drops will be listed here. Your Riple count will be tracked and you will" +
+                " be given a Riple Rank, accordingly. Make a bigger Riple to increase your rank." +
+                " Nobody likes a showoff, but it certainly does feel good to see the impact you " +
+                "have made, doesn't it?");
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-            ripleTips = false;
-
+                savePreferences("ripleTipBoolean", false);
+                unCheckAllTipsCheckBox("allTipsBoolean", false);
             }
         });
 

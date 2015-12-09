@@ -1,13 +1,16 @@
 package com.khfire22gmail.riple.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -67,6 +70,8 @@ public class ViewUserActivity extends AppCompatActivity {
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 
         loadCurrentUserRipleItemsFromParse();
+        loadSavedPreferences();
+//        viewUserTip();
 
         //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
@@ -87,9 +92,15 @@ public class ViewUserActivity extends AppCompatActivity {
 
         mViewUserRecyclerView = (RecyclerView) findViewById(R.id.view_user_recycler_view);
         mViewUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        mRecyclerView.setItemAnimator(animator);
+
+
+        profilePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewUserInfo(mClickedUserName, mClickedUserId);
+            }
+        });
 
         FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
         messageFab.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +110,68 @@ public class ViewUserActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void loadSavedPreferences() {
+        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean viewUserTipBoolean = sharedPreferences.getBoolean("viewUserTipBoolean", true);
+        if (viewUserTipBoolean) {
+            viewUserTip();
+        }
+    }
+
+    public void savePreferences(String key, Boolean value) {
+        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public void unCheckAllTipsCheckBox(String key, Boolean value) {
+        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public void viewUserTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
+
+        builder.setTitle("View Profile");
+        builder.setMessage("This is where you view others Riple page. View all the Drops" +
+                " they have created and completed. Touch their picture to get more info - You " +
+                "can even check out their riple count and rank. Cool, huh?");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                savePreferences("viewUserTipBoolean", false);
+                unCheckAllTipsCheckBox("allTipsBoolean", false);
+            }
+        });
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
+    }
+
+    public void viewUserInfo(String usersName, String aboutUser) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
+
+        builder.setTitle(usersName);
+        builder.setMessage("Hi I'm Kevin and I am the creator of Riple. I am glad you are using " +
+                "this exciting app alongside me. Lets make some big Riples!!!");
+
+        builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        builder.show();
     }
 
     private void getViewedUserProfilePicture(String mClickedUserId) {

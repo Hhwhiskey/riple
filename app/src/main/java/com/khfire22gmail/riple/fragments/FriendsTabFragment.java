@@ -3,13 +3,17 @@ package com.khfire22gmail.riple.fragments;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -57,8 +61,47 @@ public class FriendsTabFragment extends Fragment {
         friendsRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsRecyclerView.setItemAnimator(new SlideInUpAnimator());
+        loadSavedPreferences();
 
         return view;
+    }
+
+    public void loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean friendTipBoolean = sharedPreferences.getBoolean("friendTipBoolean", true);
+        if (friendTipBoolean) {
+            friendTip();
+        }
+    }
+
+    public void savePreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public void friendTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
+
+        builder.setTitle("Friends...");
+        builder.setMessage("This is your friends list. Everyone you have contacted will show up " +
+                "here so you can easily keep in touch. Simple enough, right?");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                savePreferences("friendTipBoolean", false);
+
+            }
+        });
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
     }
 
     //Show list of all users

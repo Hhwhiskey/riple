@@ -5,19 +5,27 @@
 
     <item
         android:id="@+id/settingsButton"
-        android:orderInCategory="1"
+        android:orderInCategory="0"
         android:title="Settings"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/aboutButton"
-        android:orderInCategory="2"
+        android:orderInCategory="1"
         android:title="About"
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/logoutButton"
+        android:id="@+id/tips"
         android:orderInCategory="2"
+        android:title="Show Tips"
+        app:showAsAction="never"
+        android:visible="true"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/logoutButton"
+        android:orderInCategory="3"
         android:title="Logout"
         app:showAsAction="never"/>
 

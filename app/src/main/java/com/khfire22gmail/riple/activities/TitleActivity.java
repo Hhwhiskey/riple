@@ -21,8 +21,8 @@ import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.application.RipleApplication;
-import com.khfire22gmail.riple.utils.MessageService;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
+import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -43,14 +43,14 @@ public class TitleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_title);
 
         //Remove status bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //Splash Video
-        VideoView drops = (VideoView)findViewById(R.id.login_video);
-        String path = "android.resource://" + getPackageName() + "/" + R.raw.drops_outside;
+        VideoView drops = (VideoView)findViewById(R.id.title_video);
+        String path = "android.resource://" + getPackageName() + "/" + R.raw.ducks;
         drops.setVideoURI(Uri.parse(path));
         drops.start();
 

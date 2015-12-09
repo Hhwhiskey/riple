@@ -1,10 +1,14 @@
 package com.khfire22gmail.riple.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -68,10 +72,51 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        loadSavedPreferences();
         loadAllDropsFromParse();
 
         return view;
+    }
+
+    public void loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean trickleTipBoolean = sharedPreferences.getBoolean("trickleTipBoolean", true);
+        if (trickleTipBoolean) {
+            trickleTip();
+        }
+    }
+
+    public void savePreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public void trickleTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TrickleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
+
+        builder.setTitle("Trickle...");
+        builder.setMessage("This is the Trickle. A steady flow of Drops where every Riple begins. " +
+                "Add these Drops to your to-do list with the conveniently placed switch. " +
+                "Touch the author or the Drop to get a better look at them, respectively. Please do" +
+                " your part and report harassment, by touching the setting button seen on each Drop" +
+                ". If someone posts something offensive here then report it so it can be taken care of promptly");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                savePreferences("trickleTipBoolean", false);
+
+            }
+        });
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
     }
 
     /*private void initView() {
@@ -255,8 +300,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
-        scaleAdapter.setDuration(250);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-
+        scaleAdapter.setDuration(250);
     }
 }

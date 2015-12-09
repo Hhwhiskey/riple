@@ -162,17 +162,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        homeButton = (Button) findViewById(R.id.button_home);
-        homeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
         displayNameView.setText(parseDisplayName);
-
-
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

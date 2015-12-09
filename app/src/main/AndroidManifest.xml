@@ -88,11 +88,7 @@
             android:label="@string/title_activity_view_user_info"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".activities.ParseSignupActivity"
-            android:label="@string/title_activity_parse_signup"
-            android:theme="@style/AppTheme">
-        </activity>
+
         <service android:name=".utils.MessageService" />
     </application>
 

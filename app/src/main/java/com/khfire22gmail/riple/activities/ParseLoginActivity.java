@@ -9,13 +9,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
 
 public class ParseLoginActivity extends AppCompatActivity {
@@ -23,15 +26,14 @@ public class ParseLoginActivity extends AppCompatActivity {
     private Button signUpButton;
     private Button loginButton;
     private EditText emailField;
-    private EditText usernameField;
     private EditText passwordField;
-    private String username;
     private String email;
     private String password;
     private Intent intent;
     private Intent serviceIntent;
     private Context context;
     private Boolean emailVerified;
+    private TextView forgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +60,14 @@ public class ParseLoginActivity extends AppCompatActivity {
         loginButton = (Button) findViewById(R.id.button_login);
         signUpButton = (Button) findViewById(R.id.button_signup);
         emailField = (EditText) findViewById(R.id.email_login);
-//        usernameField = (EditText) findViewById(R.id.loginUsername);
         passwordField = (EditText) findViewById(R.id.password_login);
+        forgotPassword = (TextView) findViewById(R.id.forgot_password_tv);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 email = emailField.getText().toString();
-//                username = usernameField.getText().toString();
                 password = passwordField.getText().toString();
 
                 ParseUser.logInInBackground(email, password, new LogInCallback() {
@@ -90,18 +92,13 @@ public class ParseLoginActivity extends AppCompatActivity {
             }
         });
 
-
-
-
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-//                username = usernameField.getText().toString();
                 email = emailField.getText().toString();
                 password = passwordField.getText().toString();
 
-//                int usernameLength = emailField.getText().length();
                 int passwordLength = passwordField.getText().length();
 
                 if ( passwordLength > 5) {
@@ -111,7 +108,6 @@ public class ParseLoginActivity extends AppCompatActivity {
                     user.setEmail(email);
                     user.setPassword(password);
                     user.put("username", email);
-//                    user.put("displayName", username);
                     user.put("email", email);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
@@ -162,6 +158,57 @@ public class ParseLoginActivity extends AppCompatActivity {
                             "Your Username must be at least 3 characters and your password " +
                                     "must be at least 6 characters",
                             Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                email = emailField.getText().toString();
+                if (!email.isEmpty()) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
+
+                    builder.setTitle("Password Reset");
+                    builder.setMessage("Are you sure you want to reset your password?");
+
+                    builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+
+                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            email = emailField.getText().toString();
+                            if (email != null) {
+                                resetParsePassword(email);
+                            }
+                        }
+                    });
+                    builder.show();
+
+                } else {
+                    Toast.makeText(ParseLoginActivity.this, "Please enter your email before resetting your password", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        });
+    }
+
+    public void resetParsePassword(String email) {
+        ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(ParseLoginActivity.this, "An email was successfully " +
+                            "sent with password reset instructions.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ParseLoginActivity.this, "Please enter a " +
+                            "valid email first.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

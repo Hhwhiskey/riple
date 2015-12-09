@@ -15,13 +15,12 @@
         android:weightSum="1"
         android:baselineAligned="false"
         android:id="@+id/linearLayout2"
-        android:layout_above="@+id/textView6"
-        android:layout_marginTop="24dp">
+        android:layout_above="@+id/forgot_password_tv"
+        >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
             android:text="@string/password"
             android:id="@+id/loginPasswordText"
             android:layout_gravity="center_horizontal"
@@ -39,8 +38,7 @@
             android:background="@drawable/inputbox"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_marginBottom="60dp"
-            >
+            android:layout_marginBottom="72dp">
         </EditText>
 
         <LinearLayout
@@ -84,7 +82,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Forgot Password"
-        android:id="@+id/textView6"
+        android:id="@+id/forgot_password_tv"
         android:textIsSelectable="false"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -94,15 +92,16 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Riple is a place of good, where people make the world a better place. In the event that your account contains offensive material, you will be reported and your account will be removed. Thanks for following the rules!"
+        android:text="Riple is a place of good. A community whose members strive to make the world a better place. In the event that your account contains offensive material, you will be reported and your account will be removed. Thanks for following the rules!"
         android:id="@+id/textView10"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_above="@+id/textView12"
         android:layout_alignParentTop="true"
-        android:gravity="center_vertical"
-        android:textAlignment="center"/>
+        android:gravity="center_vertical|center_horizontal"
+        android:textAlignment="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -114,7 +113,7 @@
         android:textSize="20sp"
         android:layout_above="@+id/email_login"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        />
 
     <EditText
         android:id="@+id/email_login"
@@ -129,5 +128,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_above="@+id/linearLayout2"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="48dp"/>
+        <requestFocus/>
 </RelativeLayout>

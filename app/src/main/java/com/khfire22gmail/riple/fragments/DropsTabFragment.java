@@ -1,9 +1,13 @@
 package com.khfire22gmail.riple.fragments;
 
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +51,7 @@ public class DropsTabFragment extends Fragment {
     private CheckBox completeCheckBox;
     public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();
     public static ArrayList<DropItem> dropTabInteractionList;
+    private boolean dropTips;
 
 
     @Override
@@ -55,6 +60,7 @@ public class DropsTabFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        loadSavedPreferences();
 
         loadDropItemsFromParse();
 
@@ -63,6 +69,47 @@ public class DropsTabFragment extends Fragment {
 //        mRecyclerView.setItemAnimator(new SlideInOutLeftDefaultItemAnimator(mRecyclerView));
 
         return view;
+    }
+
+    public void loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean dropTipBoolean = sharedPreferences.getBoolean("dropTipBoolean", true);
+        if (dropTipBoolean) {
+            dropTip();
+        }
+    }
+
+    public void savePreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public void dropTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(DropsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
+
+        builder.setTitle("Drops...");
+        builder.setMessage("This is your Drops list. Your very own to-do list of Drops. Once added to " +
+                "this list, challenge yourself to complete them as you go about your" +
+                " day. Once complete, hit the checkbox, the author of the Drop will receive a" +
+                " Riple, and you will have helped make the world a better place; a win-win.");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                savePreferences("dropTipBoolean", false);
+
+            }
+        });
+
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
     }
 
     public void loadDropItemsFromParse() {

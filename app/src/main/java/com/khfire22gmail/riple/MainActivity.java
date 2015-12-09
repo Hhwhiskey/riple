@@ -5,8 +5,10 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
@@ -27,9 +29,9 @@ import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.application.RipleApplication;
-import com.khfire22gmail.riple.utils.MessageService;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
+import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -311,6 +313,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        SharedPreferences tipsSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isChecked = tipsSharedPreferences.getBoolean("allTipsBoolean", true);
+        MenuItem checkBox = menu.findItem(R.id.tips);
+        checkBox.setChecked(isChecked);
         return true;
     }
 
@@ -333,16 +340,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.logoutButton) {
-            ParseUser.logOut();
-            Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
-            startActivity(intentLogout);
-            return true;
+        if (id == R.id.tips) {
+            item.setChecked(!item.isChecked());
+
+            SharedPreferences.Editor editor = null;
+            if (item.isChecked()) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                editor = sharedPreferences.edit();
+                editor.putBoolean("allTipsBoolean", true);
+                editor.apply();
+                Toast.makeText(MainActivity.this, "All tips will be displayed.", Toast.LENGTH_LONG).show();
+            } else {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                editor = sharedPreferences.edit();
+                editor.putBoolean("allTipsBoolean", false);
+                editor.apply();
+                Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
+            }
+                return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.logoutButton) {
+                ParseUser.logOut();
+                Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
+                startActivity(intentLogout);
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
+    /*public void savePreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }*/
 
     private void storeUserOnParse() {
 
@@ -399,6 +433,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 }
+
+
 
 
 
