@@ -140,10 +140,12 @@ public class DropsTabFragment extends Fragment {
 
                         final DropItem dropItem = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
+                        //Drop Author Data//////////////////////////////////////////////////////////
+                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
 
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        if (parseProfilePicture != null) {
+                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
                                 @Override
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
@@ -154,23 +156,23 @@ public class DropsTabFragment extends Fragment {
                                 }
                             });
                         }
-                        //ObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
+
+                        //dropItemAll.setAuthorName(authorName);
+                        dropItem.setAuthorName((String) authorData.get("displayName"));
                         //Author id
-                        dropItem.setAuthorId(list.get(i).getString("objectId"));
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("displayName"));
-                        //CreatedAt
-                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
+                        dropItem.setAuthorId(authorData.getObjectId());
+
+                        //Drop Data////////////////////////////////////////////////////////////////
+                        //DropObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
+                        //CreatedAt
+                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
                         //Riple Count
                         dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-                        //Id that connects commenterName to drop
-//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         dropList.add(dropItem);
                     }

@@ -78,6 +78,7 @@ public class ViewDropActivity extends AppCompatActivity {
     private CheckBox viewedDropCompleteCheckBox;
     private ParseFile parseProfilePicture;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,10 +186,10 @@ public class ViewDropActivity extends AppCompatActivity {
             });
 //        }
 
-        // Complete CheckBox Listener
-        if (viewedDropCompleteCheckBox != null) {
-            viewedDropCompleteCheckBox = (CheckBox) findViewById(R.id.checkbox_complete);
-            viewedDropCompleteCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+       /* // Complete CheckBox Listener
+        if (completeDropButton != null) {
+            completeDropButton = (Button) findViewById(R.id.button_complete);
+            completeDropButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
@@ -196,7 +197,7 @@ public class ViewDropActivity extends AppCompatActivity {
                     }
                 }
             });
-        }
+        }*/
     }
 
     private void getViewedUserProfilePicture(String mAuthorId) {

@@ -1,2 +1,5 @@
 <resources>
+    <style name="AppTheme.">
+        <item name="android:colorControlHighlight">@color/colorHighlight</item>
+    </style>
 </resources>

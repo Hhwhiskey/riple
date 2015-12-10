@@ -9,10 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
@@ -20,13 +18,13 @@ import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.Collections;
 import java.util.Date;
@@ -202,15 +200,25 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
     public void incrementDropAuthorRipleCount(final ParseUser dropAuthor) {
 
-        dropAuthor.increment("userRipleCount");
-        dropAuthor.saveInBackground(new SaveCallback() {
+        ParseQuery ripleCountQuery = ParseQuery.getQuery("UserRipleCount");
+        ripleCountQuery.whereEqualTo("userId", dropAuthor);
+        ripleCountQuery.findInBackground(new FindCallback() {
             @Override
-            public void done(ParseException e) {
-                int i = (int) dropAuthor.get("userRipleCount");
-                Log.d("Kevin e", "error = " + e);
+            public void done(List list, ParseException e) {
+                ParseObject userRipleCount = (ParseObject) list.get(0);
+                userRipleCount.increment("ripleCount");
+                userRipleCount.saveInBackground();
+            }
+
+            @Override
+            public void done(Object o, Throwable throwable) {
+
             }
         });
     }
+
+
+
 
     public void removeDropFromView(int position) {
         data.remove(position);
@@ -223,39 +231,32 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         viewHolder.update(position);
 
         // To-do Toggle Listener
-        if (viewHolder.todoSwitch != null) {
-            viewHolder.todoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
+        if (viewHolder.todoButton != null) {
+            viewHolder.todoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked) {
-                        getTrickleObjectFromRowToAdd(position);
-                        removeDropFromView(position);
-
-                        Log.d("checkbox", "Checked");
-                    } else {
-                        getDropObjectFromRowToRemove(position);
-                    }
+                public void onClick(View v) {
+                    getTrickleObjectFromRowToAdd(position);
+                    removeDropFromView(position);
                 }
             });
         }
 
         // Complete CheckBox Listener
-        if (viewHolder.completeCheckBox != null) {
-            viewHolder.completeCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
+        if (viewHolder.completeButton != null) {
+            viewHolder.completeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked) {
-                        getDropObjectFromRowToComplete(position);
-                        removeDropFromView(position);
-                        Log.d("checkbox", "Checked");
-                    } else {
-                        Log.d("checkbox", "UnChecked");
-                    }
+                public void onClick(View v) {
+                    getDropObjectFromRowToComplete(position);
+                    removeDropFromView(position);
+                    Log.d("checkbox", "Checked");
+
+                    Log.d("checkbox", "UnChecked");
                 }
             });
         }
+
+
+
 
         // View all other Drop Clicks
         viewHolder.description.setOnClickListener(new View.OnClickListener() {
@@ -376,8 +377,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     //DropViewHolder//////////////////////////////////////////////////////////////////////////////
     public class DropViewHolder extends AnimateViewHolder  {
 
-        private final Switch todoSwitch;
-        private final CheckBox completeCheckBox;
+        private final Button todoButton;
+        private final Button completeButton;
         public TextView authorName;
         public TextView createdAt;
         public TextView description;
@@ -394,13 +395,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
 //            share = (ImageView) itemView.findViewById(R.id.share_button);
-            todoSwitch = (Switch) itemView.findViewById(R.id.switch_todo);
+            todoButton = (Button) itemView.findViewById(R.id.button_todo);
 /*
             if (todoSwitch != null) {
                 todoSwitch.setOnCheckedChangeListener(this);
             }*/
 
-            completeCheckBox = (CheckBox) itemView.findViewById(R.id.checkbox_complete);
+            completeButton = (Button) itemView.findViewById(R.id.button_complete);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             authorName = (TextView) itemView.findViewById(R.id.name);
             description = (TextView) itemView.findViewById(R.id.description);

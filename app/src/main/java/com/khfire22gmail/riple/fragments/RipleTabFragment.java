@@ -183,9 +183,6 @@ public class RipleTabFragment extends Fragment {
         ParseQuery createdQuery = createdRelation.getQuery();
         ParseQuery completedQuery = completedRelation.getQuery();
 
-        /*createdQuery.include("authorPointer");
-        completedQuery.include("authorPointer");*/
-
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(createdQuery);
         queries.add(completedQuery);
@@ -205,10 +202,12 @@ public class RipleTabFragment extends Fragment {
 
                         final DropItem dropItem = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
+                        //Drop Author Data//////////////////////////////////////////////////////////
+                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
 
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        if (parseProfilePicture != null) {
+                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
                                 @Override
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
@@ -219,12 +218,15 @@ public class RipleTabFragment extends Fragment {
                                 }
                             });
                         }
-                        //ObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
+
+                        //dropItemAll.setAuthorName(authorName);
+                        dropItem.setAuthorName((String) authorData.get("displayName"));
                         //Author id
-                        dropItem.setAuthorId(list.get(i).getString("objectId"));
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("displayName"));
+                        dropItem.setAuthorId(authorData.getObjectId());
+
+                        //Drop Data////////////////////////////////////////////////////////////////
+                        //DropObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
                         //CreatedAt
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
                         //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
@@ -259,6 +261,7 @@ public class RipleTabFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("displayName");
         String facebookId = currentUser.getString("facebookId");
+
 
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 

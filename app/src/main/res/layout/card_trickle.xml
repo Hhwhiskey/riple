@@ -3,7 +3,9 @@
               xmlns:card_view="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+              android:layout_height="wrap_content"
+              android:background="@drawable/custom_bg"
+              android:clickable="true">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_trickle"
@@ -15,15 +17,19 @@
         android:layout_marginBottom="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        android:background="@drawable/custom_bg"
+        android:clickable="true">
 
         <RelativeLayout
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="#ffffff"
+
             android:paddingBottom="8dp"
-            android:alpha="123124">
+            android:alpha="123124"
+            android:background="@drawable/custom_bg"
+            android:clickable="true">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/trickle_card_tool_bar"
@@ -43,7 +49,9 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_user_default"/>
+                android:src="@drawable/ic_user_default"
+                android:background="@drawable/custom_bg"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/name"
@@ -61,7 +69,9 @@
                 android:textColor="#000000"
                 android:singleLine="true"
                 android:layout_margin="8dp"
-                android:layout_alignTop="@+id/profile_picture"/>
+                android:layout_alignTop="@+id/profile_picture"
+                android:background="@drawable/custom_bg"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/created_at"
@@ -75,7 +85,9 @@
                 android:layout_below="@+id/name"
                 android:layout_toRightOf="@+id/profile_picture"
                 android:layout_toEndOf="@+id/profile_picture"
-                android:layout_marginLeft="8dp"/>
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/custom_bg"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/description"
@@ -98,25 +110,29 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/custom_bg"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/riple_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/description"
                 android:text="205 riples"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
                 android:singleLine="true"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:textAlignment="textStart"
-                android:gravity="left"
+                android:textAlignment="gravity"
+                android:gravity="left|bottom"
                 android:layout_toLeftOf="@+id/comment_count"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginLeft="16dp"/>
+                android:layout_marginLeft="16dp"
+                android:layout_alignTop="@+id/comment_count"
+                android:layout_alignBottom="@+id/button_todo"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/custom_bg"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/comment_count"
@@ -126,36 +142,35 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
                 android:singleLine="true"
-                android:textAlignment="textStart"
-                android:layout_alignTop="@+id/riple_count"
+                android:textAlignment="gravity"
                 android:layout_alignLeft="@+id/created_at"
                 android:layout_alignStart="@+id/created_at"
-                android:gravity="left"
+                android:gravity="left|bottom"
                 android:layout_marginLeft="4dp"
+                android:layout_alignBottom="@+id/button_todo"
+                android:layout_alignTop="@+id/button_todo"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/custom_bg"
+                android:clickable="true"/>
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="TODO"
+                android:id="@+id/button_todo"
+                android:layout_below="@+id/description"
+                android:layout_alignRight="@+id/description"
+                android:layout_alignEnd="@+id/description"
+                android:textSize="14sp"
+                android:textColor="#ffffff"
+                android:background="@color/AccentColor"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:minHeight="32dp"
+
                 />
 
-            <ImageView
-                android:id="@+id/trickle_share"
-                android:src="@mipmap/ic_share_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:layout_alignBottom="@+id/switch_todo"
-                android:layout_toLeftOf="@+id/switch_todo"
-                android:layout_toStartOf="@+id/switch_todo"
-                android:layout_below="@+id/description"
-                android:layout_marginTop="2dp"/>
-
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/switch_todo"
-                android:layout_below="@+id/description"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="16dp"
-                android:layout_marginLeft="24dp"
-                android:checked="false"/>
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

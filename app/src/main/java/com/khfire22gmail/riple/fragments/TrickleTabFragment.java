@@ -196,14 +196,20 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
                     for (int i = 0; i < list.size(); i++) {
 
+//                        String authorId = authorData.getObjectId();
+
                         //Collects Drop Objects
                         trickleObjectsList.add(list.get(i));
 
                         final DropItem dropItemAll = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
+
+                        //Drop Author Data/////////////////////////////////////////////////////////
+                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
+
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        if (parseProfilePicture != null) {
+                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
 
                                 @Override
                                 public void done(byte[] data, ParseException e) {
@@ -216,16 +222,19 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                             });
                         }
 
-                        //ObjectId
-                        dropItemAll.setObjectId(list.get(i).getObjectId());
+                        //dropItemAll.setAuthorName(authorName);
+                        dropItemAll.setAuthorName((String) authorData.get("displayName"));
                         //Author id
-                        dropItemAll.setAuthorId(list.get(i).getString("objectId"));
-                        //Author name
-                        dropItemAll.setAuthorName(list.get(i).getString("displayName"));
-                        //CreatedAt
-                        dropItemAll.setCreatedAt(list.get(i).getCreatedAt());
+                        dropItemAll.setAuthorId(authorData.getObjectId());
+
+
+                        //Drop Data///////////////////////////////////////////////////////////////
+                        //DropObjectId
+                        dropItemAll.setObjectId(list.get(i).getObjectId());
                         //Drop description
                         dropItemAll.setDescription(list.get(i).getString("description"));
+                        //CreatedAt
+                        dropItemAll.setCreatedAt(list.get(i).getCreatedAt());
                         //Riple Count
                         dropItemAll.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
                         //Comment Count

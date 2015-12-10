@@ -132,7 +132,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Store the current users facebookId
-        storeUserOnParse();
+        // TODO: 12/9/2015 FIX THIS!!!
+         storeUserOnParse();
 
         // Creating The Toolbar and setting it as the Toolbar for the activity
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -391,12 +392,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 currentUser.put("facebookId", jsonObject.getString("id"));
                                 currentUser.put("username", jsonObject.getString("name"));
                                 currentUser.put("displayName", jsonObject.getString("name"));
-
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
+
+//                                        if ()
+//                                        ParseQuery userRipleCount = ParseQuery.getQuery("UserRipleCount");
+
+
                                     }
                                 });
+
+
 
                             } catch (JSONException e) {
                                 Log.d(RipleApplication.TAG,
