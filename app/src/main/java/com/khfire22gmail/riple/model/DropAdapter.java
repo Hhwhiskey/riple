@@ -212,6 +212,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         });
     }
 
+    public void removeDropFromView(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
+
+    }
+
     @Override
     public void onBindViewHolder(final DropViewHolder viewHolder, final int position) {
         viewHolder.update(position);
@@ -224,7 +230,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getTrickleObjectFromRowToAdd(position);
-//                        removeDropFromView(position);
+                        removeDropFromView(position);
 
                         Log.d("checkbox", "Checked");
                     } else {
@@ -242,7 +248,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     if (isChecked) {
                         getDropObjectFromRowToComplete(position);
-//                        removeDropFromView(position);
+                        removeDropFromView(position);
                         Log.d("checkbox", "Checked");
                     } else {
                         Log.d("checkbox", "UnChecked");
@@ -368,7 +374,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
 
     //DropViewHolder//////////////////////////////////////////////////////////////////////////////
-    public class DropViewHolder extends AnimateViewHolder implements CompoundButton.OnCheckedChangeListener {
+    public class DropViewHolder extends AnimateViewHolder  {
 
         private final Switch todoSwitch;
         private final CheckBox completeCheckBox;
@@ -389,10 +395,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
 //            share = (ImageView) itemView.findViewById(R.id.share_button);
             todoSwitch = (Switch) itemView.findViewById(R.id.switch_todo);
-
+/*
             if (todoSwitch != null) {
                 todoSwitch.setOnCheckedChangeListener(this);
-            }
+            }*/
 
             completeCheckBox = (CheckBox) itemView.findViewById(R.id.checkbox_complete);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
@@ -442,7 +448,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     .start();
         }
 
-        @Override
+        /*@Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             removeDropFromView(getAdapterPosition(), this);
         }
@@ -451,7 +457,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             data.remove(position);
             notifyItemRemoved(position);
 
-        }
+        }*/
     }
 
 
