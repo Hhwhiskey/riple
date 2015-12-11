@@ -262,7 +262,6 @@ public class RipleTabFragment extends Fragment {
         String userName = currentUser.getString("displayName");
         String facebookId = currentUser.getString("facebookId");
 
-
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");

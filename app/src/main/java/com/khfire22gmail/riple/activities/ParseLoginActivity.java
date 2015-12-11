@@ -17,6 +17,7 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
@@ -133,19 +134,24 @@ public class ParseLoginActivity extends AppCompatActivity {
                                     if (e == null) {
                                         if (user != null) {
                                             emailVerified = user.getBoolean("emailVerified");
-                                            if (emailVerified) {
+//                                            if (emailVerified) {
                                                 startActivity(intent);
-                                            } else {
+//                                            } else {
                                                 Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
                                                                 " address before you begin using Riple!",
                                                         Toast.LENGTH_LONG ).show();
-                                            }
+//                                            }
                                         }
                                     } else {
                                         Toast.makeText(getApplicationContext(),
                                                 "There was an error signing up. User name must be unique"
                                                 , Toast.LENGTH_LONG).show();
                                     }
+
+                                    ParseObject userRipleCount = new ParseObject("UserRipleCount");
+                                    userRipleCount.put("userPointer", user);
+                                    userRipleCount.put("ripleCount", 0);
+                                    userRipleCount.saveInBackground();
                                 }
                             });
 

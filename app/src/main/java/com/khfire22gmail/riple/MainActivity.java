@@ -133,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Store the current users facebookId
         // TODO: 12/9/2015 FIX THIS!!!
-         storeUserOnParse();
+         storeFacebookUserOnParse();
+
 
         // Creating The Toolbar and setting it as the Toolbar for the activity
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -197,7 +198,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "This is a fairly short Drop, try adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "This is a fairly short Drop, try " +
+                            "adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -210,56 +212,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         builder.show();
     }
-
-
-
-    // Create Drop Popup
-    /*public void showPopup(View anchorView) {
-
-        final View popupView = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
-
-        final PopupWindow popupWindow = new PopupWindow(popupView,
-                WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
-
-        popupWindow.setAnimationStyle(R.style.Animation);
-
-//        popupWindow.setBackgroundDrawable(drawable.popup_background);
-
-//        WindowManager.LayoutParams windowManager = getWindow().getAttributes();
-//        windowManager.dimAmount = 0.75f;
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-
-        // If the PopupWindow should be focusable
-        popupWindow.setFocusable(true);
-
-        // If you need the PopupWindow to dismiss when when touched outside
-        popupWindow.setBackgroundDrawable(new ColorDrawable());
-
-        int location[] = new int[2];
-
-        // Get the View's(the one that was clicked in the Fragment) location
-        anchorView.getLocationOnScreen(location);
-
-        Button postDropButton = (Button) popupView.findViewById(R.id.button_post_drop);
-        dropDescriptionView = (AutoCompleteTextView) popupView.findViewById(R.id.drop_description);
-
-        popupWindow.showAtLocation(findViewById(R.id.root_layout), 30, 30, 30);
-
-        // Allow user to input Drop
-        postDropButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dropDescription = dropDescriptionView.getEditableText().toString();
-                try {
-                    createDrop(dropDescription);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                popupWindow.dismiss();
-            }
-        });
-    }*/
 
     // Take user input and post the Drop
     public void createDrop(String dropDescription) throws InterruptedException {
@@ -379,7 +331,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.apply();
     }*/
 
-    private void storeUserOnParse() {
+
+
+    private void storeFacebookUserOnParse() {
 
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONObjectCallback() {
@@ -395,15 +349,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-
-//                                        if ()
-//                                        ParseQuery userRipleCount = ParseQuery.getQuery("UserRipleCount");
-
-
                                     }
                                 });
 
-
+                                ParseObject userRipleCount = new ParseObject("UserRipleCount");
+//                                ParseObject userRipleCount = new ParseObject("_User");
+                                userRipleCount.put("userPointer", currentUser);
+                                userRipleCount.put("ripleCount", "0");
+                                userRipleCount.saveInBackground();
 
                             } catch (JSONException e) {
                                 Log.d(RipleApplication.TAG,

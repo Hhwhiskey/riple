@@ -18,7 +18,6 @@ import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -100,6 +99,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         });
     }
 
+    // TODO: 12/10/2015 Add this option with a card overflow menu
     private void getDropObjectFromRowToRemove(int position) {
         DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
@@ -118,7 +118,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
             public void done(ParseObject dropObject, ParseException e) {
                 if (e == null) {
-                    String authorId = dropObject.getString("author");
+                    String authorId = dropObject.getString("objectId");
                     completeDrop(dropObject, authorId);
                 }
             }
@@ -199,10 +199,27 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     }
 
     public void incrementDropAuthorRipleCount(final ParseUser dropAuthor) {
+/*
+        ParseQuery authorQuery = ParseQuery.getQuery("_User");
+        authorQuery.whereEqualTo("objectId", dropAuthor)*/
 
         ParseQuery ripleCountQuery = ParseQuery.getQuery("UserRipleCount");
-        ripleCountQuery.whereEqualTo("userId", dropAuthor);
-        ripleCountQuery.findInBackground(new FindCallback() {
+        ripleCountQuery.whereEqualTo("userPointer", dropAuthor);
+        ripleCountQuery.getFirstInBackground(new GetCallback() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                parseObject.increment("ripleCount");
+                parseObject.saveInBackground();
+            }
+
+            @Override
+            public void done(Object o, Throwable throwable) {
+
+            }
+        });
+
+
+        /* ripleCountQuery.findInBackground(new FindCallback() {
             @Override
             public void done(List list, ParseException e) {
                 ParseObject userRipleCount = (ParseObject) list.get(0);
@@ -214,11 +231,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             public void done(Object o, Throwable throwable) {
 
             }
-        });
+        });*/
     }
-
-
-
 
     public void removeDropFromView(int position) {
         data.remove(position);
@@ -236,7 +250,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 @Override
                 public void onClick(View v) {
                     getTrickleObjectFromRowToAdd(position);
-                    removeDropFromView(position);
+//                    removeDropFromView(position);
                 }
             });
         }
@@ -247,7 +261,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 @Override
                 public void onClick(View v) {
                     getDropObjectFromRowToComplete(position);
-                    removeDropFromView(position);
+//                    removeDropFromView(position);
                     Log.d("checkbox", "Checked");
 
                     Log.d("checkbox", "UnChecked");
