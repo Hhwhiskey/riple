@@ -136,7 +136,7 @@ public class DropsTabFragment extends Fragment {
                     for (int i = 0; i < list.size(); i++) {
 
                         //Collects Drop Objects
-                        dropObjectsList.add(list.get(i));
+//                        dropObjectsList.add(list.get(i));
 
                         final DropItem dropItem = new DropItem();
 

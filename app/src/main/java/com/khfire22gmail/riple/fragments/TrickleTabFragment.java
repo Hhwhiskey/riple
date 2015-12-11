@@ -199,7 +199,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 //                        String authorId = authorData.getObjectId();
 
                         //Collects Drop Objects
-                        trickleObjectsList.add(list.get(i));
+//                        trickleObjectsList.add(list.get(i));
 
                         final DropItem dropItemAll = new DropItem();
 

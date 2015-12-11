@@ -118,16 +118,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
             public void done(ParseObject dropObject, ParseException e) {
                 if (e == null) {
-                    String authorId = dropObject.getString("objectId");
-                    completeDrop(dropObject, authorId);
+                    ParseObject dropAuthor = dropObject.getParseObject("authorPointer");
+                    completeDropAndIncrement(dropObject, dropAuthor);
                 }
             }
         });
-
-
     }
-
-
 
     // Add Drop in question to users "Drops" list
     public static void todoDrop(ParseObject trickleObject) {
@@ -157,81 +153,37 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         user.saveInBackground();
     }
 
-    // Add Drop in question to users "Riple" list
-    public void completeDrop(ParseObject mDropObject, String dropAuthor) {
+    //Complete drop and increment the Drop and Author
+    public void completeDropAndIncrement(ParseObject mDropObject, ParseObject dropAuthor) {
 
-        //Increment the user
-        ParseUser user = ParseUser.getCurrentUser();
+        ParseUser currentUser = ParseUser.getCurrentUser();
 
-        ParseQuery<ParseUser> authorQuery = ParseUser.getQuery();
-        authorQuery.getInBackground(dropAuthor, new GetCallback<ParseUser>() {
-            public void done(ParseUser mDropAuthor, ParseException e) {
-                if (e == null) {
-                    incrementDropAuthorRipleCount(mDropAuthor);
-                }
-            }
-        });
+        ParseRelation completeRelation1 = currentUser.getRelation("completedDrops");
+        completeRelation1.add(mDropObject);
 
-        /* user.increment("userRipleCount");
-        user.saveInBackground();*/
-        /*mDropAuthor.increment("userRipleCount",1);
-        mDropAuthor.saveInBackground();*/
+        ParseRelation completeRelation2 = currentUser.getRelation("todoDrops");
+        completeRelation2.remove(mDropObject);
+        currentUser.saveInBackground();
 
+        ParseRelation completeRelation3 = currentUser.getRelation("hasRelationTo");
+        completeRelation3.add(mDropObject);
+        currentUser.saveInBackground();
 
         //Increment the Drop
         mDropObject.increment("ripleCount");
         mDropObject.saveInBackground();
 
-        ParseRelation completeRelation1 = user.getRelation("completedDrops");
-        completeRelation1.add(mDropObject);
-
-        ParseRelation completeRelation2 = user.getRelation("todoDrops");
-        completeRelation2.remove(mDropObject);
-        user.saveInBackground();
-
-        ParseRelation completeRelation3 = user.getRelation("hasRelationTo");
-        completeRelation3.add(mDropObject);
-        user.saveInBackground();
-
-        //Todo Add completed timestamp and update the data on parse
-       /* Date date = new Date();
-        Long time = (date.getTime());*/
-    }
-
-    public void incrementDropAuthorRipleCount(final ParseUser dropAuthor) {
-/*
-        ParseQuery authorQuery = ParseQuery.getQuery("_User");
-        authorQuery.whereEqualTo("objectId", dropAuthor)*/
-
+        //Increment the Author
         ParseQuery ripleCountQuery = ParseQuery.getQuery("UserRipleCount");
         ripleCountQuery.whereEqualTo("userPointer", dropAuthor);
-        ripleCountQuery.getFirstInBackground(new GetCallback() {
+        ripleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
                 parseObject.increment("ripleCount");
                 parseObject.saveInBackground();
             }
-
-            @Override
-            public void done(Object o, Throwable throwable) {
-
-            }
         });
 
-
-        /* ripleCountQuery.findInBackground(new FindCallback() {
-            @Override
-            public void done(List list, ParseException e) {
-                ParseObject userRipleCount = (ParseObject) list.get(0);
-                userRipleCount.increment("ripleCount");
-                userRipleCount.saveInBackground();
-            }
-
-            @Override
-            public void done(Object o, Throwable throwable) {
-
-            }
-        });*/
     }
 
     public void removeDropFromView(int position) {

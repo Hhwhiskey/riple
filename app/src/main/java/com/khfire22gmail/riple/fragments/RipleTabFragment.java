@@ -25,6 +25,7 @@ import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -261,6 +262,8 @@ public class RipleTabFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("displayName");
         String facebookId = currentUser.getString("facebookId");
+        int parseRipleCount = 0;
+
 
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
@@ -268,8 +271,7 @@ public class RipleTabFragment extends Fragment {
         }
 
         //get parse profile picture if exists, if not, store Facebook picture on Parse and show
-
-        if(parseProfilePicture != null) {
+        if (parseProfilePicture != null) {
             Glide.with(this)
                     .load(parseProfilePicture.getUrl())
                     .crossFade()
@@ -278,7 +280,7 @@ public class RipleTabFragment extends Fragment {
                     .signature(new StringSignature(UUID.randomUUID().toString()))
                     .into(profilePictureView);
         } else {
-            if (facebookId != null){
+            if (facebookId != null) {
                 Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
                 new DownloadImageTask(profilePictureView)
                         .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
@@ -293,8 +295,20 @@ public class RipleTabFragment extends Fragment {
             nameView.setText("Anonymous");
         }
 
+
+        //Update Riple count and Rank
+
+        ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
+        userRipleCountQuery.whereEqualTo("userPointer", currentUser);
+        userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                int parseRipleCount = parseObject.getInt("ripleCount");
+            }
+        });
+
+
         String localRank = "\"Drop\"";
-        int parseRipleCount = currentUser.getInt("userRipleCount");
 
         if (parseRipleCount > 19) {
             localRank = ("\"Volunteer\"");//2
@@ -324,15 +338,20 @@ public class RipleTabFragment extends Fragment {
             localRank = ("\"Mother Teresa\"");//10
         }
 
+
+
+
+        if (localRank != null) {
+            profileRankView.setText(localRank);
+        }
+
         if (localRank != null) {
             currentUser.put("userRank", localRank);
         }
 
         profileRipleCountView.setText(String.valueOf(parseRipleCount) + " Riples");
 
-        if (localRank != null) {
-            profileRankView.setText(localRank);
-        }
+
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

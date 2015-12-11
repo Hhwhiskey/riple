@@ -75,14 +75,14 @@ public class ParseLoginActivity extends AppCompatActivity {
                     public void done(ParseUser user, com.parse.ParseException e) {
                         if (user != null) {
                             emailVerified = user.getBoolean("emailVerified");
-                            if (emailVerified) {
+//                            if (emailVerified) {
                                 startActivity(intent);
 
-                            } else {
+//                            } else {
                                Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
                                        " address before you begin using Riple!",
                                        Toast.LENGTH_LONG ).show();
-                            }
+//                            }
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "Wrong username/password combo",
