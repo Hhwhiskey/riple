@@ -12,51 +12,51 @@
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        android:layout_gravity="bottom">
 
         <RelativeLayout
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            android:alpha="123124"
             android:background="@drawable/custom_bg">
 
             <ImageView
-                android:id="@+id/commenter_profile_picture"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
+                android:id="@+id/completed_by_profile_picture"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
+                android:layout_alignParentTop="false"
                 android:foregroundGravity="center_vertical"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="8dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_user_default"/>
+                android:src="@drawable/ic_user_default"
+                android:layout_alignParentBottom="false"/>
 
             <TextView
-                android:id="@+id/commenter"
+                android:id="@+id/completed_by_display_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/created_at"
-                android:layout_alignParentTop="true"
-                android:layout_alignRight="@+id/created_at"
-                android:layout_toRightOf="@+id/commenter_profile_picture"
+                android:layout_alignParentTop="false"
                 android:width="50dp"
-                android:text="Kevin Hodges"
+                android:text="Kevin"
                 android:textAlignment="center"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="20sp"
-                android:textColor="@color/PrimaryText"
+                android:textSize="18sp"
+                android:textColor="@android:color/darker_gray"
                 android:singleLine="true"
-                android:layout_margin="8dp"
-                android:layout_alignTop="@+id/commenter_profile_picture"/>
+                android:layout_alignTop="@+id/completed_by_profile_picture"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentEnd="true"
+                android:layout_toRightOf="@+id/completed_by_profile_picture"
+                android:layout_toEndOf="@+id/completed_by_profile_picture"
+                android:layout_alignBottom="@+id/completed_by_profile_picture"
+                android:layout_marginLeft="16dp"
+                android:layout_alignParentBottom="false"
+                android:gravity="center_vertical"
+                android:textStyle="italic"/>
 
-            <TextView
+            TextView
                 android:id="@+id/created_at"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
                 android:layout_toRightOf="@+id/commenter_profile_picture"
                 android:layout_marginLeft="8dp"/>
 
-            <TextView
+            TextView
                 android:id="@+id/commentText"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

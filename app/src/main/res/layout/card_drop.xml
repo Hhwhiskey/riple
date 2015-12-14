@@ -23,15 +23,13 @@
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:alpha="123124"
-            android:background="@drawable/custom_bg"
-            android:clickable="true">
+            android:background="@drawable/custom_bg">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/trickle_card_tool_bar"
                 android:layout_width="match_parent"
                 android:layout_height="38dp"
-                android:background="#BBDEFB"
-                android:clickable="false"/>
+                android:background="#BBDEFB"/>
 
             <ImageView
                 android:id="@+id/profile_picture"

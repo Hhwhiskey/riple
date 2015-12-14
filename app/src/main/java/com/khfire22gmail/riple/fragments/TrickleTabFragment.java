@@ -180,8 +180,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         dropQuery.orderByDescending("createdAt");
         dropQuery.include("authorPointer");
-//        dropQuery.include("objectId");
-//        dropQuery.include("displayName");
 
         dropQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override

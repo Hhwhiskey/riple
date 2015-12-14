@@ -69,21 +69,19 @@ public class ViewUserActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 
-        loadCurrentUserRipleItemsFromParse();
         loadSavedPreferences();
 //        viewUserTip();
 
         //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
-
         mClickedUserId = intent.getStringExtra("clickedUserId");
         mClickedUserName = intent.getStringExtra("clickedUserName");
-
         Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
         Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
 
-
         getViewedUserProfilePicture(mClickedUserId);
+
+        loadRipleItemsFromParse();
 
         // Set collapsable toolbar picture and text
         profilePictureView = (ImageView)findViewById(R.id.view_user_profile_picture);
@@ -201,41 +199,34 @@ public class ViewUserActivity extends AppCompatActivity {
 
 
     public void loadRipleItemsFromParse() {
-        final ArrayList<DropItem> clickedUsersList = new ArrayList<>();
+        final ArrayList<DropItem> viewUserList = new ArrayList<>();
 
         ParseUser clickedUser = null;
-        ParseQuery<ParseUser> getClickedUserquery = ParseQuery.getQuery("_User");
-        getClickedUserquery.whereEqualTo("objectId", mClickedUserId);
-
-        // TODO: Change this to findInBackground and pass in a callback to listen to when this inBackground finishes
-       /* getClickedUserquery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {*/
+        ParseQuery viewedUserQuery = ParseQuery.getQuery("_User");
+        viewedUserQuery.whereEqualTo("objectId", mClickedUserId);
 
         try {
-            if (getClickedUserquery.find().size() != 0) {
-                clickedUser = getClickedUserquery.find().get(0);
+            if (viewedUserQuery.find().size() != 0) {
+                clickedUser = (ParseUser) viewedUserQuery.find().get(0);
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
+        assert clickedUser != null;
         ParseRelation createdRelation = clickedUser.getRelation("createdDrops");
         ParseRelation completedRelation = clickedUser.getRelation("completedDrops");
 
         ParseQuery createdQuery = createdRelation.getQuery();
         ParseQuery completedQuery = completedRelation.getQuery();
 
-        Log.d("viewUserId", "Id is currently " + mClickedUserId);
-
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(createdQuery);
         queries.add(completedQuery);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-
+        mainQuery.include("authorPointer");
         mainQuery.orderByDescending("createdAt");
-
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
@@ -248,10 +239,12 @@ public class ViewUserActivity extends AppCompatActivity {
 
                         final DropItem dropItem = new DropItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
+                        //Drop Author Data//////////////////////////////////////////////////////////
+                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
 
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        if (parseProfilePicture != null) {
+                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
                                 @Override
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
@@ -263,56 +256,50 @@ public class ViewUserActivity extends AppCompatActivity {
                             });
                         }
 
-                        //ObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("name"));
+                        //dropItemAll.setAuthorName(authorName);
+                        dropItem.setAuthorName((String) authorData.get("displayName"));
                         //Author id
-                        dropItem.setAuthorId(list.get(i).getString("author"));
-                        //Date
+                        dropItem.setAuthorId(authorData.getObjectId());
+
+                        //Drop Data////////////////////////////////////////////////////////////////
+                        //DropObjectId
+                        dropItem.setObjectId(list.get(i).getObjectId());
+                        //CreatedAt
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
-//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
-                        //Drop Title
-//                        dropItem.setTitle(list.get(i).getString("title"));
-
+                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
-
                         //Riple Count
                         dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
-                        //Id that connects commenterName to drop
-//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
-
-                        clickedUsersList.add(dropItem);
+                        viewUserList.add(dropItem);
                     }
 
 //                    Log.i("KEVIN", "PARSE LIST SIZE: " + clickedUsersList.size());
                     // Don't update this until we have the list of the current user's stuff as well
                     // Then, we'll have the relations that we need to display the proper card.
-                    updateRecyclerView(clickedUsersList);
+
                 }
+                updateRecyclerView(viewUserList);
             }
         });
     }
 
 
-    public void loadCurrentUserRipleItemsFromParse() {
+    /*public void loadCurrentUserRipleItemsFromParse() {
 
         final ArrayList<DropItem> currentUsersList = new ArrayList<>();
 
         ParseUser clickedUser = null;
-/*        ParseQuery<ParseUser> getClickedUserquery = ParseQuery.getQuery("_User");
+*//*        ParseQuery<ParseUser> getClickedUserquery = ParseQuery.getQuery("_User");
         getClickedUserquery.whereEqualTo("objectId", mClickedUserId);
 
         // TODO: Change this to findInBackground and pass in a callback to listen to when this inBackground finishes
-       *//* getClickedUserquery.findInBackground(new FindCallback<ParseObject>() {
+       *//**//* getClickedUserquery.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> list, ParseException e) {*//*
+            public void done(List<ParseObject> list, ParseException e) {*//**//*
 
         try {
             if (getClickedUserquery.find().size() != 0) {
@@ -320,7 +307,7 @@ public class ViewUserActivity extends AppCompatActivity {
             }
         } catch (ParseException e) {
             e.printStackTrace();
-        }*/
+        }*//*
 
         clickedUser = ParseUser.getCurrentUser();
 
@@ -399,11 +386,11 @@ public class ViewUserActivity extends AppCompatActivity {
                     // Don't update this until we have the list of the current user's stuff as well
                     // Then, we'll have the relations that we need to display the proper card.
                     mCurrentUserDrops = currentUsersList;
-                    loadRipleItemsFromParse();
+
                 }
             }
         });
-    }
+    }*/
 
 
 
@@ -411,9 +398,9 @@ public class ViewUserActivity extends AppCompatActivity {
 
     private void updateRecyclerView(ArrayList<DropItem> clickedUserList) {
         Log.d("VIEWUSERLIST", "CLICKED USER LIST SIZE: " + clickedUserList.size());
-        Log.d("VIEWUSERLIST", "CURRENT USER LIST SIZE: " + mCurrentUserDrops.size());
+//        Log.d("VIEWUSERLIST", "CURRENT USER LIST SIZE: " + mCurrentUserDrops.size());
 
-        mViewUserAdapter = new DropAdapter(this, clickedUserList, "viewUser");
+        mViewUserAdapter = new DropAdapter(this, clickedUserList, "created");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);
         scaleAdapter.setDuration(250);
         mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));

@@ -17,9 +17,6 @@ public class CommentItem {
     public String commenterName;
     public Bitmap parseProfilePicture;
 
-
-
-
     public Bitmap getParseProfilePicture() {
         return parseProfilePicture;
     }

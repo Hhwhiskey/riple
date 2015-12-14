@@ -27,7 +27,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendsVie
     ParseUser currentUser = ParseUser.getCurrentUser();
     Context mContext;
     List<FriendItem> data = Collections.emptyList();
-    private CommentAdapter.MyViewHolder viewHolder;
+    private FriendAdapter.FriendsViewHolder viewHolder;
     private LayoutInflater inflater;
 
     public FriendAdapter(Context context, ArrayList<FriendItem> friendsList) {
@@ -51,9 +51,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendsVie
 
         /*if (data != null) {
             String senderName = data.get("displayName");
-            String userId = user1.getObjectId();
-
-            if (userId.equals(currentUser.getObjectId())) {
+            String userObjectId = user1.getObjectId();
+            if (userObjectId.equals(currentUser.getObjectId())) {
                 user = (ParseUser) holder.get(position);
             }
             else {
@@ -70,7 +69,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendsVie
 
 
 
-   //FriendsViewHolder/////////////////////////////////////////////////////////////////////////////
+    //FriendsViewHolder/////////////////////////////////////////////////////////////////////////////
     public class FriendsViewHolder extends AnimateViewHolder {
 
         private ImageView friendProfilePicture;

@@ -2,8 +2,6 @@ package com.khfire22gmail.riple.model;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.CompletedByActivity;
 import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
@@ -28,8 +27,6 @@ import com.parse.ParseUser;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import jp.wasabeef.recyclerview.animators.holder.AnimateViewHolder;
 
 public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder> {
 
@@ -156,8 +153,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     //Complete drop and increment the Drop and Author
     public void completeDropAndIncrement(ParseObject mDropObject, ParseObject dropAuthor) {
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
 
+        //Modify currentUser relations to Drop
         ParseRelation completeRelation1 = currentUser.getRelation("completedDrops");
         completeRelation1.add(mDropObject);
 
@@ -168,6 +166,11 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         ParseRelation completeRelation3 = currentUser.getRelation("hasRelationTo");
         completeRelation3.add(mDropObject);
         currentUser.saveInBackground();
+
+        //Add to completedBy list
+        ParseRelation completedByRelation = mDropObject.getRelation("completedBy");
+        completedByRelation.add(currentUser);
+        mDropObject.saveInBackground();
 
         //Increment the Drop
         mDropObject.increment("ripleCount");
@@ -235,7 +238,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         viewHolder.ripleCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewDrop(position);
+                viewCompletedBy(position);
             }
         });
 
@@ -332,6 +335,35 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         mContext.startActivity(intent);
     }
 
+    private void viewCompletedBy(int position){
+
+        String mDropObjectId = (data.get(position).getObjectId());
+        String mAuthorId = (data.get(position).getAuthorId());
+        String mAuthorName = (data.get(position).getAuthorName());
+        String mDropDescription = (data.get(position).getDescription());
+        String mRipleCount = (data.get(position).getRipleCount());
+        String mCommentCount = (data.get(position).getCommentCount());
+        Date mCreatedAt = (data.get(position).getCreatedAt());
+
+        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
+        Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
+        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + mAuthorName);
+        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
+        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
+        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
+        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
+
+        Intent intent = new Intent(mContext, CompletedByActivity.class);
+        intent.putExtra("dropObjectId", mDropObjectId);
+        intent.putExtra("authorId", mAuthorId);
+        intent.putExtra("commenterName", mAuthorName);
+        intent.putExtra("dropDescription", mDropDescription);
+        intent.putExtra("ripleCount", mRipleCount);
+        intent.putExtra("commentCount", mCommentCount);
+        intent.putExtra("createdAt", mCreatedAt);
+        mContext.startActivity(intent);
+    }
+
     @Override
     public int getItemCount() {
         return data.size();
@@ -340,8 +372,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
 
 
+
+
     //DropViewHolder//////////////////////////////////////////////////////////////////////////////
-    public class DropViewHolder extends AnimateViewHolder  {
+    public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final Button todoButton;
         private final Button completeButton;
@@ -350,9 +384,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         public TextView description;
         public TextView ripleCount;
         public TextView commentCount;
-        public ImageView share;
-        private ViewPropertyAnimatorListener listener;
-        private ParseUser currentUser;
         private ImageView parseProfilePicture;
 
 
@@ -360,13 +391,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             super(itemView);
 
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
-//            share = (ImageView) itemView.findViewById(R.id.share_button);
             todoButton = (Button) itemView.findViewById(R.id.button_todo);
-/*
-            if (todoSwitch != null) {
-                todoSwitch.setOnCheckedChangeListener(this);
-            }*/
-
             completeButton = (Button) itemView.findViewById(R.id.button_complete);
             createdAt = (TextView) itemView.findViewById(R.id.created_at);
             authorName = (TextView) itemView.findViewById(R.id.name);
@@ -374,7 +399,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
 
-
+            itemView.setOnClickListener(this);
         }
 
         public void update(int position){
@@ -390,41 +415,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         }
 
         @Override
-        public void animateAddImpl(ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
-            ViewCompat.animate(itemView)
-                    .translationY(-itemView.getHeight() * 0.3f)
-                    .alpha(0)
-                    .setDuration(300)
-                    .setListener(listener)
-                    .start();
+        public void onClick(View v) {
+            viewDrop(getAdapterPosition());
         }
-
-        @Override
-        public void preAnimateAddImpl() {
-            ViewCompat.setTranslationY(itemView, -itemView.getHeight() * 0.3f);
-            ViewCompat.setAlpha(itemView, 0);
-        }
-
-        @Override
-        public void animateRemoveImpl(ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
-            ViewCompat.animate(itemView)
-                    .translationY(0)
-                    .alpha(1)
-                    .setDuration(300)
-                    .setListener(listener)
-                    .start();
-        }
-
-        /*@Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            removeDropFromView(getAdapterPosition(), this);
-        }
-
-        public void removeDropFromView(int position, DropViewHolder viewholder) {
-            data.remove(position);
-            notifyItemRemoved(position);
-
-        }*/
     }
 
 

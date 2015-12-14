@@ -36,7 +36,7 @@ public class RipleApplication extends Application {
     public static void updateParseInstallation() {
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 
-        installation.put("userId", ParseUser.getCurrentUser().getObjectId());
+        installation.put("userObjectId", ParseUser.getCurrentUser().getObjectId());
         installation.saveInBackground();
         ParseUser.enableRevocableSessionInBackground();
     }

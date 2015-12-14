@@ -25,7 +25,6 @@ import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -174,7 +173,7 @@ public class RipleTabFragment extends Fragment {
 
 
     public void loadRipleItemsFromParse() {
-        final List<DropItem> ripleList = new ArrayList<>();
+        final ArrayList<DropItem> ripleList = new ArrayList<>();
 
         ParseUser user = ParseUser.getCurrentUser();
 
@@ -298,14 +297,14 @@ public class RipleTabFragment extends Fragment {
 
         //Update Riple count and Rank
 
-        ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
+        /*ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
         userRipleCountQuery.whereEqualTo("userPointer", currentUser);
         userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
                 int parseRipleCount = parseObject.getInt("ripleCount");
             }
-        });
+        });*/
 
 
         String localRank = "\"Drop\"";

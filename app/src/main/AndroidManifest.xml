@@ -89,7 +89,10 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <service android:name=".utils.MessageService" />
+        <service android:name=".utils.MessageService"/>
+
+        <activity android:name=".activities.CompletedByActivity">
+        </activity>
     </application>
 
 </manifest>

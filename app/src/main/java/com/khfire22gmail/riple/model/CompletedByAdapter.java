@@ -1,5 +1,8 @@
 package com.khfire22gmail.riple.model;
 
+/**
+ * Created by Kevin on 12/13/2015.
+ */
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -11,23 +14,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.CompletedByActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
+public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.CompletedByViewHolder> {
 
     Context mContext;
 
     //    private final String mTabName;
     private LayoutInflater inflater;
-    List<CommentItem> data = Collections.emptyList();
+    List<CompletedByItem> data = Collections.emptyList();
 
-
-
-    public CommentAdapter(Context context, List<CommentItem> data){
-
+    public CompletedByAdapter(CompletedByActivity context, ArrayList<CompletedByItem> data) {
         mContext = context;
         this.inflater = LayoutInflater.from(context);
         this.data = data;
@@ -35,13 +37,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
     @Override
-    public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.card_comment, parent, false);
-        CommentViewHolder viewHolder = new CommentViewHolder(view);
+    public CompletedByViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.row_completed_by, parent, false);
+        CompletedByViewHolder viewHolder = new CompletedByViewHolder(view);
         return viewHolder;
     }
 
-    private void viewOtherUser(int position) {
+   /* private void viewOtherUser(int position) {
 
         String mClickedUserId = (data.get(position).getCommenterId());
         String mClickedUserName = (data.get(position).getCommenterName());
@@ -53,11 +55,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         intent.putExtra("clickedUserId", mClickedUserId);
         intent.putExtra("clickedUserName", mClickedUserName);
         mContext.startActivity(intent);
-    }
+    }*/
 
 
     @Override
-    public void onBindViewHolder(CommentViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(CompletedByViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
         /*viewHolder.parseProfilePicture.setOnClickListener(new View.OnClickListener() {
@@ -89,25 +91,36 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         });*/
     }
 
+    private void viewOtherUser(int position) {
+
+        String mClickedUserId = (data.get(position).getUserObjectId());
+        String mClickedUserName = (data.get(position).getDisplayName());
+
+        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
+        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+
+        Intent intent = new Intent(mContext, ViewUserActivity.class);
+        intent.putExtra("clickedUserId", mClickedUserId);
+        intent.putExtra("clickedUserName", mClickedUserName);
+        mContext.startActivity(intent);
+    }
+
     @Override
     public int getItemCount() {
         return data.size();
     }
 
-    class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class CompletedByViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        public TextView createdAt;
-        public TextView commentText;
-        public TextView commenterName;
+        public TextView displayName;
         public ImageView parseProfilePicture;
 
-        public CommentViewHolder(View itemView) {
+        public CompletedByViewHolder(View itemView) {
             super(itemView);
 
-            parseProfilePicture = (ImageView) itemView.findViewById(R.id.commenter_profile_picture);
-            createdAt = (TextView) itemView.findViewById(R.id.created_at);
-            commenterName = (TextView) itemView.findViewById(R.id.commenter);
-            commentText = (TextView) itemView.findViewById(R.id.commentText);
+            parseProfilePicture = (ImageView) itemView.findViewById(R.id.completed_by_profile_picture);
+            displayName = (TextView) itemView.findViewById(R.id.completed_by_display_name);
+
 
             itemView.setOnClickListener(this);
 //            itemView.setLongClickable(true);
@@ -116,12 +129,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         public void update(int position){
 
-            CommentItem current = data.get(position);
+            CompletedByItem current = data.get(position);
 
             parseProfilePicture.setImageBitmap(current.parseProfilePicture);
-            commenterName.setText(current.commenterName);
-            commentText.setText(current.commentText);
-            createdAt.setText(String.valueOf(current.createdAt));
+            displayName.setText(current.displayName);
+
 
         }
 
@@ -137,6 +149,4 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
     }
 }
-
-
 

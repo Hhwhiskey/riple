@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -27,6 +26,7 @@ import com.bumptech.glide.signature.StringSignature;
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
+import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -35,7 +35,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -50,7 +49,7 @@ public class ViewDropActivity extends AppCompatActivity {
     private Object animator;
     private RecyclerView mRecyclerView;
     private List<CommentItem> mCommentList;
-    private CommentAdapter mCommenterAdapter;
+    private CompletedByAdapter mCommenterAdapter;
     private RecyclerView.Adapter mCommentAdapter;
     private String mDescription;
     private String currentDrop;
@@ -116,7 +115,7 @@ public class ViewDropActivity extends AppCompatActivity {
         authorProfilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewOtherUser(mAuthorId, mAuthorName, mAuthorFacebookId);
+                viewOtherUser(mAuthorId, mAuthorName);
             }
         });
 
@@ -128,6 +127,12 @@ public class ViewDropActivity extends AppCompatActivity {
 
         ripleCountView = (TextView) findViewById(R.id.riple_count);
         ripleCountView.setText(mRipleCount);
+        ripleCountView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewCompletedBy();
+            }
+        });
 
         commentCountView = (TextView) findViewById(R.id.comment_count);
         commentCountView.setText(mCommentCount);
@@ -173,7 +178,7 @@ public class ViewDropActivity extends AppCompatActivity {
 /////////Add/Remove/Complete Drop from within ViewDrop//////////////////////////////////////////////////
         //To do Switch
 //        if (viewedDropTodoSwitch != null) {
-            viewedDropTodoSwitch = (Switch) findViewById(R.id.switch_todo);
+           /* viewedDropTodoSwitch = (Switch) findViewById(R.id.switch_todo);
             viewedDropTodoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -183,7 +188,7 @@ public class ViewDropActivity extends AppCompatActivity {
                         getDropObjectToRemove(mDropObjectId);
                     }
                 }
-            });
+            });*/
 //        }
 
        /* // Complete CheckBox Listener
@@ -224,7 +229,20 @@ public class ViewDropActivity extends AppCompatActivity {
         });
     }
 
-    private void getDropObjectToAdd(String mDropObjectId) {
+    private void viewCompletedBy(){
+
+        Intent intent = new Intent(ViewDropActivity.this, CompletedByActivity.class);
+        intent.putExtra("dropObjectId", mDropObjectId);
+        intent.putExtra("authorId", mAuthorId);
+        intent.putExtra("commenterName", mAuthorName);
+        intent.putExtra("dropDescription", mDropDescription);
+        intent.putExtra("ripleCount", mRipleCount);
+        intent.putExtra("commentCount", mCommentCount);
+        intent.putExtra("createdAt", mCreatedAt);
+        this.startActivity(intent);
+    }
+
+    /*private void getDropObjectToAdd(String mDropObjectId) {
 
         ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
         viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
@@ -309,9 +327,9 @@ public class ViewDropActivity extends AppCompatActivity {
         user.saveInBackground();
 
         //Todo Add completed timestamp and update the data on parse
-       /* Date date = new Date();
-        Long time = (date.getTime());*/
-    }
+       *//* Date date = new Date();
+        Long time = (date.getTime());*//*
+    }*/
 /////////////////////////////////////////////////////////////////////
 
 
@@ -321,6 +339,7 @@ public class ViewDropActivity extends AppCompatActivity {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("dropId", mDropObjectId);
         query.orderByDescending("createdAt");
+        query.include("commenterPointer");
 //        query.setLimit(25);
 
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -335,7 +354,9 @@ public class ViewDropActivity extends AppCompatActivity {
 
                         final CommentItem commentItem = new CommentItem();
 
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("commenterProfilePicture");
+                        ParseObject commenterData = (ParseObject) list.get(i).get("commenterPointer");
+
+                        ParseFile profilePicture = (ParseFile) commenterData.get("parseProfilePicture");
                         if (profilePicture != null) {
                             profilePicture.getDataInBackground(new GetDataCallback() {
 
@@ -357,13 +378,13 @@ public class ViewDropActivity extends AppCompatActivity {
                         commentItem.setDropId(list.get(i).getString("dropId"));
 
                         //CommenterId
-                        commentItem.setCommenterId(list.get(i).getString("commenterId"));
+                        commentItem.setCommenterId(commenterData.getObjectId());
 
-                        //Author name
-                        commentItem.setCommenterName(list.get(i).getString("commenterName"));
+                        //Commenter
+                        commentItem.setCommenterName((String) commenterData.get("displayName"));
 
                         //Commenter Picture
-                        commentItem.setCommenterFacebookId(list.get(i).getString("commenterFacebookId"));
+//                        commentItem.setCommenterFacebookId(list.get(i).getString("commenterFacebookId"));
 
                         //Comment
                         commentItem.setCommentText(list.get(i).getString("commentText"));
@@ -414,9 +435,10 @@ public class ViewDropActivity extends AppCompatActivity {
 
         if (commentText != null) {
             comment.put("dropId", mDropObjectId);
-            comment.put("commenterId", user.getObjectId());
-            comment.put("commenterName", user.get("username"));
-            comment.put("commenterProfilePicture", user.getParseFile("parseProfilePicture"));
+            comment.put("commenterPointer", user);
+//            comment.put("commenterId", user.getObjectId());
+//            comment.put("commenterName", user.get("username"));
+//            comment.put("commenterProfilePicture", user.getParseFile("parseProfilePicture"));
             comment.put("commentText", commentText);
             comment.saveInBackground(new SaveCallback() {
                 @Override
@@ -468,20 +490,17 @@ public class ViewDropActivity extends AppCompatActivity {
 
 
     // Allow user to view the Drop's Author's profile
-    private void viewOtherUser(String mAuthorId, String mAuthorName, String mAuthorFacebookId) {
+    private void viewOtherUser(String mAuthorId, String mAuthorName) {
 
         String mClickedUserId = mAuthorId;
         String mClickedUserName = mAuthorName;
-        String mClickedUserFacebookId = mAuthorFacebookId;
 
         Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
         Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
-        Log.d("sDropViewUser", "Clicked User's facebookId = " + mClickedUserFacebookId);
 
         Intent intent = new Intent(this, ViewUserActivity.class);
         intent.putExtra("clickedUserId", mClickedUserId);
         intent.putExtra("clickedUserName", mClickedUserName);
-        intent.putExtra("clickedUserFacebookId", mClickedUserFacebookId);
         this.startActivity(intent);
     }
 
