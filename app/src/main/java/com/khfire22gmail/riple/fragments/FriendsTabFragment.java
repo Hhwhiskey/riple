@@ -39,6 +39,10 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
+/**
+ * Created by Kevin on 9/8/2015.
+ */
+
 public class FriendsTabFragment extends Fragment {
 
     private RecyclerView friendsRecyclerView;
