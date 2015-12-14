@@ -33,7 +33,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter{
     @Override
     public Fragment getItem(int position) {
 
-        // if the position is 0 we are returning the First tab
+        // if the position is 0 we are returning the first tab
 
         if (position == 0) {
             RipleTabFragment ripleTab = new RipleTabFragment();

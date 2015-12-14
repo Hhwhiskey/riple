@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
@@ -54,6 +55,7 @@ public class ViewUserActivity extends AppCompatActivity {
     private String mClickedUserFacebookId;
     private ParseFile parseProfilePicture;
     private ImageView profilePictureView;
+    private TextView viewUserEmptyView;
 
     // Added this to track current User's drop stuff
     private ArrayList<DropItem> mCurrentUserDrops = null;
@@ -92,6 +94,7 @@ public class ViewUserActivity extends AppCompatActivity {
         mViewUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        viewUserEmptyView = (TextView) findViewById(R.id.view_user_empty_view);
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,6 +202,7 @@ public class ViewUserActivity extends AppCompatActivity {
 
 
     public void loadRipleItemsFromParse() {
+
         final ArrayList<DropItem> viewUserList = new ArrayList<>();
 
         ParseUser clickedUser = null;
@@ -399,6 +403,15 @@ public class ViewUserActivity extends AppCompatActivity {
     private void updateRecyclerView(ArrayList<DropItem> clickedUserList) {
         Log.d("VIEWUSERLIST", "CLICKED USER LIST SIZE: " + clickedUserList.size());
 //        Log.d("VIEWUSERLIST", "CURRENT USER LIST SIZE: " + mCurrentUserDrops.size());
+
+        if (clickedUserList.isEmpty()) {
+            mViewUserRecyclerView.setVisibility(View.GONE);
+            viewUserEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mViewUserRecyclerView.setVisibility(View.VISIBLE);
+            viewUserEmptyView.setVisibility(View.GONE);
+        }
 
         mViewUserAdapter = new DropAdapter(this, clickedUserList, "created");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);

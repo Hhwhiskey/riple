@@ -14,6 +14,9 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.appevents.AppEventsLogger;
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
@@ -23,7 +26,12 @@ import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,9 +53,9 @@ public class TitleActivity extends AppCompatActivity {
         //Remove status bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //Splash Video
-        /*VideoView drops = (VideoView)findViewById(R.id.title_video);
-        String path = "android.resource://" + getPackageName() + "/" + R.raw.ducks;
+       /* //Splash Video
+        VideoView drops = (VideoView)findViewById(R.id.title_video);
+        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
         drops.setVideoURI(Uri.parse(path));
         drops.start();
 
@@ -177,7 +185,8 @@ public class TitleActivity extends AppCompatActivity {
                 } else if (user.isNew()) {
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
                     Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
-                    launchMainActivity();
+                    storeFacebookUserOnParse();
+
 
                 } else {
                     Log.d(RipleApplication.TAG, "You have logged in through Facebook!");
@@ -186,6 +195,62 @@ public class TitleActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void storeFacebookUserOnParse() {
+
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                        if (jsonObject != null) {
+                            try {
+
+                                // Save the facebook user if they are new
+                                final ParseUser currentUser = ParseUser.getCurrentUser();
+
+                                currentUser.put("facebookId", jsonObject.getString("id"));
+                                currentUser.put("username", jsonObject.getString("name"));
+                                currentUser.put("displayName", jsonObject.getString("name"));
+                                currentUser.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+
+                                        launchMainActivity();
+                                        ParseUser currentUser = ParseUser.getCurrentUser();
+                                        ParseObject userRipleCount = new ParseObject("UserRipleCount");
+                                        userRipleCount.put("userPointer", currentUser);
+                                        userRipleCount.put("ripleCount", 0);
+                                        userRipleCount.saveInBackground();
+                                    }
+                                });
+
+                            } catch (JSONException e) {
+                                Log.d(RipleApplication.TAG,
+                                        "Error parsing returned user data. " + e);
+                            }
+                        } else if (graphResponse.getError() != null) {
+                            switch (graphResponse.getError().getCategory()) {
+                                case LOGIN_RECOVERABLE:
+                                    Log.d(RipleApplication.TAG,
+                                            "Authentication error: " + graphResponse.getError());
+                                    break;
+
+                                case TRANSIENT:
+                                    Log.d(RipleApplication.TAG,
+                                            "Transient error. Try again. " + graphResponse.getError());
+                                    break;
+
+                                case OTHER:
+                                    Log.d(RipleApplication.TAG,
+                                            "Some other error: " + graphResponse.getError());
+                                    break;
+                            }
+                        }
+                    }
+                });
+
+        request.executeAsync();
     }
 
     private void launchMainActivity() {

@@ -15,20 +15,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
-import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
 import com.khfire22gmail.riple.utils.MessageService;
@@ -40,9 +35,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.sinch.android.rtc.SinchClient;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Toolbar toolbar;
@@ -53,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int numOfTabs = 4;
     private AutoCompleteTextView dropDescriptionView;
     private SinchClient sinchClient;
-    ParseUser currentUser;
     private View root_layout;
     private String dropDescription;
     private ParseFile parseProfilePicture;
@@ -131,10 +122,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             myFab.setLayoutParams(p);
         }
 
-        // Store the current users facebookId
-        // TODO: 12/9/2015 FIX THIS!!!
-         storeFacebookUserOnParse();
+       /* // Store the new facebook User on parse
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        String displayName =  currentUser.getString("displayName");
+
+        if (displayName == null); {
+            storeFacebookUserOnParse();
+        }*/
 
         // Creating The Toolbar and setting it as the Toolbar for the activity
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -333,58 +328,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    private void storeFacebookUserOnParse() {
 
-        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                        if (jsonObject != null) {
-                            try {
-                                // Save the user profile info in a user property
-                                final ParseUser currentUser = ParseUser.getCurrentUser();
-                                currentUser.put("facebookId", jsonObject.getString("id"));
-                                currentUser.put("username", jsonObject.getString("name"));
-                                currentUser.put("displayName", jsonObject.getString("name"));
-                                currentUser.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                    }
-                                });
-
-                                ParseObject userRipleCount = new ParseObject("UserRipleCount");
-//                                ParseObject userRipleCount = new ParseObject("_User");
-                                userRipleCount.put("userPointer", currentUser);
-                                userRipleCount.put("ripleCount", "0");
-                                userRipleCount.saveInBackground();
-
-                            } catch (JSONException e) {
-                                Log.d(RipleApplication.TAG,
-                                        "Error parsing returned user data. " + e);
-                            }
-                        } else if (graphResponse.getError() != null) {
-                            switch (graphResponse.getError().getCategory()) {
-                                case LOGIN_RECOVERABLE:
-                                    Log.d(RipleApplication.TAG,
-                                            "Authentication error: " + graphResponse.getError());
-                                    break;
-
-                                case TRANSIENT:
-                                    Log.d(RipleApplication.TAG,
-                                            "Transient error. Try again. " + graphResponse.getError());
-                                    break;
-
-                                case OTHER:
-                                    Log.d(RipleApplication.TAG,
-                                            "Some other error: " + graphResponse.getError());
-                                    break;
-                            }
-                        }
-                    }
-                });
-
-        request.executeAsync();
-    }
 
 
 

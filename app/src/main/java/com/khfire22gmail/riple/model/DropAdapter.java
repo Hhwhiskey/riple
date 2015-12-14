@@ -205,7 +205,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 @Override
                 public void onClick(View v) {
                     getTrickleObjectFromRowToAdd(position);
-//                    removeDropFromView(position);
+                    removeDropFromView(position);
                 }
             });
         }

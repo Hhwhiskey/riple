@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.UUID;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -62,29 +61,42 @@ public class RipleTabFragment extends Fragment {
     private ParseFile parseProfilePicture;
     private ParseUser currentUser;
     private boolean ripleTipBoolean;
+    private TextView ripleEmptyView;
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        updateUserInfo();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.fragment_riple_tab,container,false);
 
 
-//        Profile Card
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
+
+
+        //Profile Card
         profilePictureView = (ImageView) view.findViewById(R.id.profile_card_picture);
         nameView = (TextView) view.findViewById(R.id.profile_name);
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
         savePreferences("ripleTipBoolean", true);
+
+
 //        loadSavedPreferences();
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
+
 
         currentUser = ParseUser.getCurrentUser();
 
         //Query the users created and completed drops_blue
-        updateUserInfo();
+
         loadRipleItemsFromParse();
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
@@ -249,11 +261,20 @@ public class RipleTabFragment extends Fragment {
 
     public void updateRecyclerView(List<DropItem> mRipleList) {
 
+        if (mRipleList.isEmpty()) {
+            mRecyclerView.setVisibility(View.GONE);
+            ripleEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            ripleEmptyView.setVisibility(View.GONE);
+        }
+
         mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "created");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mRipleAdapter);
         scaleAdapter.setDuration(250);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+
     }
 
     private void updateUserInfo() {

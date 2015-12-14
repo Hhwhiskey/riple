@@ -10,14 +10,22 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drop_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         />
 
-    <!--<Button
-        android:id="@+id/button_test"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:text="Popup Test"/>-->
+    <TextView
+        android:id="@+id/drop_tab_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom|center_horizontal"
+        android:visibility="gone"
+        android:text="This is where your todo Drops will be displayed. Add Drops to this list to start making Riples!"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        android:foregroundGravity="center"
+        android:paddingBottom="250dp"
+        />
+
     </LinearLayout>
 
 <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->

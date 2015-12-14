@@ -70,8 +70,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
 
 //        loadSavedPreferences();
         loadAllDropsFromParse();
@@ -310,7 +310,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+
         scaleAdapter.setDuration(250);
     }
 }

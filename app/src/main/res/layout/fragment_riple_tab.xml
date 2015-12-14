@@ -7,22 +7,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-   <!--todo android:animateLayoutChanges="true">-->
 
     <include
         layout="@layout/card_riple"
         android:id="@+id/riple"/>
 
-    <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+    <!--<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
         android:id="@+id/riple_swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent">-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/riple_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
+
+        <TextView
+            android:id="@+id/riple_tab_empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom|center_horizontal"
+            android:visibility="gone"
+            android:text="This is where your activity will be displayed. Start making Riples!"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:foregroundGravity="center"
+            android:paddingBottom="225dp"/>
+    <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
 
 </LinearLayout>
 

@@ -22,6 +22,19 @@
         android:background="@color/Primary_Background_Color"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
+    <TextView
+        android:id="@+id/view_user_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom|center_horizontal"
+        android:visibility="gone"
+        android:text="This is where this users activity will be displayed. Start making Riples!"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        android:foregroundGravity="center"
+        android:paddingBottom="150dp"
+        android:textAlignment="center"/>
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_view_user"
         android:layout_width="match_parent"

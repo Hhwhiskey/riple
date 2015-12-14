@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
@@ -52,6 +52,7 @@ public class DropsTabFragment extends Fragment {
     public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();
     public static ArrayList<DropItem> dropTabInteractionList;
     private boolean dropTips;
+    private TextView dropEmptyView;
 
 
     @Override
@@ -60,13 +61,13 @@ public class DropsTabFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        loadSavedPreferences();
+        mRecyclerView.setItemAnimator(animator);
+        dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
+
+
+        //        loadSavedPreferences();
 
         loadDropItemsFromParse();
-
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setItemAnimator(animator);
-//        mRecyclerView.setItemAnimator(new SlideInOutLeftDefaultItemAnimator(mRecyclerView));
 
         return view;
     }
@@ -187,10 +188,20 @@ public class DropsTabFragment extends Fragment {
     private void updateRecyclerView(ArrayList<DropItem> dropList) {
         Log.d("kevinDropList", "Drop LIST SIZE: " + dropList.size());
 
+        if (dropList.isEmpty()) {
+            mRecyclerView.setVisibility(View.GONE);
+            dropEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            dropEmptyView.setVisibility(View.GONE);
+        }
+
         mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
         scaleAdapter.setDuration(250);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+
 
     }
 
