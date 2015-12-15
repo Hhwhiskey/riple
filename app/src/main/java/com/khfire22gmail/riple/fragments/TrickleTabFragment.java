@@ -37,10 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
-
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -71,7 +70,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        SlideInLeftAnimator slide = new SlideInLeftAnimator();
+        mRecyclerView.setItemAnimator(slide);
 
 //        loadSavedPreferences();
         loadAllDropsFromParse();
@@ -310,7 +310,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-
-        scaleAdapter.setDuration(250);
+        scaleAdapter.setDuration(500);
     }
 }

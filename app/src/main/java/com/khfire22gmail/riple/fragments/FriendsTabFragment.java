@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -23,14 +21,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
-import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.parse.FindCallback;
-import com.parse.GetDataCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -104,7 +99,7 @@ public class FriendsTabFragment extends Fragment {
         builder.show();
     }
 
-    //Show list of all users
+    /*//Show list of all users
     private void setConversationsList() {
 
         final ArrayList<FriendItem> friendsList = new ArrayList();
@@ -160,7 +155,7 @@ public class FriendsTabFragment extends Fragment {
                 updateFriendsListRecyclerView(friendsList);
             }
         });
-    }
+    }*/
 
     public void updateFriendsListRecyclerView(ArrayList <FriendItem> friendsList) {
 
@@ -217,9 +212,11 @@ public class FriendsTabFragment extends Fragment {
         return true;
     }*/
 
+
+
     @Override
     public void onResume() {
-        setConversationsList();
+//  todo      setConversationsList();
         super.onResume();
     }
 

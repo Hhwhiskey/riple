@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/trickle_drop_view"
@@ -19,4 +19,4 @@
             android:layout_height="match_parent"/>
     </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
-</LinearLayout>
+</FrameLayout>

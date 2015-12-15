@@ -23,7 +23,7 @@
         android:textSize="18sp"
         android:textStyle="italic"
         android:foregroundGravity="center"
-        android:paddingBottom="250dp"
+        android:paddingBottom="300dp"
         />
 
     </LinearLayout>

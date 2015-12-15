@@ -32,7 +32,7 @@
             android:textSize="18sp"
             android:textStyle="italic"
             android:foregroundGravity="center"
-            android:paddingBottom="225dp"/>
+            android:paddingBottom="250dp"/>
     <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
 
 </LinearLayout>
