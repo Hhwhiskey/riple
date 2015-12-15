@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -16,9 +17,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateInterpolator;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
@@ -63,6 +66,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     public static final ArrayList <ParseObject> trickleObjectsList = new ArrayList<>();
     public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
     public static ArrayList<DropItem> trickleTabInteractionList;
+    private TextView trickleEmptyView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,8 +74,20 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        SlideInLeftAnimator slide = new SlideInLeftAnimator();
-        mRecyclerView.setItemAnimator(slide);
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
+        mRecyclerView.getItemAnimator().setRemoveDuration(500);
+
+        //Swipe Refresh
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.swipe_trickle);
+        mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
+            @Override public void onRefresh() {
+                // Do work to refresh the list here.
+                loadAllDropsFromParse();
+                new Task().execute();
+            }
+        });
+
+        trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
 //        loadSavedPreferences();
         loadAllDropsFromParse();
@@ -120,37 +136,11 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         builder.show();
     }
 
-    /*private void initView() {
-        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) getActivity().findViewById(R.id.main_swipe);
-        mWaveSwipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);
-        mWaveSwipeRefreshLayout.setOnRefreshListener(this);
-        mWaveSwipeRefreshLayout.setWaveColor(0x00000000);
-//        mWaveSwipeRefreshLayout.setMaxDropHeight(1500);
-        mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.trickle_recycler_view);
-    }*/
-
     @Override
     public void onResume() {
-       /* mWaveSwipeRefreshLayout.setRefreshing(true);
-        refresh();*/
+
         super.onResume();
     }
-
-    /*@Override
-    public void onRefresh() {
-        refresh();
-    }*/
-
-    /*private void refresh(){
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                *//*mWaveSwipeRefreshLayout.setRefreshing(false);
-                getItemsFromParse();
-                dropAdapter = new DropAdapter(getActivity(), list, "trickle");*//*
-            }
-        }, 3000);
-    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -166,8 +156,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-//            mWaveSwipeRefreshLayout.setRefreshing(true);
-//            refresh();
             return true;
         }
 
@@ -194,13 +182,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
                     for (int i = 0; i < list.size(); i++) {
 
-//                        String authorId = authorData.getObjectId();
-
-                        //Collects Drop Objects
-//                        trickleObjectsList.add(list.get(i));
-
                         final DropItem dropItemAll = new DropItem();
-
 
                         //Drop Author Data/////////////////////////////////////////////////////////
                         ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
@@ -307,9 +289,31 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
         Log.d("KEVIN", "TRICKLE LIST SIZE: " + filteredDropList.size());
 
+        if (filteredDropList.isEmpty()) {
+            mRecyclerView.setVisibility(View.GONE);
+            trickleEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            trickleEmptyView.setVisibility(View.GONE);
+        }
+
         mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
+    }
+
+    private class Task extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+            return new String[0];
+        }
+
+        @Override protected void onPostExecute(String[] result) {
+            // Call setRefreshing(false) when the list has been refreshed.
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+            super.onPostExecute(result);
+        }
     }
 }

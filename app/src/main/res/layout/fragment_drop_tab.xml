@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout-->
-   <LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="1">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/drop_recycler_view"
+    <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+        android:id="@+id/drop_swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/drop_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
     <TextView
         android:id="@+id/drop_tab_empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:foregroundGravity="center"
         android:gravity="bottom|center_horizontal"
-        android:visibility="gone"
+        android:paddingBottom="300dp"
         android:text="This is where your todo Drops will be displayed. Add Drops to this list to start making Riples!"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:foregroundGravity="center"
-        android:paddingBottom="300dp"
+        android:visibility="gone"
         />
 
-    </LinearLayout>
+</FrameLayout>
 
-<!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
+
 
 

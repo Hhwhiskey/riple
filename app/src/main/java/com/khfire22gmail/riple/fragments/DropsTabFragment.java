@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateInterpolator;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -33,8 +35,10 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -52,15 +56,31 @@ public class DropsTabFragment extends Fragment {
     public static ArrayList<DropItem> dropTabInteractionList;
     private boolean dropTips;
     private TextView dropEmptyView;
+    private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
 
+
         mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(animator);
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
+        mRecyclerView.getItemAnimator().setRemoveDuration(500);
+
+        //Swipe Refresh
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.drop_swipe);
+        mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
+            @Override public void onRefresh() {
+                // Do work to refresh the list here.
+                loadDropItemsFromParse();
+                new Task().execute();
+            }
+        });
+
+
+
         dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
 
 
@@ -207,5 +227,18 @@ public class DropsTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    private class Task extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+            return new String[0];
+        }
+
+        @Override protected void onPostExecute(String[] result) {
+            // Call setRefreshing(false) when the list has been refreshed.
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+            super.onPostExecute(result);
+        }
     }
 }

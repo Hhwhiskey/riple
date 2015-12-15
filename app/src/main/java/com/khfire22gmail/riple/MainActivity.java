@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setCurrentItem(0);
 
         // Allow fragments to stay in memory
-        mPager.setOffscreenPageLimit(0);
+        mPager.setOffscreenPageLimit(3);
 
         // Assigning the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);

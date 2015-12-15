@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
@@ -63,6 +64,7 @@ public class RipleTabFragment extends Fragment {
     private ParseUser currentUser;
     private boolean ripleTipBoolean;
     private TextView ripleEmptyView;
+    private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
 
 
     @Override
@@ -81,13 +83,22 @@ public class RipleTabFragment extends Fragment {
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
         ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
 
-
         //Profile Card
         profilePictureView = (ImageView) view.findViewById(R.id.profile_card_picture);
         nameView = (TextView) view.findViewById(R.id.profile_name);
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
         savePreferences("ripleTipBoolean", true);
+
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.riple_swipe);
+        mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
+            @Override public void onRefresh() {
+                // Do work to refresh the list here.
+                loadRipleItemsFromParse();
+                updateUserInfo();
+                new Task().execute();
+            }
+        });
 
 
 //        loadSavedPreferences();
@@ -419,13 +430,16 @@ public class RipleTabFragment extends Fragment {
         }
     }
 
-    /*private void startLoginActivity() {
-        Intent intent = new Intent(this.getActivity(), TitleActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }*/
+    private class Task extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+            return new String[0];
+        }
 
-
-
+        @Override protected void onPostExecute(String[] result) {
+            // Call setRefreshing(false) when the list has been refreshed.
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+            super.onPostExecute(result);
+        }
+    }
 }
