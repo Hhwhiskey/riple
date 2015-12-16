@@ -175,10 +175,12 @@
                 android:layout_alignRight="@+id/created_at"
                 android:layout_alignEnd="@+id/created_at"
                 android:layout_marginRight="4dp"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="8dp"
                 android:src="@drawable/menu_svg"
                 android:layout_alignParentTop="true"
-                android:layout_alignBottom="@+id/trickle_card_tool_bar"/>
+                android:layout_alignBottom="@+id/trickle_card_tool_bar"
+                android:layout_marginBottom="6dp"
+                android:layout_marginTop="6dp"/>
 
 
         </RelativeLayout>
