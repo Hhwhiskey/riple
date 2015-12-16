@@ -53,9 +53,7 @@
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/created_at"
                 android:layout_alignParentTop="true"
-                android:layout_alignRight="@+id/created_at"
                 android:layout_toRightOf="@+id/profile_picture"
                 android:width="50dp"
                 android:text="Kevin Hodges"
@@ -64,10 +62,14 @@
                 android:textSize="20sp"
                 android:textColor="#000000"
                 android:singleLine="true"
-                android:layout_margin="8dp"
                 android:layout_alignTop="@+id/profile_picture"
                 android:background="@drawable/custom_bg"
-                android:clickable="true"/>
+                android:clickable="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@+id/imageView"
+                android:layout_toLeftOf="@+id/imageView"/>
 
             <TextView
                 android:id="@+id/created_at"
@@ -165,6 +167,18 @@
                 android:minHeight="32dp"
 
                 />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:layout_alignRight="@+id/created_at"
+                android:layout_alignEnd="@+id/created_at"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="16dp"
+                android:src="@drawable/menu_svg"
+                android:layout_alignParentTop="true"
+                android:layout_alignBottom="@+id/trickle_card_tool_bar"/>
 
 
         </RelativeLayout>
