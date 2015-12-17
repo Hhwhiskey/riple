@@ -26,7 +26,6 @@ import android.widget.TextView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
-import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -68,6 +67,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
     public static ArrayList<DropItem> trickleTabInteractionList;
     private TextView trickleEmptyView;
 
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
@@ -78,22 +80,197 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         mRecyclerView.getItemAnimator().setRemoveDuration(500);
 
         //Swipe Refresh
-        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.swipe_trickle);
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.trickle_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
-                // Do work to refresh the list here.
-                loadAllDropsFromParse();
-                new Task().execute();
+                // Load all drops and refresh
+                new AllDropsTask(new LoadRelationsDropsTask(false)).execute();
             }
         });
 
         trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
-//        loadSavedPreferences();
-        loadAllDropsFromParse();
+
+        AllDropsTask allDropsTask = new AllDropsTask(new LoadRelationsDropsTask(true));
+        allDropsTask.execute();
 
         return view;
     }
+
+    /**
+     * COMMENT ME AFTER YOU UNDERSTAND IT
+     */
+    public class AllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
+
+        List<ParseObject> listFromParse;
+
+        LoadRelationsDropsTask nextTask;
+
+
+        public AllDropsTask(LoadRelationsDropsTask nextTask) {
+            this.nextTask = nextTask;
+        }
+
+        /**
+         * onPreExecute
+         * This is invoked on the UI Thread so do any last minute updates to
+         * the UI that you want here
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected ArrayList<DropItem> doInBackground(Void... params) {
+            final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
+
+            dropQuery.orderByDescending("createdAt");
+            dropQuery.include("authorPointer");
+            try {
+                listFromParse = dropQuery.find();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            allDropsList.clear();
+
+            for (int i = 0; i < listFromParse.size(); i++) {
+
+                final DropItem dropItemAll = new DropItem();
+
+                //Drop Author Data/////////////////////////////////////////////////////////
+                ParseObject authorData = (ParseObject) listFromParse.get(i).get("authorPointer");
+
+                ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                if (parseProfilePicture != null) {
+                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
+
+                        @Override
+                        public void done(byte[] data, ParseException e) {
+                            if (e == null) {
+                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                dropItemAll.setParseProfilePicture(bmp);
+                            }
+                        }
+                    });
+                }
+
+                //dropItemAll.setAuthorName(authorName);
+                dropItemAll.setAuthorName((String) authorData.get("displayName"));
+                //Author id
+                dropItemAll.setAuthorId(authorData.getObjectId());
+
+
+                //Drop Data///////////////////////////////////////////////////////////////
+                //DropObjectId
+                dropItemAll.setObjectId(listFromParse.get(i).getObjectId());
+                //Drop description
+                dropItemAll.setDescription(listFromParse.get(i).getString("description"));
+                //CreatedAt
+                dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
+                //Riple Count
+                dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
+                //Comment Count
+                dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
+
+                allDropsList.add(dropItemAll);
+                Log.d("KevinData", "ArrayListContains" + allDropsList.size());
+
+
+            }
+
+            return allDropsList;
+
+        }
+
+
+
+
+        @Override
+        protected void onPostExecute(ArrayList<DropItem> dropItems) {
+            nextTask.execute();
+        }
+    }
+
+    /**
+     * COMMENT ME AFTER YOU UNDERSTAND IT
+     */
+    class LoadRelationsDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
+
+        List<ParseObject> parseRelationDrops = new ArrayList<ParseObject>();
+        boolean isRefresh = false;
+
+        public LoadRelationsDropsTask(boolean isRefresh) {
+            this.isRefresh = isRefresh;
+        }
+
+
+        @Override
+        protected ArrayList<DropItem> doInBackground(Void... params) {
+            ParseUser user = ParseUser.getCurrentUser();
+            ParseRelation relation = user.getRelation("hasRelationTo");
+
+            final ParseQuery hasRelationQuery = relation.getQuery();
+
+            try {
+                parseRelationDrops = hasRelationQuery.find();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            hasRelationList.clear();
+
+            if (!parseRelationDrops.isEmpty()) {
+
+
+
+                for (int i = 0; i < parseRelationDrops.size(); i++) {
+                    DropItem dropItemRelation = new DropItem();
+
+                    dropItemRelation.setObjectId(parseRelationDrops.get(i).getObjectId());
+
+                    hasRelationList.add(dropItemRelation);
+                }
+
+
+                asyncFilterDrops(hasRelationList, allDropsList);
+            }
+
+
+            return hasRelationList;
+        }
+
+
+        public void asyncFilterDrops(ArrayList<DropItem> mHasRelationList, ArrayList<DropItem> mAllDropsList){
+
+            Iterator<DropItem> allDropsIterator = mAllDropsList.iterator();
+
+
+            while(allDropsIterator.hasNext()) {
+                DropItem dropItemAll = allDropsIterator.next();
+
+                for(DropItem dropItemRelation  : mHasRelationList) {
+                    if(dropItemAll.getObjectId().equals(dropItemRelation.getObjectId())){
+                        allDropsIterator.remove();
+                    }
+                }
+            }
+
+            trickleTabInteractionList = allDropsList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<DropItem> dropItems) {
+            updateRecyclerView(allDropsList);
+
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+
+        }
+    }
+
 
     public void loadSavedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -162,129 +339,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadAllDropsFromParse() {
-
-        final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
-
-        dropQuery.orderByDescending("createdAt");
-        dropQuery.include("authorPointer");
-
-        dropQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-
-                if (e != null) {
-                    Log.d("KEVIN", "error error");
-
-                } else {
-
-                    allDropsList.clear();
-
-                    for (int i = 0; i < list.size(); i++) {
-
-                        final DropItem dropItemAll = new DropItem();
-
-                        //Drop Author Data/////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
-
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItemAll.setParseProfilePicture(bmp);
-                                    }
-                                }
-                            });
-                        }
-
-                        //dropItemAll.setAuthorName(authorName);
-                        dropItemAll.setAuthorName((String) authorData.get("displayName"));
-                        //Author id
-                        dropItemAll.setAuthorId(authorData.getObjectId());
-
-
-                        //Drop Data///////////////////////////////////////////////////////////////
-                        //DropObjectId
-                        dropItemAll.setObjectId(list.get(i).getObjectId());
-                        //Drop description
-                        dropItemAll.setDescription(list.get(i).getString("description"));
-                        //CreatedAt
-                        dropItemAll.setCreatedAt(list.get(i).getCreatedAt());
-                        //Riple Count
-                        dropItemAll.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-                        //Comment Count
-                        dropItemAll.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-                        allDropsList.add(dropItemAll);
-                        Log.d("KevinData", "ArrayListContains" + allDropsList);
-
-
-                    }
-                }
-
-                loadRelationDropsFromParse();
-            }
-        });
-
-    }
-
-    public void loadRelationDropsFromParse() {
-
-        ParseUser user = ParseUser.getCurrentUser();
-
-        ParseRelation relation = user.getRelation("hasRelationTo");
-
-        final ParseQuery hasRelationQuery = relation.getQuery();
-
-//        hasRelationToQuery.orderByDescending("createdAt");
-
-        hasRelationQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-
-                if (e != null) {
-                    Log.d("KEVIN", "error error");
-
-                } else {
-                    for (int i = 0; i < list.size(); i++) {
-
-                        DropItem dropItemRelation = new DropItem();
-
-                        dropItemRelation.setObjectId(list.get(i).getObjectId());
-
-                        hasRelationList.add(dropItemRelation);
-                    }
-                }
-                filterDrops(hasRelationList, allDropsList);
-            }
-        });
-
-    }
-
-
-
-    public void filterDrops(ArrayList <DropItem> hasRelationList, ArrayList <DropItem> filteredDropList) {
-        Iterator<DropItem> allDropsIterator = filteredDropList.iterator();
-
-
-        while(allDropsIterator.hasNext()) {
-            DropItem dropItemAll = allDropsIterator.next();
-
-            for(DropItem dropItemRelation  : hasRelationList) {
-                if(dropItemAll.getObjectId().equals(dropItemRelation.getObjectId())){
-                    allDropsIterator.remove();
-                }
-            }
-        }
-
-        trickleTabInteractionList = filteredDropList;
-        updateRecyclerView(filteredDropList);
-    }
 
     private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
         Log.d("KEVIN", "TRICKLE LIST SIZE: " + filteredDropList.size());
@@ -304,16 +358,4 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         scaleAdapter.setDuration(500);
     }
 
-    private class Task extends AsyncTask<Void, Void, String[]> {
-        @Override
-        protected String[] doInBackground(Void... params) {
-            return new String[0];
-        }
-
-        @Override protected void onPostExecute(String[] result) {
-            // Call setRefreshing(false) when the list has been refreshed.
-            mWaveSwipeRefreshLayout.setRefreshing(false);
-            super.onPostExecute(result);
-        }
-    }
 }

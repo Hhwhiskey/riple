@@ -179,8 +179,8 @@
                 android:src="@drawable/menu_svg"
                 android:layout_alignParentTop="true"
                 android:layout_alignBottom="@+id/trickle_card_tool_bar"
-                android:layout_marginBottom="6dp"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"/>
 
 
         </RelativeLayout>

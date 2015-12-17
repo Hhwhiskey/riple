@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
-        android:id="@+id/swipe_trickle"
+        android:id="@+id/trickle_swipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
