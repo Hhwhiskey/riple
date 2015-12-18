@@ -66,7 +66,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
          */
 
         if (mTabName.equals(created)) {
-            xmlLayoutId = R.layout.card_created;
+            xmlLayoutId = R.layout.card_riple;
 
         } else if (mTabName.equals(drop)) {
             xmlLayoutId = R.layout.card_drop;
@@ -76,7 +76,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
             //Todo Show card in ViewDropActivity based on users relation to that Drop
         } else if (mTabName.equals(viewUser)) {
-            xmlLayoutId = R.layout.card_created;
+            xmlLayoutId = R.layout.card_riple;
         }
 
         View view = inflater.inflate(xmlLayoutId, parent, false);
@@ -433,12 +433,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     public void removeDropFromView(int position) {
         data.remove(position);
         notifyItemRemoved(position);
-
-//        notifyDataSetChanged();
-//        notifyItemRangeChanged(position, data.size());
     }
-
-
 }
 
 

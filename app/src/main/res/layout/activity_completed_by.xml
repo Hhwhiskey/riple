@@ -9,7 +9,7 @@
 
     <include
         android:id="@+id/completed_by_card"
-        layout="@layout/card_created"
+        layout="@layout/card_riple"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:checked="true"

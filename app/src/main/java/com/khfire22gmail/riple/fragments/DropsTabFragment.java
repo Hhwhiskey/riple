@@ -218,7 +218,7 @@ public class DropsTabFragment extends Fragment {
 
         mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
-        scaleAdapter.setDuration(250);
+        scaleAdapter.setDuration(500);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
 
 

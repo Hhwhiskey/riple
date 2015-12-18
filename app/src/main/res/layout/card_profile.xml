@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
+
+        <RelativeLayout
+            android:id="@+id/profileCard"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/AccentColor">
+
+            <ImageView
+                android:id="@+id/profile_card_picture"
+                android:layout_width="110dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignBottom="@+id/profile_riple_count"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_user_default"
+                android:background="@drawable/custom_bg"/>
+
+            <TextView
+                android:id="@+id/profile_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/profile_card_picture"
+                android:width="100dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
+                android:text="Name"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:paddingRight="8dp"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:singleLine="true"
+                android:background="@drawable/custom_bg"/>
+
+            <TextView
+                android:id="@+id/profile_riple_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="2500 riples"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="24sp"
+                android:paddingLeft="16dp"
+                android:elegantTextHeight="false"
+                android:layout_below="@+id/profile_rank"
+                android:layout_toRightOf="@+id/profile_card_picture"
+                android:paddingRight="16dp"
+                android:layout_alignRight="@+id/profile_name"
+                android:layout_alignEnd="@+id/profile_name"
+                android:gravity="center_horizontal"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/custom_bg"/>
+
+            <TextView
+                android:id="@+id/profile_rank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:width="100dp"
+                android:paddingLeft="16dp"
+                android:text="&quot;Saint&quot;"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:layout_below="@+id/profile_name"
+                android:layout_toRightOf="@+id/profile_card_picture"
+                android:paddingRight="16dp"
+                android:layout_alignRight="@+id/profile_riple_count"
+                android:layout_alignEnd="@+id/profile_riple_count"
+                android:gravity="center_horizontal"
+                android:textStyle="italic"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/custom_bg"/>
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

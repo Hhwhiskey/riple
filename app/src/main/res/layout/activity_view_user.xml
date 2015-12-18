@@ -82,7 +82,7 @@
 
     <!--<include
         android:id="@+id/view_other_user_card"
-        layout="@layout/card_riple"
+        layout="@layout/card_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>-->
 

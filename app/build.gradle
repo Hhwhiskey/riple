@@ -46,6 +46,7 @@ android {
         compile 'jp.wasabeef:recyclerview-animators:2.1.0'
         compile 'com.github.bumptech.glide:glide:3.6.0'
         compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
+        compile 'com.github.traex.rippleeffect:library:1.3'
 
 
     }

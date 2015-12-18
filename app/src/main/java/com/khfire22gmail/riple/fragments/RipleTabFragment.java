@@ -284,9 +284,8 @@ public class RipleTabFragment extends Fragment {
 
         mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "created");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mRipleAdapter);
-        scaleAdapter.setDuration(250);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-
+        scaleAdapter.setDuration(500);
     }
 
     private void updateUserInfo() {

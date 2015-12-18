@@ -15,7 +15,9 @@
         android:layout_marginBottom="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        android:background="#FFFFFF"
+        >
 
         <RelativeLayout
             android:id="@+id/top_layout"
@@ -23,7 +25,8 @@
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:alpha="123124"
-            android:background="@drawable/custom_bg">
+            android:background="@drawable/custom_bg"
+            android:clickable="true">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/trickle_card_tool_bar"
@@ -39,6 +42,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:foregroundGravity="center_vertical"
+                android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
@@ -64,8 +68,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:background="@drawable/custom_bg"
-                android:clickable="true"/>
+                android:background="@drawable/custom_bg_blue"/>
 
             <TextView
                 android:id="@+id/created_at"
@@ -112,18 +115,23 @@
                 android:id="@+id/riple_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="205 riples"
+                android:text="9999 riples"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="10sp"
+                android:textSize="12dp"
                 android:singleLine="true"
-                android:textAlignment="textStart"
-                android:gravity="left|bottom"
-                android:layout_toLeftOf="@+id/comment_count"
+                android:gravity="center|start"
+                android:layout_alignBottom="@+id/button_complete"
+                android:background="@drawable/custom_bg"
+                android:layout_below="@+id/description"
+                android:layout_marginTop="12dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/created_at"
                 android:layout_marginLeft="16dp"
-                android:layout_alignTop="@+id/comment_count"
-                android:layout_alignBottom="@+id/comment_count"/>
+                android:layout_toLeftOf="@+id/created_at"
+                android:layout_alignParentEnd="true"
+                android:textStyle="italic"
+                android:layout_alignParentRight="true"/>
 
             <TextView
                 android:id="@+id/comment_count"
@@ -131,17 +139,23 @@
                 android:layout_height="wrap_content"
                 android:text="12 comments"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="10sp"
+                android:textSize="12dp"
                 android:singleLine="true"
-                android:textAlignment="textStart"
+                android:layout_alignBottom="@+id/button_complete"
+                android:background="@drawable/custom_bg"
+                android:layout_alignTop="@+id/riple_count"
+                android:layout_below="@+id/description"
+                android:layout_toLeftOf="@+id/button_complete"
+                android:gravity="center_vertical"
+                android:layout_alignParentEnd="false"
                 android:layout_alignLeft="@+id/created_at"
                 android:layout_alignStart="@+id/created_at"
-                android:gravity="left|bottom"
-                android:layout_alignTop="@+id/button_complete"
-                android:layout_alignBottom="@+id/button_complete"
-                android:layout_marginBottom="6dp"
-                android:background="@drawable/custom_bg"
-                android:clickable="true"/>
+                android:layout_marginLeft="16dp"
+                android:layout_alignParentStart="false"
+                android:layout_toRightOf="@+id/riple_count"
+                android:textStyle="italic"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentLeft="false"/>
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -152,7 +166,7 @@
                 android:layout_alignRight="@+id/description"
                 android:layout_alignEnd="@+id/description"
                 android:textSize="14sp"
-                android:background="@color/AccentColor"
+                android:background="@drawable/button_bg"
                 android:textColor="#ffffff"
                 android:layout_below="@+id/description"
                 android:textStyle="bold"

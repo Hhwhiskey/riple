@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -25,7 +27,10 @@ import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -99,7 +104,7 @@ public class FriendsTabFragment extends Fragment {
         builder.show();
     }
 
-    /*//Show list of all users
+    //Show list of all users
     private void setConversationsList() {
 
         final ArrayList<FriendItem> friendsList = new ArrayList();
@@ -118,8 +123,8 @@ public class FriendsTabFragment extends Fragment {
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
         mainQuery.orderByDescending("updatedAt");
-        mainQuery.include("sender");
-        mainQuery.include("recipient");
+        mainQuery.include("localUser");
+        mainQuery.include("remoteUser");
 
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -155,7 +160,7 @@ public class FriendsTabFragment extends Fragment {
                 updateFriendsListRecyclerView(friendsList);
             }
         });
-    }*/
+    }
 
     public void updateFriendsListRecyclerView(ArrayList <FriendItem> friendsList) {
 
