@@ -111,12 +111,23 @@ public class RipleTabFragment extends Fragment {
 
         loadRipleItemsFromParse();
 
-        profilePictureView.setOnClickListener(new View.OnClickListener() {
+        nameView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 viewOtherUser();
             }
         });
 
+        profileRankView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                viewOtherUser();
+            }
+        });
+
+        profileRipleCountView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                viewOtherUser();
+            }
+        });
 
 //        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
 //        profilePictureView.setPresetSize(ProfilePictureView.LARGE);

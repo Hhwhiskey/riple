@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -62,6 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String userInfoEntry;
 
     private EditText aboutUserField;
+    private int dimension;
 
 
     @Override
@@ -234,19 +236,20 @@ public class SettingsActivity extends AppCompatActivity {
                 Log.d("MyApp", String.valueOf(bitmap));
 
                 smallBitmap = getResizedBitmap(bitmap);
+                Bitmap thumbNail = thumbNailBitmap(smallBitmap);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                smallBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                thumbNail.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
                 Log.d("MyApp", "smallBitmap compressed stream size = " + byteArray.length);
 
 //                rotateImageIfRequired();
 
                 ImageView imageView = (ImageView) findViewById(R.id.edit_profile_picture);
-                imageView.setImageBitmap(bitmap);
+                imageView.setImageBitmap(thumbNail);
 
                 if (byteArray.length > 10485759) {
                     Log.d("MyApp", "Picture is too large");
-                    compressedBitmap = Bitmap.createScaledBitmap(smallBitmap, 240, 240, true);
+                    compressedBitmap = Bitmap.createScaledBitmap(thumbNail, 240, 240, true);
                     stream = new ByteArrayOutputStream();
                     compressedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byteArray = stream.toByteArray();
@@ -292,11 +295,11 @@ public class SettingsActivity extends AppCompatActivity {
 /////////////////////////////////////////////////////////////////////////
     public Bitmap getResizedBitmap(Bitmap image) {
         Bitmap originalImage = image;
-        Bitmap background = Bitmap.createBitmap(240, 240, Bitmap.Config.ARGB_8888);
+        Bitmap background = Bitmap.createBitmap(480, 480, Bitmap.Config.ARGB_8888);
         float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
         Canvas canvas = new Canvas(background);
-        float scale = 240/originalWidth;
-        float xTranslation = 0.0f, yTranslation = (240 - originalHeight * scale)/2.0f;
+        float scale = 500/originalWidth;
+        float xTranslation = 0.0f, yTranslation = (480 - originalHeight * scale)/2.0f;
         Matrix transformation = new Matrix();
 //        transformation.postRotate(degree);
         transformation.postTranslate(xTranslation, yTranslation);
@@ -304,7 +307,32 @@ public class SettingsActivity extends AppCompatActivity {
         Paint paint = new Paint();
         paint.setFilterBitmap(true);
         canvas.drawBitmap(originalImage, transformation, paint);
+
         return background;
+    }
+
+
+
+
+    public Bitmap thumbNailBitmap(Bitmap image) {
+        int dimension = getSquareCropDimensionForBitmap(image);
+        image = ThumbnailUtils.extractThumbnail(image, dimension, dimension);
+
+        return image;
+    }
+
+    public int getSquareCropDimensionForBitmap(Bitmap bitmap) {
+        //If the bitmap is wider than it is tall
+        //use the height as the square crop dimension
+        if (bitmap.getWidth() >= bitmap.getHeight()) {
+            dimension = bitmap.getHeight();
+
+            //If the bitmap is taller than it is wide
+            //use the width as the square crop dimension
+        }else {
+            dimension = bitmap.getWidth();
+        }
+        return dimension;
     }
 
     private void saveImageToParse(byte[] byteArray) {

@@ -151,8 +151,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         public void done(byte[] data, ParseException e) {
                             if (e == null) {
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                dropItemAll.setParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                dropItemAll.setParseProfilePicture(resized);
                             }
                         }
                     });

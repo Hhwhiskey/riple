@@ -86,7 +86,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
     // Get drop associacated with click
     private void getTrickleObjectFromRowToAdd(int position) {
-        DropItem interactedDrop = TrickleTabFragment.trickleTabInteractionList.get(position);
+        DropItem interactedDrop = TrickleTabFragment.allDropsList.get(position);
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
         interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
