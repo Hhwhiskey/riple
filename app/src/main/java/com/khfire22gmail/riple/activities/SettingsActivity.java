@@ -66,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
     private int dimension;
     private Bitmap resizedBitmap;
     private Bitmap resizedAndCroppedBitmap;
+    private Bitmap bitmap;
 
 
     @Override
@@ -225,7 +226,34 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+
+            try {
+                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            Intent intentPhoto = new Intent(SettingsActivity.this, CropActivity.class);
+            intentPhoto.putExtra("selectedImage",byteArray);
+            startActivity(intentPhoto);
+
+//           startActivity(new Intent(this,ropActivity.class).setData(uri));
+        }
+    }
+
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -236,6 +264,7 @@ public class SettingsActivity extends AppCompatActivity {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 Log.d("MyApp", String.valueOf(bitmap));
+
 
                 resizedAndCroppedBitmap = scaleCenterCrop(bitmap, 250, 500);
 //                smallBitmap = getResizedBitmap(bitmap);
@@ -250,7 +279,7 @@ public class SettingsActivity extends AppCompatActivity {
                 ImageView imageView = (ImageView) findViewById(R.id.edit_profile_picture);
                 imageView.setImageBitmap(resizedAndCroppedBitmap);
 
-                /*if (byteArray.length > 10485759) {
+                /*//*if (byteArray.length > 10485759) {
                     Log.d("MyApp", "Picture is too large");
                     compressedBitmap = Bitmap.createScaledBitmap(thumbNail, 240, 240, true);
                     stream = new ByteArrayOutputStream();
@@ -259,7 +288,7 @@ public class SettingsActivity extends AppCompatActivity {
                     Log.d("MyApp", "byteArray = " + byteArray.length);
                     saveImageToParse(byteArray);
 
-                } else {*/
+                } else {*//**//*
                     saveImageToParse(byteArray);
 //                }
 
@@ -268,7 +297,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
         recreate();
-    }
+    }*/
 
 
 
@@ -323,8 +352,8 @@ public class SettingsActivity extends AppCompatActivity {
         RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
 
         if (scaledHeight > scaledWidth) {
-            newWidth = 500;
-            newHeight = 500;
+            newWidth = 1000;
+            newHeight = 1000;
         }
 
         // Finally, we create a new bitmap of the specified size and draw our new,

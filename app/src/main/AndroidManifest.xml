@@ -93,6 +93,8 @@
 
         <activity android:name=".activities.CompletedByActivity">
         </activity>
+        <activity android:name=".activities.CropActivity">
+        </activity>
     </application>
 
 </manifest>

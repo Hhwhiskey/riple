@@ -41,5 +41,21 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_parse_signup">ParseSignupActivity</string>
     <string name="title_activity_completed_by">CompletedByActivity</string>
+    <string name="show_guidelines">Show Guidelines</string>
+    <string name="aspect_ratio_y">Aspect Ratio - Y</string>
+    <string name="aspect_ratio_x">Aspect Ratio - X</string>
+    <string name="fixed_aspect_ratio">Fixed Aspect Ratio</string>
+    <string name="crop">crop</string>
+    <string name="cropped_image_description">Cropped Image Description</string>
+    <string name="fixedAspectRatio"/>
+    <string name="aspectRatioXHeader"/>
+    <string name="aspectRatioYHeader"/>
+    <string name="showGuidelines"/>
+    <string name="croppedImageDesc"/>
 
+    <string-array name="showGuidelinesArray">showGuidlinesArray
+        <item>Off</item>
+        <item>On Touch</item>
+        <item>On</item>
+    </string-array>
 </resources>
