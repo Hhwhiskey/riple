@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
+import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -64,6 +64,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private EditText aboutUserField;
     private int dimension;
+    private Bitmap resizedBitmap;
+    private Bitmap resizedAndCroppedBitmap;
 
 
     @Override
@@ -235,19 +237,20 @@ public class SettingsActivity extends AppCompatActivity {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 Log.d("MyApp", String.valueOf(bitmap));
 
-                smallBitmap = getResizedBitmap(bitmap);
-                Bitmap thumbNail = thumbNailBitmap(smallBitmap);
+                resizedAndCroppedBitmap = scaleCenterCrop(bitmap, 250, 500);
+//                smallBitmap = getResizedBitmap(bitmap);
+//                Bitmap thumbNail = thumbNailBitmap(smallBitmap);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                thumbNail.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                resizedAndCroppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
                 Log.d("MyApp", "smallBitmap compressed stream size = " + byteArray.length);
 
 //                rotateImageIfRequired();
 
                 ImageView imageView = (ImageView) findViewById(R.id.edit_profile_picture);
-                imageView.setImageBitmap(thumbNail);
+                imageView.setImageBitmap(resizedAndCroppedBitmap);
 
-                if (byteArray.length > 10485759) {
+                /*if (byteArray.length > 10485759) {
                     Log.d("MyApp", "Picture is too large");
                     compressedBitmap = Bitmap.createScaledBitmap(thumbNail, 240, 240, true);
                     stream = new ByteArrayOutputStream();
@@ -256,15 +259,81 @@ public class SettingsActivity extends AppCompatActivity {
                     Log.d("MyApp", "byteArray = " + byteArray.length);
                     saveImageToParse(byteArray);
 
-                } else {
+                } else {*/
                     saveImageToParse(byteArray);
-                }
+//                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         recreate();
+    }
+
+
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+
+        int width = bm.getWidth();
+
+        int height = bm.getHeight();
+
+        float scaleWidth = newWidth;
+
+        float scaleHeight = newHeight;
+
+        // CREATE A MATRIX FOR THE MANIPULATION
+
+        Matrix matrix = new Matrix();
+
+        // RESIZE THE BIT MAP
+
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // RECREATE THE NEW BITMAP
+
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+
+        return resizedBitmap;
+
+    }
+
+    public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+
+        // Compute the scaling factors to fit the new height and width, respectively.
+        // To cover the final image, the final scaling will be the bigger
+        // of these two.
+        float xScale = (float) newWidth / sourceWidth;
+        float yScale = (float) newHeight / sourceHeight;
+        float scale = Math.max(xScale, yScale);
+
+        // Now get the size of the source bitmap when scaled
+        float scaledWidth = scale * sourceWidth;
+        float scaledHeight = scale * sourceHeight;
+
+        // Let's find out the upper left coordinates if the scaled bitmap
+        // should be centered in the new size give by the parameters
+        float left = (newWidth - scaledWidth) / 2;
+        float top = (newHeight - scaledHeight) / 2;
+
+        // The target rectangle for the new, scaled version of the source bitmap will now
+        // be
+        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
+
+        if (scaledHeight > scaledWidth) {
+            newWidth = 500;
+            newHeight = 500;
+        }
+
+        // Finally, we create a new bitmap of the specified size and draw our new,
+        // scaled bitmap onto it.
+        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
+        Canvas canvas = new Canvas(dest);
+        canvas.drawBitmap(source, null, targetRect, null);
+
+        return dest;
     }
 
     //Rotate Image////////////////////////////////////////////////
@@ -293,7 +362,7 @@ public class SettingsActivity extends AppCompatActivity {
         return rotatedImg;
     }
 /////////////////////////////////////////////////////////////////////////
-    public Bitmap getResizedBitmap(Bitmap image) {
+    /*public Bitmap getResizedBitmap(Bitmap image) {
         Bitmap originalImage = image;
         Bitmap background = Bitmap.createBitmap(480, 480, Bitmap.Config.ARGB_8888);
         float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
@@ -309,7 +378,7 @@ public class SettingsActivity extends AppCompatActivity {
         canvas.drawBitmap(originalImage, transformation, paint);
 
         return background;
-    }
+    }*/
 
 
 
