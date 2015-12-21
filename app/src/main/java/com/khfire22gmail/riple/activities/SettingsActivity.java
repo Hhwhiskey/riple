@@ -215,8 +215,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-
-
     // User uploaded picture code
     private void selectImage() {
         Intent intent = new Intent();
@@ -238,12 +236,8 @@ public class SettingsActivity extends AppCompatActivity {
             Uri uri = data.getData();
 
             try {
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> crop-branch
-                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -401,17 +395,13 @@ public class SettingsActivity extends AppCompatActivity {
         // be
         RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
+
         if (scaledHeight > scaledWidth) {
             newWidth = 500;
             newHeight = 500;
         }
 
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> crop-branch
+
         // Finally, we create a new bitmap of the specified size and draw our new,
         // scaled bitmap onto it.
         Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());

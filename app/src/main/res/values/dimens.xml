@@ -10,10 +10,4 @@
     <dimen name="com_facebook_profilepictureview_preset_size_large">1000dp</dimen>
     <dimen name="tabs_height">20dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
-
-
 </resources>
