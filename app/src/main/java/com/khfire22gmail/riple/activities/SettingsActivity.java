@@ -242,7 +242,7 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            resizedBitmap = scaleCenterCrop(bitmap, 1000, 1000);
+            resizedBitmap = scaleBitmap(bitmap);
 
             try {
                 //Write file
@@ -261,18 +261,107 @@ public class SettingsActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-//            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//            resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//            bitmap.recycle();
-//            byte[] byteArray = stream.toByteArray();
-
-//            Intent intentPhoto = new Intent(SettingsActivity.this, CropActivity.class);
-//            intentPhoto.putExtra("selectedImage", byteArray);
-//            startActivity(intentPhoto);
-//            saveImageToParse(byteArray);
-
         }
+    }
+
+    private Bitmap scaleBitmap(Bitmap bm) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        Log.v("Pictures", "Width and height are " + width + "--" + height);
+
+        int maxWidth = 1600;
+        int maxHeight = 1600;
+        if (width > height) {
+            // landscape
+            float ratio = (float) width / maxWidth;
+            width = maxWidth;
+            height = (int)(height / ratio);
+        } else if (height > width) {
+            // portrait
+            float ratio = (float) height / maxHeight;
+            height = maxHeight;
+            width = (int)(width / ratio);
+        } else {
+            // square
+            height = maxHeight;
+            width = maxWidth;
+        }
+
+        Log.v("Pictures", "after scaling Width and height are " + width + "--" + height);
+
+        bm = Bitmap.createScaledBitmap(bm, width, height, true);
+        return bm;
+    }
+
+    public Bitmap resizeBitmap(Bitmap image) {
+        Bitmap originalImage = image;
+        Bitmap background = Bitmap.createBitmap(1600, 900, Bitmap.Config.ARGB_8888);
+        float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
+        Canvas canvas = new Canvas(background);
+        float scale = 1000/originalWidth;
+        float xTranslation = 0.0f, yTranslation = (1000 - originalHeight * scale)/2.0f;
+        Matrix transformation = new Matrix();
+        transformation.postTranslate(xTranslation, yTranslation);
+        transformation.preScale(scale, scale);
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+        canvas.drawBitmap(originalImage, transformation, paint);
+
+        return background;
+    }
+
+    public Bitmap scaleAndCenterBitmap(Bitmap source, int newHeight, int newWidth) {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+
+        // Compute the scaling factors to fit the new height and width, respectively.
+        // To cover the final image, the final scaling will be the bigger
+        // of these two.
+        float xScale = (float) newWidth / sourceWidth;
+        float yScale = (float) newHeight / sourceHeight;
+        float scale = Math.max(xScale, yScale);
+
+        // Now get the size of the source bitmap when scaled
+        float scaledWidth = scale * sourceWidth;
+        float scaledHeight = scale * sourceHeight;
+
+        // Let's find out the upper left coordinates if the scaled bitmap
+        // should be centered in the new size give by the parameters
+        float left = (newWidth - scaledWidth) / 2;
+        float top = (newHeight - scaledHeight) / 2;
+
+        // The target rectangle for the new, scaled version of the source bitmap will now
+        // be
+        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
+
+
+
+
+        if (sourceHeight > sourceWidth) {
+            newHeight = 1600;
+            newWidth = 900;
+        }
+
+        if (sourceHeight == sourceWidth) {
+            newHeight = 1500;
+            newWidth = 1500;
+        }
+//
+//        if (sourceWidth > sourceHeight) {
+//            updatedWidth = 1000;
+//            updatedHeight = 500;
+//    }
+
+
+
+        // Finally, we create a new bitmap of the specified size and draw our new,
+        // scaled bitmap onto it.
+        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
+        Canvas canvas = new Canvas(dest);
+        canvas.drawBitmap(source, null, targetRect, null);
+
+        return dest;
     }
 
     /*@Override
@@ -353,63 +442,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     }*/
 
-    public Bitmap getResizedBitmap(Bitmap image) {
-        Bitmap originalImage = image;
-        Bitmap background = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
-        float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
-        Canvas canvas = new Canvas(background);
-        float scale = 500/originalWidth;
-        float xTranslation = 0.0f, yTranslation = (500 - originalHeight * scale)/2.0f;
-        Matrix transformation = new Matrix();
-//        transformation.postRotate(degree);
-        transformation.postTranslate(xTranslation, yTranslation);
-        transformation.preScale(scale, scale);
-        Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-        canvas.drawBitmap(originalImage, transformation, paint);
 
-        return background;
-    }
-
-    public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
-        int sourceWidth = source.getWidth();
-        int sourceHeight = source.getHeight();
-
-        // Compute the scaling factors to fit the new height and width, respectively.
-        // To cover the final image, the final scaling will be the bigger
-        // of these two.
-        float xScale = (float) newWidth / sourceWidth;
-        float yScale = (float) newHeight / sourceHeight;
-        float scale = Math.max(xScale, yScale);
-
-        // Now get the size of the source bitmap when scaled
-        float scaledWidth = scale * sourceWidth;
-        float scaledHeight = scale * sourceHeight;
-
-        // Let's find out the upper left coordinates if the scaled bitmap
-        // should be centered in the new size give by the parameters
-        float left = (newWidth - scaledWidth) / 2;
-        float top = (newHeight - scaledHeight) / 2;
-
-        // The target rectangle for the new, scaled version of the source bitmap will now
-        // be
-        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
-
-
-        if (scaledHeight > scaledWidth) {
-            newWidth = 500;
-            newHeight = 500;
-        }
-
-
-        // Finally, we create a new bitmap of the specified size and draw our new,
-        // scaled bitmap onto it.
-        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
-        Canvas canvas = new Canvas(dest);
-        canvas.drawBitmap(source, null, targetRect, null);
-
-        return dest;
-    }
 
     //Rotate Image////////////////////////////////////////////////
     private static Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
