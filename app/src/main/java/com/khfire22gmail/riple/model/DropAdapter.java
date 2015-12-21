@@ -34,7 +34,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     Context mContext;
     private final String mTabName;
     private LayoutInflater inflater;
-    List<DropItem> data = Collections.emptyList();
+    public List<DropItem> data = Collections.emptyList();
     public static final String created = "created";
     public static final String drop = "drop";
     public static final String trickle = "trickle";

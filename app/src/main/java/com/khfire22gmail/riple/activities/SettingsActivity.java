@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
@@ -36,6 +37,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -241,15 +243,36 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
+            resizedBitmap = scaleCenterCrop(bitmap, 1000, 1000);
 
-            Intent intentPhoto = new Intent(SettingsActivity.this, CropActivity.class);
-            intentPhoto.putExtra("selectedImage",byteArray);
-            startActivity(intentPhoto);
+            try {
+                //Write file
+                String filename = "bitmap.png";
+                FileOutputStream stream = this.openFileOutput(filename, Context.MODE_PRIVATE);
+                resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
-//           startActivity(new Intent(this,ropActivity.class).setData(uri));
+                //Cleanup
+                stream.close();
+                resizedBitmap.recycle();
+
+                //Pop intent
+                Intent cropIntent = new Intent(this, CropActivity.class);
+                cropIntent.putExtra("selectedImage", filename);
+                startActivity(cropIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+//            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//            resizedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//            bitmap.recycle();
+//            byte[] byteArray = stream.toByteArray();
+
+//            Intent intentPhoto = new Intent(SettingsActivity.this, CropActivity.class);
+//            intentPhoto.putExtra("selectedImage", byteArray);
+//            startActivity(intentPhoto);
+//            saveImageToParse(byteArray);
+
         }
     }
 
@@ -301,7 +324,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+    /*public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
 
         int width = bm.getWidth();
 
@@ -325,6 +348,24 @@ public class SettingsActivity extends AppCompatActivity {
 
         return resizedBitmap;
 
+    }*/
+
+    public Bitmap getResizedBitmap(Bitmap image) {
+        Bitmap originalImage = image;
+        Bitmap background = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
+        float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
+        Canvas canvas = new Canvas(background);
+        float scale = 500/originalWidth;
+        float xTranslation = 0.0f, yTranslation = (500 - originalHeight * scale)/2.0f;
+        Matrix transformation = new Matrix();
+//        transformation.postRotate(degree);
+        transformation.postTranslate(xTranslation, yTranslation);
+        transformation.preScale(scale, scale);
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+        canvas.drawBitmap(originalImage, transformation, paint);
+
+        return background;
     }
 
     public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
@@ -350,11 +391,6 @@ public class SettingsActivity extends AppCompatActivity {
         // The target rectangle for the new, scaled version of the source bitmap will now
         // be
         RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
-
-        if (scaledHeight > scaledWidth) {
-            newWidth = 1000;
-            newHeight = 1000;
-        }
 
         // Finally, we create a new bitmap of the specified size and draw our new,
         // scaled bitmap onto it.
@@ -391,23 +427,7 @@ public class SettingsActivity extends AppCompatActivity {
         return rotatedImg;
     }
 /////////////////////////////////////////////////////////////////////////
-    /*public Bitmap getResizedBitmap(Bitmap image) {
-        Bitmap originalImage = image;
-        Bitmap background = Bitmap.createBitmap(480, 480, Bitmap.Config.ARGB_8888);
-        float originalWidth = originalImage.getWidth(), originalHeight = originalImage.getHeight();
-        Canvas canvas = new Canvas(background);
-        float scale = 500/originalWidth;
-        float xTranslation = 0.0f, yTranslation = (480 - originalHeight * scale)/2.0f;
-        Matrix transformation = new Matrix();
-//        transformation.postRotate(degree);
-        transformation.postTranslate(xTranslation, yTranslation);
-        transformation.preScale(scale, scale);
-        Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-        canvas.drawBitmap(originalImage, transformation, paint);
 
-        return background;
-    }*/
 
 
 
