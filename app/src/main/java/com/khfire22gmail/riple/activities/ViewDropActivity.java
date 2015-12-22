@@ -366,6 +366,7 @@ public class ViewDropActivity extends AppCompatActivity {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                        commentItem.setParseProfilePicture(bmp);
+                                        updateRecyclerView(commentList);
                                     }
                                 }
                             });
@@ -413,7 +414,7 @@ public class ViewDropActivity extends AppCompatActivity {
                     }
 
                     Log.i("KEVIN", "PARSE LIST SIZE: " + commentList.size());
-                    updateRecyclerView(commentList);
+
                 }
             }
         });

@@ -44,10 +44,6 @@ public class DropItem {
         this.drop = drop;
     }
 
-    public static String getDropKey() {
-        return DROP_KEY;
-    }
-
     public String getAuthorName() {
         return authorName;
     }
@@ -80,22 +76,6 @@ public class DropItem {
         this.authorId = authorId;
     }
 
-    public String getCommenter() {
-        return commenter;
-    }
-
-    public void setCommenter(String commenter) {
-        this.commenter = commenter;
-    }
-
-    public String getFacebookId() {
-        return facebookId;
-    }
-
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -103,14 +83,6 @@ public class DropItem {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-
-   /* public String getTitle() {
-        return title;
-    }*/
-
-    /*public void setTitle(String title) {
-        this.title = title;
-    }*/
 
     public String getDescription() {
         return description;

@@ -256,6 +256,7 @@ public class ViewUserActivity extends AppCompatActivity {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
+                                        updateRecyclerView(viewUserList);
                                     }
                                 }
                             });
@@ -287,7 +288,7 @@ public class ViewUserActivity extends AppCompatActivity {
                     // Then, we'll have the relations that we need to display the proper card.
 
                 }
-                updateRecyclerView(viewUserList);
+
             }
         });
     }

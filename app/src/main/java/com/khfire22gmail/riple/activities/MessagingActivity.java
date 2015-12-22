@@ -6,6 +6,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -13,13 +14,17 @@ import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.MessageAdapter;
+import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -28,16 +33,19 @@ import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
 import com.sinch.android.rtc.messaging.MessageFailureInfo;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class MessagingActivity extends AppCompatActivity {
 
-    private String localUser;
-    private String remoteUser;
+    private String recipientId;
     private EditText messageBodyField;
     private String messageBody;
     private MessageService.MessageServiceInterface messageService;
+    private String currentUserId;
     private ServiceConnection serviceConnection = new MyServiceConnection();
     private MyMessageClientListener messageClientListener = new MyMessageClientListener();
     private MessageAdapter messageAdapter;
@@ -48,22 +56,32 @@ public class MessagingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messaging);
 
-
-
         bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
+
+        // Unsub from message notifications
+        ParsePush.unsubscribeInBackground("message", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("MyApp", "successfully unsubscribed to the broadcast channel.");
+                } else {
+                    Log.e("MyApp", "failed to unsubscribe for push" + e);
+                }
+            }
+        });
 
         //get recipientId from the intent
         Intent intent = getIntent();
-        remoteUser = intent.getStringExtra("RECIPIENT_ID");
-        localUser = ParseUser.getCurrentUser().getObjectId();
+        recipientId = intent.getStringExtra("RECIPIENT_ID");
+        currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
-        String[] userIds = {localUser, remoteUser};
+        String[] userIds = {currentUserId, recipientId};
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
-        query.whereContainedIn("localUser", Arrays.asList(userIds));
-        query.whereContainedIn("remoteUser", Arrays.asList(userIds));
+        query.whereContainedIn("senderId", Arrays.asList(userIds));
+        query.whereContainedIn("recipientId", Arrays.asList(userIds));
         query.orderByAscending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -71,7 +89,7 @@ public class MessagingActivity extends AppCompatActivity {
                 if (e == null) {
                     for (int i = 0; i < messageList.size(); i++) {
                         WritableMessage message = new WritableMessage(messageList.get(i).get("recipientId").toString(), messageList.get(i).get("messageText").toString());
-                        if (messageList.get(i).get("localUser").toString().equals(localUser)) {
+                        if (messageList.get(i).get("senderId").toString().equals(currentUserId)) {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
                         } else {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
@@ -95,15 +113,15 @@ public class MessagingActivity extends AppCompatActivity {
                 }
 
                 ParseQuery<ParseObject> addToFriendsQuery = ParseQuery.getQuery("_User");
-                addToFriendsQuery.getInBackground(remoteUser, new GetCallback<ParseObject>() {
+                addToFriendsQuery.getInBackground(recipientId, new GetCallback<ParseObject>() {
                     public void done(ParseObject object, ParseException e) {
                         if (e == null) {
-                        addFriendsRelation(object);
+                            addFriendsRelation(object);
                         }
                     }
                 });
 
-                messageService.sendMessage(remoteUser, messageBody);
+                messageService.sendMessage(recipientId, messageBody);
                 messageBodyField.setText("");
             }
         });
@@ -113,8 +131,8 @@ public class MessagingActivity extends AppCompatActivity {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseObject friends = new ParseObject("Friends");
-        friends.put("sender", currentUser);
-        friends.put("recipient", messagedUser);
+        friends.put("user1", currentUser);
+        friends.put("user2", messagedUser);
         friends.saveInBackground();
 
 
@@ -128,17 +146,13 @@ public class MessagingActivity extends AppCompatActivity {
                 }
             }
         });
-
     }*/
 
-   /* public static void addYouToTheirFriends(ParseObject messagedUser) {
-
-       ParseUser clickedUser = ParseUser.getString("_User");
-        ParseQuery query = ParseQuery.getQuery("_User");
-        query.whereEqualTo("objectId", recipientId);
-
-
-    }*/
+    /* public static void addYouToTheirFriends(ParseObject messagedUser) {
+        ParseUser clickedUser = ParseUser.getString("_User");
+         ParseQuery query = ParseQuery.getQuery("_User");
+         query.whereEqualTo("objectId", recipientId);
+     }*/
     //unbind the service when the activity is destroyed
     @Override
     public void onDestroy() {
@@ -173,7 +187,7 @@ public class MessagingActivity extends AppCompatActivity {
 
         @Override
         public void onIncomingMessage(MessageClient client, Message message) {
-            if (message.getSenderId().equals(remoteUser)) {
+            if (message.getSenderId().equals(recipientId)) {
                 WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
                 messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
             }
@@ -203,13 +217,19 @@ public class MessagingActivity extends AppCompatActivity {
                     if (e == null) {
                         if (messageList.size() == 0) {
                             ParseObject parseMessage = new ParseObject("ParseMessage");
-                            parseMessage.put("senderId", localUser);
+                            parseMessage.put("senderId", currentUserId);
                             parseMessage.put("recipientId", writableMessage.getRecipientIds().get(0));
                             parseMessage.put("messageText", writableMessage.getTextBody());
                             parseMessage.put("sinchId", writableMessage.getMessageId());
                             parseMessage.saveInBackground();
 
-                            //messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
+                            messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
+
+                            try {
+                                sendPushNotification();
+                            } catch (JSONException error) {
+                                error.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -224,6 +244,23 @@ public class MessagingActivity extends AppCompatActivity {
         //Don't worry about this right now
         @Override
         public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {}
+    }
+
+    private void sendPushNotification() throws JSONException {
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo(Constants.USER_ID, recipientId);
+        query.whereEqualTo(Constants.CHANNELS, Constants.MESSAGE_PUSH);
+
+        JSONObject data = new JSONObject();
+        data.put(Constants.PUSH_ALERT, "You have a message from " +
+                ParseUser.getCurrentUser().get(Constants.NAME) + "!");
+        data.put(Constants.PUSH_ID, ParseUser.getCurrentUser().getObjectId());
+        data.put(Constants.PUSH_NAME, ParseUser.getCurrentUser().get(Constants.NAME));
+
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setData(data);
+        push.sendInBackground();
     }
 
 

@@ -172,6 +172,7 @@ public class DropsTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
+                                        updateRecyclerView(dropList);
                                     }
                                 }
                             });
@@ -198,7 +199,7 @@ public class DropsTabFragment extends Fragment {
                     }
                 }
                 dropTabInteractionList = dropList;
-                updateRecyclerView(dropList);
+
 
             }
         });

@@ -41,7 +41,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     public static final String viewUser = "viewUser";
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
-
         mContext = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -80,8 +79,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         }
 
         View view = inflater.inflate(xmlLayoutId, parent, false);
-        DropViewHolder viewHolder = new DropViewHolder(view);
-        return viewHolder;
+        return new DropViewHolder(view);
     }
 
     // Get drop associacated with click

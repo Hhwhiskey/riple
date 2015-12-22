@@ -158,6 +158,7 @@ public class CompletedByActivity extends AppCompatActivity {
                                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                                 completedbyItem.setParseProfilePicture(bmp);
+                                                updateRecyclerView(completedByList);
                                             }
                                         }
                                     });
@@ -170,7 +171,7 @@ public class CompletedByActivity extends AppCompatActivity {
                                 completedByList.add(completedbyItem);
                             }
                         }
-                        updateRecyclerView(completedByList);
+
 
                     }
                 });

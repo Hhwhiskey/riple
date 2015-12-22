@@ -5,6 +5,8 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
+
+
     <android.support.v7.widget.CardView
         android:id="@+id/card_trickle"
         android:layout_width="fill_parent"
@@ -24,31 +26,24 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
-            android:alpha="123124"
-            android:background="@drawable/custom_bg"
-            android:clickable="true">
+            android:background="@drawable/custom_bg">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/trickle_card_tool_bar"
                 android:layout_width="match_parent"
-                android:layout_height="38dp"
-                android:background="#BBDEFB"/>
+                android:layout_height="55dp"
+                android:background="#BBDEFB"
+                />
 
             <ImageView
                 android:id="@+id/profile_picture"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:foregroundGravity="center_vertical"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_user_default"
-                android:background="@drawable/custom_bg"
-                android:clickable="true"/>
+                android:background="@drawable/custom_bg"/>
 
             <TextView
                 android:id="@+id/name"
@@ -56,42 +51,43 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/profile_picture"
+                android:width="50dp"
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="20sp"
-                android:textColor="@color/PrimaryText"
+                android:textColor="#000000"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/profile_picture"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/custom_bg_blue"/>
+                android:layout_marginTop="4dp"
+                android:layout_toStartOf="@+id/imageView"
+                android:layout_toLeftOf="@+id/imageView"
+                android:background="@drawable/custom_bg_blue"
+                android:clickable="true"
+                />
 
             <TextView
                 android:id="@+id/created_at"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top"
                 android:text="September 18, 2015 @ 3:32 p.m."
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
                 android:singleLine="true"
-                android:layout_below="@+id/name"
-                android:layout_toRightOf="@+id/profile_picture"
-                android:layout_toEndOf="@+id/profile_picture"
-                android:layout_marginLeft="8dp"
                 android:background="@drawable/custom_bg"
-                android:clickable="true"/>
+                android:gravity="left"
+                android:layout_alignBottom="@+id/profile_picture"
+                android:layout_alignRight="@+id/imageView"
+                android:layout_alignEnd="@+id/imageView"
+                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_marginLeft="8dp"
+                />
 
             <TextView
                 android:id="@+id/description"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/created_at"
-                android:layout_alignRight="@+id/created_at"
                 android:elegantTextHeight="false"
                 android:ellipsize="end"
                 android:enabled="true"
@@ -106,10 +102,9 @@
                 android:textSize="16sp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/custom_bg"
-                android:clickable="true"/>
+                android:background="@drawable/custom_bg"/>
 
             <TextView
                 android:id="@+id/riple_count"
@@ -145,17 +140,13 @@
                 android:background="@drawable/custom_bg"
                 android:layout_alignTop="@+id/riple_count"
                 android:layout_below="@+id/description"
-                android:layout_toLeftOf="@+id/button_complete"
                 android:gravity="center_vertical"
-                android:layout_alignParentEnd="false"
+                android:textStyle="italic"
                 android:layout_alignLeft="@+id/created_at"
                 android:layout_alignStart="@+id/created_at"
                 android:layout_marginLeft="16dp"
-                android:layout_alignParentStart="false"
-                android:layout_toRightOf="@+id/riple_count"
-                android:textStyle="italic"
-                android:layout_alignParentRight="false"
-                android:layout_alignParentLeft="false"/>
+                android:layout_alignRight="@+id/created_at"
+                android:layout_alignEnd="@+id/created_at"/>
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -163,193 +154,53 @@
                 android:layout_height="wrap_content"
                 android:text="COMPLETE"
                 android:id="@+id/button_complete"
+                android:layout_below="@+id/description"
                 android:layout_alignRight="@+id/description"
                 android:layout_alignEnd="@+id/description"
                 android:textSize="14sp"
-                android:background="@drawable/button_bg"
                 android:textColor="#ffffff"
-                android:layout_below="@+id/description"
+                android:background="@drawable/button_bg"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"
-                android:minHeight="32dp"/>
+                android:minHeight="32dp"
 
-            <!--<Switch
+                />
+
+
+
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/switch_todo"
-                android:checked="true"
-                android:layout_below="@+id/description"
+                android:id="@+id/imageView"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/menu_svg"
+                android:layout_alignBottom="@+id/trickle_card_tool_bar"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/custom_bg_blue"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="3dp"
-                />-->
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&quot;Mother Teresa&quot;"
+                android:id="@+id/textView"
+                android:textSize="14sp"
+                android:singleLine="false"
+                android:gravity="left|center_horizontal"
+                android:layout_alignLeft="@+id/name"
+                android:layout_alignStart="@+id/name"
+                android:textStyle="italic"
+                android:layout_below="@+id/name"
+                android:layout_alignBottom="@+id/trickle_card_tool_bar"
+                android:textColor="#7d000000"
+                android:layout_toStartOf="@+id/button_todo"
+                android:layout_toLeftOf="@+id/button_todo"/>
+
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
 </LinearLayout>
-
-<!--
-    <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:card_view="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
-
-<android.support.v7.widget.CardView
-    android:id="@+id/card_trickle"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    card_view:cardCornerRadius="0dp"
-    card_view:cardElevation="8dp"
-    card_view:cardUseCompatPadding="true"
-    android:layout_marginBottom="8dp">
-
-    <RelativeLayout
-        android:id="@+id/top_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#ffffff"
-        android:paddingBottom="8dp"
-        android:alpha="123124">
-
-        <com.facebook.login.widget.ProfilePictureView
-            android:id="@+id/profile_picture"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:foregroundGravity="center_vertical"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="8dp"/>
-
-        <TextView
-            android:id="@+id/author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/created_at"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/created_at"
-            android:layout_toRightOf="@+id/profile_picture"
-            android:width="50dp"
-            android:text="Kevin Hodges"
-            android:textAlignment="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="24sp"
-            android:textColor="@color/PrimaryText"
-            android:singleLine="true"
-            android:layout_margin="8dp"
-            android:layout_alignTop="@+id/profile_picture"/>
-
-        <TextView
-            android:id="@+id/created_at"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top"
-            android:text="September 18, 2015 @ 3:32 p.m."
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="10sp"
-            android:singleLine="true"
-            android:layout_below="@+id/author"
-            android:layout_toRightOf="@+id/profile_picture"
-            android:layout_toEndOf="@+id/profile_picture"
-            android:layout_marginLeft="8dp"/>
-
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/created_at"
-            android:layout_alignRight="@+id/created_at"
-            android:elegantTextHeight="false"
-            android:ellipsize="end"
-            android:enabled="true"
-            android:focusable="false"
-            android:maxLines="5"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:singleLine="false"
-            android:text="Description"
-            android:layout_below="@+id/profile_picture"
-            android:textColor="@color/PrimaryText"
-            android:textSize="16sp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/riple_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/description"
-            android:text="205 riples"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="10sp"
-            android:singleLine="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:textAlignment="textStart"
-            android:gravity="left"
-            android:layout_toLeftOf="@+id/comment_count"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="16dp"/>
-
-        <TextView
-            android:id="@+id/comment_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="12 comments"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="10sp"
-            android:singleLine="true"
-            android:textAlignment="textStart"
-            android:layout_alignTop="@+id/riple_count"
-            android:layout_alignLeft="@+id/created_at"
-            android:layout_alignStart="@+id/created_at"
-            android:gravity="left"
-            android:layout_marginLeft="8dp"
-            />
-
-        <ImageView
-            android:id="@+id/share_button"
-            android:src="@mipmap/ic_share_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#ffffff"
-            android:layout_alignBottom="@+id/drop_switch"
-            android:layout_toLeftOf="@+id/drop_switch"
-            android:layout_toStartOf="@+id/drop_switch"
-            android:layout_below="@+id/description"
-            android:layout_marginRight="16dp"/>
-
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/drop_switch"
-            android:checked="true"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_below="@+id/description"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="48dp"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/drop_checkbox"
-            android:checked="false"
-            android:layout_below="@+id/description"
-            android:layout_toRightOf="@+id/share_button"
-            />
-
-    </RelativeLayout>
-</android.support.v7.widget.CardView>
-
-</LinearLayout>-->
