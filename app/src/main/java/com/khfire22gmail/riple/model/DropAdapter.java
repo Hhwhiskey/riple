@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.CompletedByActivity;
-import com.khfire22gmail.riple.activities.ViewDropActivity;
+import com.khfire22gmail.riple.activities.DropCompletedActivity;
+import com.khfire22gmail.riple.activities.DropCommentsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
@@ -73,7 +73,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         } else if (mTabName.equals(trickle)) {
             xmlLayoutId = R.layout.card_trickle;
 
-            //Todo Show card in ViewDropActivity based on users relation to that Drop
+            //Todo Show card in DropCommentsActivity based on users relation to that Drop
         } else if (mTabName.equals(viewUser)) {
             xmlLayoutId = R.layout.card_riple;
         }
@@ -302,7 +302,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
         Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
 
-        Intent intent = new Intent(mContext, ViewDropActivity.class);
+        Intent intent = new Intent(mContext, DropCommentsActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);
@@ -347,7 +347,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
         Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
 
-        Intent intent = new Intent(mContext, CompletedByActivity.class);
+        Intent intent = new Intent(mContext, DropCompletedActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);
@@ -378,6 +378,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         public TextView description;
         public TextView ripleCount;
         public TextView commentCount;
+        public TextView authorRank;
         private ImageView parseProfilePicture;
 
 
@@ -387,11 +388,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
             todoButton = (Button) itemView.findViewById(R.id.button_todo);
             completeButton = (Button) itemView.findViewById(R.id.button_complete);
-            createdAt = (TextView) itemView.findViewById(R.id.created_at);
+            createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
             authorName = (TextView) itemView.findViewById(R.id.name);
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+            authorRank = (TextView) itemView.findViewById(R.id.author_rank);
 
             if (todoButton != null) {
                 todoButton.setOnClickListener(this);
@@ -412,6 +414,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));
             commentCount.setText(String.valueOf(current.commentCount));
+            authorRank.setText(current.authorRank);
         }
 
         @Override

@@ -17,6 +17,16 @@ public class CommentItem {
     public String commenterName;
     public Bitmap parseProfilePicture;
 
+    public String getCommenterRank() {
+        return commenterRank;
+    }
+
+    public void setCommenterRank(String commenterRank) {
+        this.commenterRank = commenterRank;
+    }
+
+    public String commenterRank;
+
     public Bitmap getParseProfilePicture() {
         return parseProfilePicture;
     }

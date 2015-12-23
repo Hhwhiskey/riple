@@ -99,15 +99,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         public TextView createdAt;
         public TextView commentText;
         public TextView commenterName;
+        public TextView commenterRipleCount;
         public ImageView parseProfilePicture;
 
         public CommentViewHolder(View itemView) {
             super(itemView);
 
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.commenter_profile_picture);
-            createdAt = (TextView) itemView.findViewById(R.id.created_at);
-            commenterName = (TextView) itemView.findViewById(R.id.commenter);
-            commentText = (TextView) itemView.findViewById(R.id.commentText);
+            createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
+            commenterName = (TextView) itemView.findViewById(R.id.commenter_name);
+            commentText = (TextView) itemView.findViewById(R.id.comment_text);
+            commenterRipleCount = (TextView) itemView.findViewById(R.id.commenter_rank);
 
             itemView.setOnClickListener(this);
 //            itemView.setLongClickable(true);
@@ -122,6 +124,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             commenterName.setText(current.commenterName);
             commentText.setText(current.commentText);
             createdAt.setText(String.valueOf(current.createdAt));
+            commenterRipleCount.setText(String.valueOf(current.commenterRank));
 
         }
 

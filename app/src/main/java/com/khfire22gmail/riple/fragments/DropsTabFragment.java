@@ -182,6 +182,8 @@ public class DropsTabFragment extends Fragment {
                         dropItem.setAuthorName((String) authorData.get("displayName"));
                         //Author id
                         dropItem.setAuthorId(authorData.getObjectId());
+                        //Author Rank
+                        dropItem.setAuthorRank(authorData.getString("userRank"));
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId
@@ -190,10 +192,22 @@ public class DropsTabFragment extends Fragment {
                         dropItem.setDescription(list.get(i).getString("description"));
                         //CreatedAt
                         dropItem.setCreatedAt(list.get(i).getCreatedAt());
+
                         //Riple Count
-                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                        int ripleCount = (list.get(i).getInt("ripleCount"));
+                        if (ripleCount == 1) {
+                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riple"));
+                        } else {
+                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                        }
+
                         //Comment Count
-                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                        int commentCount = (list.get(i).getInt("commentCount"));
+                        if (commentCount == 1) {
+                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comment"));
+                        }else {
+                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                        }
 
                         dropList.add(dropItem);
                     }

@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.CompletedByActivity;
+import com.khfire22gmail.riple.activities.DropCompletedActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 
 import java.util.ArrayList;
@@ -24,12 +24,10 @@ import java.util.List;
 public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.CompletedByViewHolder> {
 
     Context mContext;
-
-    //    private final String mTabName;
     private LayoutInflater inflater;
     List<CompletedByItem> data = Collections.emptyList();
 
-    public CompletedByAdapter(CompletedByActivity context, ArrayList<CompletedByItem> data) {
+    public CompletedByAdapter(DropCompletedActivity context, ArrayList<CompletedByItem> data) {
         mContext = context;
         this.inflater = LayoutInflater.from(context);
         this.data = data;
@@ -38,7 +36,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     @Override
     public CompletedByViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.row_completed_by, parent, false);
+        View view = inflater.inflate(R.layout.card_completed_by, parent, false);
         CompletedByViewHolder viewHolder = new CompletedByViewHolder(view);
         return viewHolder;
     }
@@ -114,12 +112,16 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
         public TextView displayName;
         public ImageView parseProfilePicture;
+        public TextView userRank;
+        public TextView userRipleCount;
 
         public CompletedByViewHolder(View itemView) {
             super(itemView);
 
             parseProfilePicture = (ImageView) itemView.findViewById(R.id.completed_by_profile_picture);
             displayName = (TextView) itemView.findViewById(R.id.completed_by_display_name);
+//            userRank = (TextView) itemView.findViewById(R.id.completed_by_riple_rank);
+            userRipleCount = (TextView) itemView.findViewById(R.id.completed_by_riple_count);
 
 
             itemView.setOnClickListener(this);
@@ -133,8 +135,8 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
             parseProfilePicture.setImageBitmap(current.parseProfilePicture);
             displayName.setText(current.displayName);
-
-
+//            userRank.setText(current.userRank);
+            userRipleCount.setText(String.valueOf(current.userRipleCount));
         }
 
         @Override

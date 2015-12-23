@@ -69,6 +69,7 @@ public class ParseLoginActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 email = emailField.getText().toString();
+                email = email.toLowerCase();
                 password = passwordField.getText().toString();
 
                 ParseUser.logInInBackground(email, password, new LogInCallback() {
@@ -98,7 +99,9 @@ public class ParseLoginActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 email = emailField.getText().toString();
+                email = email.toLowerCase();
                 password = passwordField.getText().toString();
+
 
                 int passwordLength = passwordField.getText().length();
 
@@ -148,10 +151,17 @@ public class ParseLoginActivity extends AppCompatActivity {
                                                 , Toast.LENGTH_LONG).show();
                                     }
 
+
+                                    //Create riple count tracker on UserRipleCount table to avoid ACL restrictions
                                     ParseObject userRipleCount = new ParseObject("UserRipleCount");
                                     userRipleCount.put("userPointer", user);
                                     userRipleCount.put("ripleCount", 0);
                                     userRipleCount.saveInBackground();
+
+//                                  //Also create riple count tracker on the currentUser table for ease of use
+                                    user.put("userRipleCount", 0);
+                                    user.saveInBackground();
+
                                 }
                             });
 
@@ -172,6 +182,7 @@ public class ParseLoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 email = emailField.getText().toString();
+                email = email.toLowerCase();
                 if (!email.isEmpty()) {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);

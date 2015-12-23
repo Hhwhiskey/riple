@@ -17,16 +17,21 @@ public class DropItem {
     public String objectId;
     public String authorId;
     public String authorName;
-    public String facebookId;
+    public String authorRank;
     public String description;
-    public String commenter;
     public String comment;
     public String ripleCount;
     public String commentCount;
     public ParseObject drop;
     public Bitmap parseProfilePicture;
 
+    public String getAuthorRank() {
+        return authorRank;
+    }
 
+    public void setAuthorRank(String authorRank) {
+        this.authorRank = authorRank;
+    }
 
     public Bitmap getParseProfilePicture() {
         return parseProfilePicture;

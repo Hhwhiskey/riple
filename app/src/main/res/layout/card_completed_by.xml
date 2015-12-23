@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_comment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_gravity="bottom">
+
+        <RelativeLayout
+            android:id="@+id/top_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/AccentColor">
+
+            <ImageView
+                android:id="@+id/completed_by_profile_picture"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="false"
+                android:foregroundGravity="center_vertical"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_user_default"
+                android:layout_alignParentBottom="false"/>
+
+            <TextView
+                android:id="@+id/completed_by_display_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="false"
+                android:text="Kevin Hodges"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textColor="#FFFFFF"
+                android:singleLine="true"
+                android:layout_alignTop="@+id/completed_by_profile_picture"
+                android:textStyle="italic"
+                android:gravity="left|center|center_horizontal"
+                android:layout_marginTop="2dp"
+                android:layout_toRightOf="@+id/completed_by_profile_picture"
+                android:layout_marginLeft="8dp"
+                android:layout_alignBottom="@+id/completed_by_profile_picture"
+                android:layout_toLeftOf="@+id/completed_by_riple_count"
+                android:layout_toStartOf="@+id/completed_by_riple_count"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="45000"
+                android:id="@+id/completed_by_riple_count"
+                android:layout_alignBottom="@+id/completed_by_display_name"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:textSize="24sp"
+                android:textColor="#FFFFFF"
+                android:layout_marginRight="8dp"
+                android:layout_alignTop="@+id/completed_by_display_name"
+                android:gravity="center_vertical"
+                android:textStyle="bold"/>
+
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

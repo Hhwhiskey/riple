@@ -68,7 +68,7 @@
                 />
 
             <TextView
-                android:id="@+id/created_at"
+                android:id="@+id/comment_created_at"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="September 18, 2015 @ 3:32 p.m."
@@ -121,9 +121,9 @@
                 android:layout_marginTop="12dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/created_at"
+                android:layout_toStartOf="@+id/comment_created_at"
                 android:layout_marginLeft="16dp"
-                android:layout_toLeftOf="@+id/created_at"
+                android:layout_toLeftOf="@+id/comment_created_at"
                 android:layout_alignParentEnd="true"
                 android:textStyle="italic"
                 android:layout_alignParentRight="true"/>
@@ -142,11 +142,11 @@
                 android:layout_below="@+id/description"
                 android:gravity="center_vertical"
                 android:textStyle="italic"
-                android:layout_alignLeft="@+id/created_at"
-                android:layout_alignStart="@+id/created_at"
+                android:layout_alignLeft="@+id/comment_created_at"
+                android:layout_alignStart="@+id/comment_created_at"
                 android:layout_marginLeft="16dp"
-                android:layout_alignRight="@+id/created_at"
-                android:layout_alignEnd="@+id/created_at"
+                android:layout_alignRight="@+id/comment_created_at"
+                android:layout_alignEnd="@+id/comment_created_at"
                 android:layout_marginBottom="8dp"/>
 
             Button
@@ -187,7 +187,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="&quot;Mother Teresa&quot;"
-                android:id="@+id/textView"
+                android:id="@+id/author_rank"
                 android:textSize="14sp"
                 android:singleLine="false"
                 android:gravity="left|center_horizontal"

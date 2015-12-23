@@ -162,6 +162,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 dropItemAll.setAuthorName((String) authorData.get("displayName"));
                 //Author id
                 dropItemAll.setAuthorId(authorData.getObjectId());
+                //Author Rank
+                dropItemAll.setAuthorRank(authorData.getString("userRank"));
 
 
                 //Drop Data///////////////////////////////////////////////////////////////
@@ -172,9 +174,20 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 //CreatedAt
                 dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
                 //Riple Count
-                dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
+                int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
+                if (ripleCount == 1) {
+                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riple"));
+                } else {
+                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
+                }
+
                 //Comment Count
-                dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
+                int commentCount = (listFromParse.get(i).getInt("commentCount"));
+                if (commentCount == 1) {
+                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comment"));
+                }else {
+                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
+                }
 
                 allDropsList.add(dropItemAll);
                 Log.d("KevinData", "ArrayListContains" + allDropsList.size());

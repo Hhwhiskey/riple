@@ -26,22 +26,22 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     List<FriendItem> data = Collections.emptyList();
     private LayoutInflater inflater;
 
-    public FriendAdapter(Context context, ArrayList<FriendItem> friendsList) {
+    public FriendAdapter(Context context, ArrayList<FriendItem> data) {
         mContext = context;
-        inflater = LayoutInflater.from(context);
-        this.data = friendsList;
+        this.inflater = LayoutInflater.from(context);
+        this.data = data;
     }
 
     @Override
     public FriendViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.friend_list_item, parent, false);
+        View view = inflater.inflate(R.layout.card_friend, parent, false);
         FriendViewHolder viewHolder = new FriendViewHolder(view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(FriendViewHolder holder, int position) {
-        holder.update(position);
+    public void onBindViewHolder(FriendViewHolder viewHolder, int position) {
+        viewHolder.update(position);
 
         ParseUser user = null;
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -60,7 +60,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public int getItemCount() {
-        return 0;
+        return data.size();
     }
 
 

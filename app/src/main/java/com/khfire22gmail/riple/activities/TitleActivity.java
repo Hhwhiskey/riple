@@ -217,11 +217,16 @@ public class TitleActivity extends AppCompatActivity {
                                     public void done(ParseException e) {
 
                                         launchMainActivity();
+                                        //Create riple count tracker on UserRipleCount table to avoid ACL restrictions
                                         ParseUser currentUser = ParseUser.getCurrentUser();
                                         ParseObject userRipleCount = new ParseObject("UserRipleCount");
                                         userRipleCount.put("userPointer", currentUser);
                                         userRipleCount.put("ripleCount", 0);
                                         userRipleCount.saveInBackground();
+
+                                        //Also create riple count tracker on the currentUser table for ease of use
+                                        currentUser.put("userRipleCount", 0);
+                                        currentUser.saveInBackground();
                                     }
                                 });
 

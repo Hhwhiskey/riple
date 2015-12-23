@@ -52,6 +52,8 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
  */
 public class RipleTabFragment extends Fragment {
 
+
+
     private ImageView profilePictureView;
     private TextView nameView;
     private RecyclerView ripleRecyclerView;
@@ -77,7 +79,6 @@ public class RipleTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
-
 
         ripleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         ripleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -208,6 +209,13 @@ public class RipleTabFragment extends Fragment {
     }
 
 
+    // Listen
+    // Action
+    public interface onDropPostListener {
+        public void onDropPost();
+    }
+
+    public onDropPostListener dropPostListener;
 
     public void loadRipleItemsFromParse() {
         final ArrayList<DropItem> ripleList = new ArrayList<>();
@@ -261,6 +269,8 @@ public class RipleTabFragment extends Fragment {
                         dropItem.setAuthorName((String) authorData.get("displayName"));
                         //Author id
                         dropItem.setAuthorId(authorData.getObjectId());
+                        //Author Rank
+                        dropItem.setAuthorRank(authorData.getString("userRank"));
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId
@@ -270,10 +280,22 @@ public class RipleTabFragment extends Fragment {
                         //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
                         //Drop description
                         dropItem.setDescription(list.get(i).getString("description"));
+
                         //Riple Count
-                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                        int ripleCount = (list.get(i).getInt("ripleCount"));
+                        if (ripleCount == 1) {
+                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riple"));
+                        } else {
+                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                        }
+
                         //Comment Count
-                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                        int commentCount = (list.get(i).getInt("commentCount"));
+                        if (commentCount == 1) {
+                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comment"));
+                        }else {
+                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                        }
 
                         ripleList.add(dropItem);
 
@@ -307,8 +329,6 @@ public class RipleTabFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("displayName");
         String facebookId = currentUser.getString("facebookId");
-        int parseRipleCount = 0;
-
 
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
@@ -337,7 +357,7 @@ public class RipleTabFragment extends Fragment {
         if (userName != null) {
             nameView.setText(userName);
         } else {
-            nameView.setText("Anonymous");
+            nameView.setText("Set your name!");
         }
 
 
@@ -388,27 +408,18 @@ public class RipleTabFragment extends Fragment {
         }
 
 
-        // Save the currentUser riple rank to User table
+        // Save the currentUser ripleCount and rank to the user table
+        currentUser.put("userRipleCount", ripleCount);
         currentUser.put("userRank", ripleRank);
         currentUser.saveInBackground();
 
         // Display the currentUser riple count and rank
-        profileRipleCountView.setText(String.valueOf(ripleCount) + " Riples");
+        if (ripleCount == 1) {
+            profileRipleCountView.setText(String.valueOf(ripleCount) + " Riple");
+        } else {
+            profileRipleCountView.setText(String.valueOf(ripleCount) + " Riples");
+        }
         profileRankView.setText(ripleRank);
-
-
-
-
-//        if (ripleRank != null) {
-
-//        }
-
-//        if (ripleRank != null) {
-
-//        }
-
-
-
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

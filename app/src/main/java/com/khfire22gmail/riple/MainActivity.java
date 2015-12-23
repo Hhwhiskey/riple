@@ -238,6 +238,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 Intent intent = getIntent();
                                 finish();
                                 startActivity(intent);
+
+//                                RipleTabFragment localFrag = (RipleTabFragment) getSupportFragmentManager().findFragmentById(R.id.riple_layout);
+//                                localFrag.loadRipleItemsFromParse();
                             }
                         }
                     });

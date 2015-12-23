@@ -49,9 +49,9 @@
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/created_at"
+                android:layout_alignEnd="@+id/comment_created_at"
                 android:layout_alignParentTop="true"
-                android:layout_alignRight="@+id/created_at"
+                android:layout_alignRight="@+id/comment_created_at"
                 android:layout_toRightOf="@+id/profile_picture"
                 android:width="50dp"
                 android:text="Name"
@@ -64,7 +64,7 @@
                 android:layout_alignTop="@+id/profile_picture"/>
 
             <TextView
-                android:id="@+id/created_at"
+                android:id="@+id/comment_created_at"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
@@ -81,8 +81,8 @@
                 android:id="@+id/description"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/created_at"
-                android:layout_alignRight="@+id/created_at"
+                android:layout_alignEnd="@+id/comment_created_at"
+                android:layout_alignRight="@+id/comment_created_at"
                 android:elegantTextHeight="false"
                 android:ellipsize="end"
                 android:enabled="true"
@@ -128,8 +128,8 @@
                 android:singleLine="true"
                 android:textAlignment="textStart"
                 android:layout_alignTop="@+id/riple_count"
-                android:layout_alignLeft="@+id/created_at"
-                android:layout_alignStart="@+id/created_at"
+                android:layout_alignLeft="@+id/comment_created_at"
+                android:layout_alignStart="@+id/comment_created_at"
                 android:gravity="left"
                 android:layout_marginLeft="4dp"
                 />
