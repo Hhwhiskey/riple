@@ -76,6 +76,8 @@ public class DropCommentsActivity extends AppCompatActivity {
     private Switch viewedDropTodoSwitch;
     private CheckBox viewedDropCompleteCheckBox;
     private ParseFile parseProfilePicture;
+    private String mAuthorRank;
+    private TextView rankView;
 
 
     @Override
@@ -90,6 +92,7 @@ public class DropCommentsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
         mAuthorId = intent.getStringExtra("authorId");
+        mAuthorRank = intent.getStringExtra("authorRank");
         mAuthorName = intent.getStringExtra("commenterName");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
@@ -121,6 +124,9 @@ public class DropCommentsActivity extends AppCompatActivity {
 
         nameView = (TextView) findViewById(R.id.name);
         nameView.setText(mAuthorName);
+
+        rankView = (TextView) findViewById(R.id.author_rank);
+        rankView.setText(mAuthorRank);
 
         descriptionView = (TextView) findViewById(R.id.description);
         descriptionView.setText(mDropDescription);

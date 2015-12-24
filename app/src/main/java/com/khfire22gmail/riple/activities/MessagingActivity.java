@@ -36,6 +36,7 @@ import com.sinch.android.rtc.messaging.WritableMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,11 +51,13 @@ public class MessagingActivity extends AppCompatActivity {
     private MyMessageClientListener messageClientListener = new MyMessageClientListener();
     private MessageAdapter messageAdapter;
     private ListView messagesList;
+    private ParseUser mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messaging);
+        mCurrentUser = ParseUser.getCurrentUser();
 
         bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
 
@@ -70,11 +73,12 @@ public class MessagingActivity extends AppCompatActivity {
             }
         });
 
+
         //get recipientId from the intent
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
         currentUserId = ParseUser.getCurrentUser().getObjectId();
-
+        checkForRelation();
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
@@ -112,14 +116,8 @@ public class MessagingActivity extends AppCompatActivity {
                     return;
                 }
 
-                ParseQuery<ParseObject> addToFriendsQuery = ParseQuery.getQuery("_User");
-                addToFriendsQuery.getInBackground(recipientId, new GetCallback<ParseObject>() {
-                    public void done(ParseObject object, ParseException e) {
-                        if (e == null) {
-                            addFriendsRelation(object);
-                        }
-                    }
-                });
+
+
 
                 messageService.sendMessage(recipientId, messageBody);
                 messageBodyField.setText("");
@@ -127,15 +125,82 @@ public class MessagingActivity extends AppCompatActivity {
         });
     }
 
-    public void addFriendsRelation(ParseObject messagedUser) {
+    public void checkForRelation() {
+        ParseQuery<ParseUser> addToFriendsQuery = ParseUser.getQuery();
+        addToFriendsQuery.getInBackground(recipientId, new GetCallback<ParseUser>() {
+            public void done(ParseUser recipient, ParseException e) {
+                if (e == null) {
+                    addFriendsRelation(recipient);
+                }
+            }
+        });
+    }
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseObject friends = new ParseObject("Friends");
-        friends.put("user1", currentUser);
-        friends.put("user2", messagedUser);
-        friends.saveInBackground();
+
+    public void addFriendsRelation(final ParseUser recipient) {
+
+        final ArrayList mRecipientsList = new ArrayList<>();
+
+        ParseQuery<ParseObject> query1 = ParseQuery.getQuery(Constants.FRIENDS);
+        query1.whereEqualTo(Constants.USER1, mCurrentUser);
+        ParseQuery<ParseObject> query2 = ParseQuery.getQuery(Constants.FRIENDS);
+        query2.whereEqualTo(Constants.USER2, mCurrentUser);
 
 
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(query1);
+        queries.add(query2);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.orderByDescending("createdAt");
+        mainQuery.include("user1");
+        mainQuery.include("user2");
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+
+
+                    mRecipientsList.clear();
+
+                    for (int i = 0; i < list.size(); i++) {
+                        Log.d("MyApp", "current relation objects = " + list.size());
+                        ParseUser user1 = (ParseUser) list.get(i).get(Constants.USER1);
+                        String userId = user1.getObjectId();
+                        ParseUser recipient;
+
+                        if (userId.equals(mCurrentUser.getObjectId())) {
+                            recipient = (ParseUser) list.get(i).get(Constants.USER2);
+                        } else {
+                            recipient = (ParseUser) list.get(i).get(Constants.USER1);
+                        }
+
+                        mRecipientsList.add(recipient.getObjectId());
+                        Log.e("MyApp", "mCurrentRelations size = " + mRecipientsList.size());
+                        //chatRecipient.put("recipient", markerUser);
+                    }
+                }
+                chatAdditionRequest(mRecipientsList, recipient);
+            }
+        });
+    }
+
+    private void chatAdditionRequest(List<String> mRecipientList, ParseUser recipient) {
+        Boolean exists = false;
+
+        for (int i =0; i < mRecipientList.size(); i++)  {
+            String user = mRecipientList.get(i);
+            if (user.equals(recipient.getObjectId())) {
+                exists = true;
+                Log.d("MyApp", "Chat relation already exists, not creating again");
+            }
+        }
+        if (!exists) {
+            ParseObject relation = new ParseObject(Constants.FRIENDS);
+            relation.put(Constants.USER1, mCurrentUser);
+            relation.put(Constants.USER2, recipient);
+            relation.saveInBackground();
+        }
     }
         /*ParseQuery<ParseUser> viewUserQuery = ParseQuery.getQuery("_User");
         viewUserQuery.getInBackground(recipientId, new GetCallback<ParseUser>() {
@@ -153,98 +218,99 @@ public class MessagingActivity extends AppCompatActivity {
          ParseQuery query = ParseQuery.getQuery("_User");
          query.whereEqualTo("objectId", recipientId);
      }*/
-    //unbind the service when the activity is destroyed
-    @Override
-    public void onDestroy() {
-        unbindService(serviceConnection);
-        messageService.removeMessageClientListener(messageClientListener);
-        super.onDestroy();
-    }
-
-    private class MyServiceConnection implements ServiceConnection {
+                //unbind the service when the activity is destroyed
         @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            messageService = (MessageService.MessageServiceInterface) iBinder;
-            messageService.addMessageClientListener(messageClientListener);
+        public void onDestroy () {
+            unbindService(serviceConnection);
+            messageService.removeMessageClientListener(messageClientListener);
+            super.onDestroy();
         }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            messageService = null;
-        }
-    }
-
-    private class MyMessageClientListener implements MessageClientListener {
-
-        //Notify the user if their message failed to send
-        @Override
-        public void onMessageFailed(MessageClient client, Message message,
-                                    MessageFailureInfo failureInfo) {
-            //Log.d("Kevin" , "send error messages" + message + failureInfo);
-            Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_LONG).show();
-        }
-
-
-        @Override
-        public void onIncomingMessage(MessageClient client, Message message) {
-            if (message.getSenderId().equals(recipientId)) {
-                WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
-                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
+        private class MyServiceConnection implements ServiceConnection {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                messageService = (MessageService.MessageServiceInterface) iBinder;
+                messageService.addMessageClientListener(messageClientListener);
             }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                messageService = null;
+            }
+        }
+
+        private class MyMessageClientListener implements MessageClientListener {
+
+            //Notify the user if their message failed to send
+            @Override
+            public void onMessageFailed(MessageClient client, Message message,
+                                        MessageFailureInfo failureInfo) {
+                //Log.d("Kevin" , "send error messages" + message + failureInfo);
+                Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_LONG).show();
+            }
+
+
+            @Override
+            public void onIncomingMessage(MessageClient client, Message message) {
+                if (message.getSenderId().equals(recipientId)) {
+                    WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+                    messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
+                }
 //Display an incoming message
 
-        }
+            }
 
-        @Override
-        public void onMessageSent(MessageClient client, Message message, String recipientId) {
-            //Display the message that was just sent
-            final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
-            messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
+            @Override
+            public void onMessageSent(MessageClient client, Message message, String recipientId) {
+                //Display the message that was just sent
+                final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
 
 
-            //Later, I'll show you how to store the
-            //message in Parse, so you can retrieve and
-            //display them every time the conversation is opened
-
+                //Later, I'll show you how to store the
+                //message in Parse, so you can retrieve and
+                //display them every time the conversation is opened
 
 
 //only add message to parse database if it doesn't already exist there
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
-            query.whereEqualTo("sinchId", message.getMessageId());
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> messageList, com.parse.ParseException e) {
-                    if (e == null) {
-                        if (messageList.size() == 0) {
-                            ParseObject parseMessage = new ParseObject("ParseMessage");
-                            parseMessage.put("senderId", currentUserId);
-                            parseMessage.put("recipientId", writableMessage.getRecipientIds().get(0));
-                            parseMessage.put("messageText", writableMessage.getTextBody());
-                            parseMessage.put("sinchId", writableMessage.getMessageId());
-                            parseMessage.saveInBackground();
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
+                query.whereEqualTo("sinchId", message.getMessageId());
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> messageList, com.parse.ParseException e) {
+                        if (e == null) {
+                            if (messageList.size() == 0) {
+                                ParseObject parseMessage = new ParseObject("ParseMessage");
+                                parseMessage.put("senderId", currentUserId);
+                                parseMessage.put("recipientId", writableMessage.getRecipientIds().get(0));
+                                parseMessage.put("messageText", writableMessage.getTextBody());
+                                parseMessage.put("sinchId", writableMessage.getMessageId());
+                                parseMessage.saveInBackground();
 
-                            messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
+                                //messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
 
-                            try {
-                                sendPushNotification();
-                            } catch (JSONException error) {
-                                error.printStackTrace();
+                                try {
+                                    sendPushNotification();
+                                } catch (JSONException error) {
+                                    error.printStackTrace();
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
 
+            }
+
+            //Do you want to notify your user when the message is delivered?
+            @Override
+            public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {
+            }
+
+            //Don't worry about this right now
+            @Override
+            public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {
+            }
         }
-
-        //Do you want to notify your user when the message is delivered?
-        @Override
-        public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {}
-
-        //Don't worry about this right now
-        @Override
-        public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {}
-    }
 
     private void sendPushNotification() throws JSONException {
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();

@@ -151,8 +151,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                         public void done(byte[] data, ParseException e) {
                             if (e == null) {
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                dropItemAll.setParseProfilePicture(resized);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                dropItemAll.setParseProfilePicture(bmp);
                             }
                         }
                     });
@@ -174,20 +174,9 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                 //CreatedAt
                 dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
                 //Riple Count
-                int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
-                if (ripleCount == 1) {
-                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riple"));
-                } else {
-                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
-                }
-
+                dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
                 //Comment Count
-                int commentCount = (listFromParse.get(i).getInt("commentCount"));
-                if (commentCount == 1) {
-                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comment"));
-                }else {
-                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
-                }
+                dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
 
                 allDropsList.add(dropItemAll);
                 Log.d("KevinData", "ArrayListContains" + allDropsList.size());

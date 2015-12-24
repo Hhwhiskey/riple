@@ -9,9 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -39,8 +39,8 @@ import java.util.List;
 public class TitleActivity extends AppCompatActivity {
 
     private Dialog progressDialog;
-    private Switch fbSwitch;
-    private Switch parseSwitch;
+    private Button fbButton;
+    private Button emailButton;
     private Intent intent;
     private Intent serviceIntent;
 
@@ -53,19 +53,21 @@ public class TitleActivity extends AppCompatActivity {
         //Remove status bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-       /* //Splash Video
-        VideoView drops = (VideoView)findViewById(R.id.title_video);
-        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
-        drops.setVideoURI(Uri.parse(path));
-        drops.start();
+        //Splash Video
 
-        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });*/
+//        VideoView drops = (VideoView)findViewById(R.id.title_video);
+//        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
+//        drops.setVideoURI(Uri.parse(path));
+//        drops.start();
+//
+//        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//
+//            @Override
+//            public void onPrepared(MediaPlayer mp) {
+//                mp.setLooping(true);
+//            }
+//        });
 
         // Bypass login screen if user is currently logged in
         intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -96,52 +98,41 @@ public class TitleActivity extends AppCompatActivity {
 
         //Login Switches///////////////////////////////////////////////////////////////////////
         //Parse login switch
-        parseSwitch = (Switch) findViewById(R.id.parse_switch);
-        parseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    parseLogin();
-
-                } else {
-
-                }
+        emailButton = (Button) findViewById(R.id.button_email);
+        emailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parseLogin();
             }
         });
+
 
         //Facebook login switch
-        fbSwitch = (Switch) findViewById(R.id.fb_switch);
-        fbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
+        fbButton = (Button) findViewById(R.id.button_facebook);
+        fbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TitleActivity.this, R.style.MyAlertDialogStyle);
+                builder.setTitle("Not so fast...");
+                builder.setMessage("I will not post any offensive material and I will report any offensive material I encounter");
+                builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        moveTaskToBack(true);
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(1);
+                    }
+                });
 
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(TitleActivity.this, R.style.MyAlertDialogStyle);
-                    builder.setTitle("Not so fast...");
-                    builder.setMessage("I will not post any offensive material and I will report any offensive material I encounter");
-                    builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            moveTaskToBack(true);
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                            System.exit(1);
-                        }
-                    });
-
-
-                    builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            fbLogin();
-                        }
-                    });
-                    builder.show();
-
-                } else {
-                    fbLogout();
-                }
+                builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        fbLogin();
+                    }
+                });
+                builder.show();
             }
         });
-        /////////////////////////////////////////////////////////////////////////////////////////
     }
 
     @Override
@@ -156,6 +147,19 @@ public class TitleActivity extends AppCompatActivity {
         super.onResume();
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
+
+//        VideoView drops = (VideoView)findViewById(R.id.title_video);
+//        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
+//        drops.setVideoURI(Uri.parse(path));
+//        drops.start();
+//
+//        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//
+//            @Override
+//            public void onPrepared(MediaPlayer mp) {
+//                mp.setLooping(true);
+//            }
+//        });
     }
 
     @Override

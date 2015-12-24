@@ -10,6 +10,15 @@ public class FriendItem {
     public Bitmap friendProfilePicture;
     public String friendName;
     public String lastMessage;
+    public String objectId;
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
 
     public Bitmap getFriendProfilePicture() {
         return friendProfilePicture;

@@ -14,7 +14,8 @@
         card_view:cardUseCompatPadding="true"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
             android:id="@+id/top_layout"

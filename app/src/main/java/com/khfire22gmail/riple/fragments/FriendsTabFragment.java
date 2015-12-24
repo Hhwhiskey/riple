@@ -16,6 +16,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,8 +26,10 @@ import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
+import com.khfire22gmail.riple.model.CommentItem;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
+import com.khfire22gmail.riple.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -40,6 +43,7 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -55,6 +59,8 @@ public class FriendsTabFragment extends Fragment {
     private BroadcastReceiver receiver;
     private ArrayList<String> displayNames;
     private TextView friendsEmptyView;
+    public static ArrayList<FriendItem> friendTabInteractionList = new ArrayList<>();
+    private CommentItem mCurrentUser;
 
 
     @Override
@@ -63,11 +69,11 @@ public class FriendsTabFragment extends Fragment {
 
         friendsRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        friendsRecyclerView.setItemAnimator(new SlideInUpAnimator());
+        friendsRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
         friendsEmptyView = (TextView) view.findViewById(R.id.friends_tab_empty_view);
 
-        setConversationsList();
+//        setConversationsList();
 //        loadSavedPreferences();
 
         return view;
@@ -111,10 +117,10 @@ public class FriendsTabFragment extends Fragment {
         builder.show();
     }
 
-    //Show list of all users
+//    Show list of all users
     private void setConversationsList() {
 
-        final ArrayList<FriendItem> friendsList = new ArrayList();
+        final ArrayList<FriendItem> friendsList = new ArrayList<>();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -138,18 +144,23 @@ public class FriendsTabFragment extends Fragment {
                 if (e == null) {
 
                     for (int i = 0; i < list.size(); i++) {
-
-                        ParseObject user1Pointer = (ParseObject)list.get(i).get("user1");
-//                        ParseObject user2Pointer = (ParseObject)list.get(i).get("user2");
+                        Log.d("MyApp", "current relation objects = " + list.size());
+                        ParseUser user1 = (ParseUser) list.get(i).get(Constants.USER1);
+                        String userId = user1.getObjectId();
+                        ParseUser recipient;
 
                         final FriendItem friendItem = new FriendItem();
 
+                        if (userId.equals(mCurrentUser.getObjectId())) {
+                            recipient = (ParseUser) list.get(i).get(Constants.USER2);
+                        } else {
+                            recipient = (ParseUser) list.get(i).get(Constants.USER1);
+                        }
 
-//                        ParseObject user2Pointer = (ParseObject)list.get(i).get("user2");
-
-                        ParseFile profilePicture = (ParseFile) user1Pointer.get("parseProfilePicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
+                        // Get User1 data
+                        ParseFile profilePicture1 = (ParseFile) recipient.get("parseProfilePicture");
+                        if (profilePicture1 != null) {
+                            profilePicture1.getDataInBackground(new GetDataCallback() {
 
                                 @Override
                                 public void done(byte[] data, ParseException e) {
@@ -163,12 +174,14 @@ public class FriendsTabFragment extends Fragment {
                             });
                         }
 
-                        friendItem.setFriendName(user1Pointer.getString("displayName"));
+                        friendItem.setFriendName(recipient.getString("displayName"));
+                        friendItem.setObjectId(recipient.getString("objectId"));
 //                        friendItem.setLastMessage(list.get(i).getString("lastMessage"));
 
                         friendsList.add(friendItem);
                     }
                 }
+                friendTabInteractionList = friendsList;
             }
         });
     }

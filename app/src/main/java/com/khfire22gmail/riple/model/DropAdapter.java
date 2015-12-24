@@ -289,6 +289,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String mDropObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
+        String mAuthorRank = (data.get(position).getAuthorRank());
         String mDropDescription = (data.get(position).getDescription());
         String mRipleCount = (data.get(position).getRipleCount());
         String mCommentCount = (data.get(position).getCommentCount());
@@ -305,6 +306,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         Intent intent = new Intent(mContext, DropCommentsActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
+        intent.putExtra("authorRank", mAuthorRank);
         intent.putExtra("commenterName", mAuthorName);
         intent.putExtra("dropDescription", mDropDescription);
         intent.putExtra("ripleCount", mRipleCount);

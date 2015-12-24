@@ -266,6 +266,8 @@ public class ViewUserActivity extends AppCompatActivity {
                         dropItem.setAuthorName((String) authorData.get("displayName"));
                         //Author id
                         dropItem.setAuthorId(authorData.getObjectId());
+                        //Author Rank
+                        dropItem.setAuthorRank(authorData.getString("userRank"));
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId

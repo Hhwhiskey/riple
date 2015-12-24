@@ -1,14 +1,23 @@
 package com.khfire22gmail.riple.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.MessagingActivity;
+import com.khfire22gmail.riple.fragments.FriendsTabFragment;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -67,18 +76,29 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
 
     //FriendsViewHolder/////////////////////////////////////////////////////////////////////////////
-    public class FriendViewHolder extends RecyclerView.ViewHolder {
+    public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private ImageView friendProfilePicture;
         private TextView friendName;
         private TextView lastMessage;
+        private View itemView;
+
 
         public FriendViewHolder(View itemView) {
             super(itemView);
 
             friendProfilePicture = (ImageView) itemView.findViewById(R.id.friend_profile_picture);
             friendName = (TextView) itemView.findViewById(R.id.friend_name);
+
+
 //            lastMessage = (TextView) itemView.findViewById(R.id.last_message_snippit);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getFriendObjectFromRow(getAdapterPosition());
+                }
+            });
         }
 
         public void update(int position) {
@@ -88,6 +108,40 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             friendProfilePicture.setImageBitmap(current.friendProfilePicture);
             friendName.setText(current.friendName);
 //            lastMessage.setText(current.lastMessage);
+        }
+
+        @Override
+        public void onClick(View v) {
+
+        }
+
+        private void getFriendObjectFromRow(int position) {
+            FriendItem conversation = FriendsTabFragment.friendTabInteractionList.get(position);
+            ParseQuery<ParseObject> conversationQuery = ParseQuery.getQuery("Friends");
+            conversationQuery.getInBackground(conversation.getObjectId(), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        openConversation(object);
+                    }
+                }
+            });
+        }
+
+        // Opens sinch conversation when it is clicked
+        public void openConversation(ParseObject conversation) {
+            ParseQuery<ParseUser> query = ParseUser.getQuery();
+            query.whereEqualTo("objectId", conversation);
+            query.findInBackground(new FindCallback<ParseUser>() {
+                public void done(List<ParseUser> user, ParseException e) {
+                    if (e == null) {
+                        Intent intent = new Intent(mContext, MessagingActivity.class);
+                        intent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
+                        mContext.startActivity(intent);
+                    } else {
+                        Toast.makeText(mContext, "Error finding that user", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 }

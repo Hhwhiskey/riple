@@ -213,14 +213,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser currentUser = ParseUser.getCurrentUser();
-//        final ParseFile userPicture = (ParseFile) user.get("parseProfilePicture");
 
         if(dropDescription != null) {
-//            drop.put("author", user.getObjectId());
+
             drop.put("authorPointer", currentUser);
-//            drop.put("name", user.get("displayName"));
             drop.put("description", dropDescription);
-//            drop.put("authorPicture", userPicture);
             drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
                 @Override
                 public void done(ParseException e) {
