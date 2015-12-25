@@ -1,9 +1,11 @@
 package com.khfire22gmail.riple.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,8 +28,8 @@ import com.bumptech.glide.signature.StringSignature;
 import com.facebook.login.widget.ProfilePictureView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
-import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
+import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -35,6 +37,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -78,12 +81,19 @@ public class DropCommentsActivity extends AppCompatActivity {
     private ParseFile parseProfilePicture;
     private String mAuthorRank;
     private TextView rankView;
+    private String mTabName;
+    private String drop;
+    private String trickle;
+    private int mPosition;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_drop);
+
+        drop = "drop";
+        trickle = "trickle";
 
         mRecyclerView = (RecyclerView) findViewById(R.id.view_drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -99,6 +109,9 @@ public class DropCommentsActivity extends AppCompatActivity {
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
+        mTabName = intent.getStringExtra("mTabName");
+//        mPosition = Integer.parseInt(intent.getStringExtra("mPosition"));
+
 
         Log.d("rDropExtra", "mDropObjectId = " + mDropObjectId);
         Log.d("rDropExtra", "mAuthorId = " + mAuthorId);
@@ -108,6 +121,7 @@ public class DropCommentsActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mRipleCount = " + mRipleCount);
         Log.d("rDropExtra", "mCommentCount = " + mCommentCount);
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
+        Log.d("rDropExtra", "mTabName = " + mTabName);
 
         getViewedUserProfilePicture(mAuthorId);
 
@@ -137,6 +151,18 @@ public class DropCommentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 viewCompletedBy();
+            }
+        });
+
+        ImageView menuButton = (ImageView) findViewById(R.id.menu_button);
+        menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mTabName.equals(drop)) {
+                    showDropMenu();
+                } else {
+                    showTrickleMenu();
+                }
             }
         });
 
@@ -540,5 +566,72 @@ public class DropCommentsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showTrickleMenu() {
+
+        CharSequence trickleDrop[] = new CharSequence[] {"Share", "Report"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Drop Menu");
+        builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int selected) {
+                if (selected == 0) {
+                    //share
+                } else {
+                    //report
+                }
+
+            }
+        });
+        builder.show();
+    }
+
+    public void showDropMenu() {
+
+        CharSequence todoDrop[] = new CharSequence[] {"Share", "Remove From Todo", "Report"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Drop Menu");
+        builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int selected) {
+                if (selected == 0) {
+                    //share
+                } else if (selected == 1) {
+                   getDropObject(mDropObjectId);
+                } else if (selected == 2){
+                    //report
+                }
+            }
+        });
+        builder.show();
+    }
+
+    public void getDropObject(String dropObject) {
+        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
+        interactedDropQuery.getInBackground(dropObject, new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    removeFromTodo(object);
+                }
+            }
+        });
+    }
+
+    public void removeFromTodo(ParseObject dropObject) {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        ParseRelation<ParseObject> removeRelation1 = user.getRelation("todoDrops");
+        removeRelation1.remove(dropObject);
+        user.saveInBackground();
+
+        ParseRelation<ParseObject> removeRelation2 = user.getRelation("hasRelationTo");
+        removeRelation2.remove(dropObject);
+        user.saveInBackground();
+
+//        DropAdapter.data.remove(mPosition);
     }
 }

@@ -318,7 +318,7 @@ public class RipleTabFragment extends Fragment {
             ripleEmptyView.setVisibility(View.GONE);
         }
 
-        ripleAdapter = new DropAdapter(getActivity(), mRipleList, "created");
+        ripleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(ripleAdapter);
         ripleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);

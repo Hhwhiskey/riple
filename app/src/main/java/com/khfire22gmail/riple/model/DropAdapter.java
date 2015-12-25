@@ -34,13 +34,14 @@ import java.util.List;
 public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder> {
 
     Context mContext;
-    private final String mTabName;
+    public final String mTabName;
     private LayoutInflater inflater;
     public List<DropItem> data = Collections.emptyList();
-    public static final String created = "created";
+    public static final String riple = "riple";
     public static final String drop = "drop";
     public static final String trickle = "trickle";
     public static final String viewUser = "viewUser";
+    public ParseUser currentUser;
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
         mContext = context;
@@ -51,6 +52,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
     @Override
     public DropViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        currentUser = ParseUser.getCurrentUser();
 
         // Change the inflated card based on which RV is being viewed
         int xmlLayoutId = -1;
@@ -66,7 +69,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
          * and if it's no relation, show the switch
          */
 
-        if (mTabName.equals(created)) {
+        if (mTabName.equals(riple)) {
             xmlLayoutId = R.layout.card_riple;
 
         } else if (mTabName.equals(drop)) {
@@ -83,6 +86,26 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         View view = inflater.inflate(xmlLayoutId, parent, false);
         return new DropViewHolder(view);
     }
+
+//    //Get Drop Id
+//    public String getDropId(int position) {
+//        DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
+//        String dropId = interactedDrop.getObjectId();
+//        return dropId;
+//    }
+//
+//    //Get context of the clicked Drop
+//    public getDropContext(String dropId) {
+//        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
+//        ParseQuery<ParseObject> query = createdRelation.getQuery();
+//        query.whereEqualTo("objectId", dropId);
+//        query.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> list, ParseException e) {
+//
+//            }
+//        });
+//    }
 
     // Get drop associacated with click
     private void getTrickleObjectFromRowToAdd(int position) {
@@ -295,6 +318,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String mDropDescription = (data.get(position).getDescription());
         String mRipleCount = (data.get(position).getRipleCount());
         String mCommentCount = (data.get(position).getCommentCount());
+        String mPosition = String.valueOf((data.get(position)));
         Date mCreatedAt = (data.get(position).getCreatedAt());
 
         Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
@@ -314,6 +338,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("ripleCount", mRipleCount);
         intent.putExtra("commentCount", mCommentCount);
         intent.putExtra("createdAt", mCreatedAt);
+        intent.putExtra("mTabName", mTabName);
+        intent.putExtra("mPosition", mPosition);
 
         mContext.startActivity(intent);
     }
@@ -414,6 +440,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             if (menuButton != null) {
                 menuButton.setOnClickListener(this);
             }
+
+
         }
 
         public void update(int position){
@@ -430,21 +458,83 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         }
 
         @Override
-        public void onClick(View v) {
-            if (v == todoButton) {
+        public void onClick(View view) {
+            if (view == todoButton) {
                 getTrickleObjectFromRowToAdd(getAdapterPosition());
                 removeDropFromView(getAdapterPosition());
             }
 
-            if (v == completeButton) {
+            if (view == completeButton) {
                 getDropObjectFromRowToComplete(getAdapterPosition());
                 removeDropFromView(getAdapterPosition());
             }
 
-            if (v == menuButton) {
-                showDropMenu();
+            if (view == menuButton) {
+                if (mTabName.equals(drop)) {
+                    showDropMenu();
+                } else {
+                    showTrickleMenu();
+                }
             }
         }
+
+//        public CharSequence[] getMenuContext() {
+//
+//            //Not your Drop
+//
+//            //to-do Drop
+//
+//
+//            if (mTabName.equals(drop)) {
+//                return todoDrop;
+//            } else {
+//                return notYourDrop;
+//            }
+//        }
+
+
+        public void showTrickleMenu() {
+
+            CharSequence trickleDrop[] = new CharSequence[] {"Share", "Report"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Drop Menu");
+            builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+                    if (selected == 0) {
+                        //share
+                    } else {
+                        //report
+                    }
+
+                }
+            });
+            builder.show();
+        }
+
+        public void showDropMenu() {
+
+            CharSequence todoDrop[] = new CharSequence[] {"Share", "Remove From Todo", "Report"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Drop Menu");
+            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+                    if (selected == 0) {
+                        //share
+                    } else if (selected == 1) {
+                        getDropObjectFromRowToRemove(getAdapterPosition());
+                        removeDropFromView(getAdapterPosition());
+                    } else if (selected == 2){
+                        //report
+                    }
+                }
+            });
+            builder.show();
+        }
+
     }
 
     public void removeDropFromView(int position) {
@@ -452,19 +542,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         notifyItemRemoved(position);
     }
 
-    public void showDropMenu() {
-        CharSequence options[] = new CharSequence[] {"Share", "Remove", "Report"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-        builder.setTitle("Drop Menu");
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // the user clicked on colors[which]
-            }
-        });
-        builder.show();
-    }
+
+
 }
 
 

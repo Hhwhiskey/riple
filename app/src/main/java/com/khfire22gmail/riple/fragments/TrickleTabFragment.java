@@ -128,6 +128,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
             dropQuery.orderByDescending("createdAt");
             dropQuery.include("authorPointer");
+            dropQuery.setLimit(10);
             try {
                 listFromParse = dropQuery.find();
             } catch (ParseException e) {
@@ -216,7 +217,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
             ParseRelation relation = user.getRelation("hasRelationTo");
 
             final ParseQuery hasRelationQuery = relation.getQuery();
-
+            hasRelationQuery.setLimit(10);
             try {
                 parseRelationDrops = hasRelationQuery.find();
             } catch (ParseException e) {
@@ -227,8 +228,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
 
             if (!parseRelationDrops.isEmpty()) {
 
-
-
                 for (int i = 0; i < parseRelationDrops.size(); i++) {
                     DropItem dropItemRelation = new DropItem();
 
@@ -237,11 +236,8 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
                     hasRelationList.add(dropItemRelation);
                 }
 
-
                 asyncFilterDrops(hasRelationList, allDropsList);
             }
-
-
             return hasRelationList;
         }
 
@@ -249,7 +245,6 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         public void asyncFilterDrops(ArrayList<DropItem> mHasRelationList, ArrayList<DropItem> mAllDropsList){
 
             Iterator<DropItem> allDropsIterator = mAllDropsList.iterator();
-
 
             while(allDropsIterator.hasNext()) {
                 DropItem dropItemAll = allDropsIterator.next();
@@ -358,6 +353,17 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
-    }
 
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+    }
 }

@@ -166,7 +166,7 @@
 
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginRight="4dp"/>
+                android:layout_marginRight="8dp"/>
 
 
 

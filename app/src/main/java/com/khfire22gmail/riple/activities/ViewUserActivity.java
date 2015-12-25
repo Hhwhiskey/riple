@@ -417,7 +417,7 @@ public class ViewUserActivity extends AppCompatActivity {
             viewUserEmptyView.setVisibility(View.GONE);
         }
 
-        mViewUserAdapter = new DropAdapter(this, clickedUserList, "created");
+        mViewUserAdapter = new DropAdapter(this, clickedUserList, "riple");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);
         scaleAdapter.setDuration(250);
         mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
