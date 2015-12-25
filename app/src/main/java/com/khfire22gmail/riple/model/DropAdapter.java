@@ -1,7 +1,9 @@
 package com.khfire22gmail.riple.model;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.DropCompletedActivity;
 import com.khfire22gmail.riple.activities.DropCommentsActivity;
+import com.khfire22gmail.riple.activities.DropCompletedActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
@@ -365,9 +367,11 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         return data.size();
     }
 
-
-
-
+    /**
+     * If the Drop belongs to the current user, they may delete it or share it
+     *
+     * If the Drop does not belong to the current user, they may report it/the author or share it.
+     */
 
 
     //DropViewHolder//////////////////////////////////////////////////////////////////////////////
@@ -375,6 +379,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         private final Button todoButton;
         private final Button completeButton;
+        private ImageView menuButton;
         public TextView authorName;
         public TextView createdAt;
         public TextView description;
@@ -396,6 +401,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
             authorRank = (TextView) itemView.findViewById(R.id.author_rank);
+            menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
 
             if (todoButton != null) {
                 todoButton.setOnClickListener(this);
@@ -403,6 +409,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
             if (completeButton != null) {
                 completeButton.setOnClickListener(this);
+            }
+
+            if (menuButton != null) {
+                menuButton.setOnClickListener(this);
             }
         }
 
@@ -430,12 +440,30 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 getDropObjectFromRowToComplete(getAdapterPosition());
                 removeDropFromView(getAdapterPosition());
             }
+
+            if (v == menuButton) {
+                showDropMenu();
+            }
         }
     }
 
     public void removeDropFromView(int position) {
         data.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void showDropMenu() {
+        CharSequence options[] = new CharSequence[] {"Share", "Remove", "Report"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+        builder.setTitle("Drop Menu");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // the user clicked on colors[which]
+            }
+        });
+        builder.show();
     }
 }
 
