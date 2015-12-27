@@ -12,15 +12,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.DropCommentsActivity;
 import com.khfire22gmail.riple.activities.DropCompletedActivity;
+import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -42,6 +45,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     public static final String trickle = "trickle";
     public static final String viewUser = "viewUser";
     public ParseUser currentUser;
+    private ParseFile parseProfilePictureCheck;
+    private String displayNameCheck;
 
     public DropAdapter(Context context, List<DropItem> data, String tabName){
         mContext = context;
@@ -87,27 +92,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         return new DropViewHolder(view);
     }
 
-//    //Get Drop Id
-//    public String getDropId(int position) {
-//        DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
-//        String dropId = interactedDrop.getObjectId();
-//        return dropId;
-//    }
-//
-//    //Get context of the clicked Drop
-//    public getDropContext(String dropId) {
-//        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
-//        ParseQuery<ParseObject> query = createdRelation.getQuery();
-//        query.whereEqualTo("objectId", dropId);
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> list, ParseException e) {
-//
-//            }
-//        });
-//    }
-
-    // Get drop associacated with click
+    // Get Drop info from Trickle list for add
     private void getTrickleObjectFromRowToAdd(int position) {
         DropItem interactedDrop = TrickleTabFragment.allDropsList.get(position);
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
@@ -120,7 +105,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         });
     }
 
-    // TODO: 12/10/2015 Add this option with a card overflow menu
+    // Get Drop info from Drop list for remove
     private void getDropObjectFromRowToRemove(int position) {
         DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
@@ -133,6 +118,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         });
     }
 
+    // Get Drop info from Drop list for complete
     private void getDropObjectFromRowToComplete(final int position) {
         DropItem interactedDrop = DropsTabFragment.dropTabInteractionList.get(position);
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
@@ -218,35 +204,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     public void onBindViewHolder(final DropViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        /*// To-do Toggle Listener
-        if (viewHolder.todoButton != null) {
-            viewHolder.todoButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getTrickleObjectFromRowToAdd(position);
-                    removeDropFromView(position);
-                }
-            });
-        }*/
-
-       /* // Complete CheckBox Listener
-        if (viewHolder.completeButton != null) {
-            viewHolder.completeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getDropObjectFromRowToComplete(position);
-//                    removeDropFromView(position);
-                    Log.d("checkbox", "Checked");
-
-                    Log.d("checkbox", "UnChecked");
-                }
-            });
-        }*/
-
-
-
-
-        // View all other Drop Clicks
         viewHolder.description.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -275,7 +232,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             }
         });
 
-        // View otherUser Clicks
         viewHolder.parseProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -290,12 +246,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             }
         });
 
-//        viewHolder.share.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//               shareDrop(position);
-//            }
-//        });
+        viewHolder.authorRank.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewOtherUser(position);
+            }
+        });
+
     }
 
     // TODO: 11/19/2015 SHare function
@@ -364,6 +321,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String mDropObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
         String mAuthorName = (data.get(position).getAuthorName());
+        String mAuthorRank = (data.get(position).getAuthorRank());
         String mDropDescription = (data.get(position).getDescription());
         String mRipleCount = (data.get(position).getRipleCount());
         String mCommentCount = (data.get(position).getCommentCount());
@@ -381,10 +339,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);
+        intent.putExtra("authorRank", mAuthorRank);
         intent.putExtra("dropDescription", mDropDescription);
         intent.putExtra("ripleCount", mRipleCount);
         intent.putExtra("commentCount", mCommentCount);
         intent.putExtra("createdAt", mCreatedAt);
+
         mContext.startActivity(intent);
     }
 
@@ -401,7 +361,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
 
     //DropViewHolder//////////////////////////////////////////////////////////////////////////////
-    public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private final Button todoButton;
         private final Button completeButton;
@@ -441,7 +401,31 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 menuButton.setOnClickListener(this);
             }
 
+            if (itemView != null) {
+                itemView.setOnLongClickListener(this);
+            }
 
+            if(parseProfilePicture != null) {
+                parseProfilePicture.setOnLongClickListener(this);
+            }
+            if(authorName != null) {
+                authorName.setOnLongClickListener(this);
+            }
+            if(authorRank != null) {
+                authorRank.setOnLongClickListener(this);
+            }
+            if(createdAt != null) {
+                createdAt.setOnLongClickListener(this);
+            }
+            if(description != null) {
+                description.setOnLongClickListener(this);
+            }
+            if(commentCount != null) {
+                commentCount.setOnLongClickListener(this);
+            }
+            if(ripleCount != null) {
+                ripleCount.setOnLongClickListener(this);
+            }
         }
 
         public void update(int position){
@@ -460,8 +444,29 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         @Override
         public void onClick(View view) {
             if (view == todoButton) {
-                getTrickleObjectFromRowToAdd(getAdapterPosition());
-                removeDropFromView(getAdapterPosition());
+
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
+                displayNameCheck = (String) currentUser.get("displayName");
+
+                if (parseProfilePictureCheck == null && displayNameCheck == null) {
+                    Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(mContext, SettingsActivity.class);
+                    mContext.startActivity(intent);
+                } else if (parseProfilePicture == null) {
+                    Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(mContext, SettingsActivity.class);
+                    mContext.startActivity(intent);
+
+                } else if (displayNameCheck == null) {
+                    Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(mContext, SettingsActivity.class);
+                    mContext.startActivity(intent);
+                } else {
+
+                    getTrickleObjectFromRowToAdd(getAdapterPosition());
+                    removeDropFromView(getAdapterPosition());
+                }
             }
 
             if (view == completeButton) {
@@ -478,20 +483,15 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             }
         }
 
-//        public CharSequence[] getMenuContext() {
-//
-//            //Not your Drop
-//
-//            //to-do Drop
-//
-//
-//            if (mTabName.equals(drop)) {
-//                return todoDrop;
-//            } else {
-//                return notYourDrop;
-//            }
-//        }
-
+        @Override
+        public boolean onLongClick(View v) {
+            if (mTabName.equals(drop)) {
+                showDropMenu();
+            } else {
+                showTrickleMenu();
+            }
+            return false;
+        }
 
         public void showTrickleMenu() {
 
@@ -535,16 +535,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             builder.show();
         }
 
+
     }
 
     public void removeDropFromView(int position) {
         data.remove(position);
         notifyItemRemoved(position);
     }
-
-
-
-
 }
 
 

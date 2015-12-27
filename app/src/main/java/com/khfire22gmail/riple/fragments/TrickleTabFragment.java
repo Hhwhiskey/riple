@@ -46,8 +46,8 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 /**
  * Created by Kevin on 9/8/2015.
  */
-// TODO WaveSwipeRefreshLayout
-public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLayout.OnRefreshListener*/ {
+
+public class TrickleTabFragment extends Fragment {
 
     public static final String TAG = TrickleTabFragment.class.getSimpleName();
 
@@ -78,6 +78,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
         mRecyclerView.getItemAnimator().setRemoveDuration(500);
+        trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
         //Swipe Refresh
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.trickle_swipe);
@@ -88,7 +89,7 @@ public class TrickleTabFragment extends Fragment /*implements WaveSwipeRefreshLa
             }
         });
 
-        trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
+
 
 
         AllDropsTask allDropsTask = new AllDropsTask(new LoadRelationsDropsTask(true));

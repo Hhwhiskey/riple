@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.facebook.login.widget.ProfilePictureView;
+import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
@@ -85,6 +86,7 @@ public class DropCommentsActivity extends AppCompatActivity {
     private String drop;
     private String trickle;
     private int mPosition;
+    private String displayName;
 
 
     @Override
@@ -179,62 +181,48 @@ public class DropCommentsActivity extends AppCompatActivity {
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
 
-        Button postCommentButton = (Button) findViewById(R.id.button_post_comment);
+        final Button postCommentButton = (Button) findViewById(R.id.button_post_comment);
         newCommentView = (AutoCompleteTextView) findViewById(R.id.enter_comment_text);
 
         // Allow user to input Drop
         postCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+             @Override
+             public void onClick(View v) {
 
-                commentText = newCommentView.getEditableText().toString();
-                try {
-                    postNewComment(commentText);
-                    newCommentView.setText("");
-//                    generatedString = "";
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                 ParseUser currentUser = ParseUser.getCurrentUser();
+                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
+                 displayName = (String) currentUser.get("displayName");
 
-//        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
-//        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
+                 if (parseProfilePicture == null && displayName == null) {
+                     Toast.makeText(getApplicationContext(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                     Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+                     startActivity(intent);
+                 } else if (parseProfilePicture == null) {
+                     Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                     Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+                     startActivity(intent);
+
+                 } else if (displayName == null) {
+                     Toast.makeText(getApplicationContext(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                     Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+                     startActivity(intent);
+                 } else  {
+                     commentText = newCommentView.getEditableText().toString();
+                     try {
+                         postNewComment(commentText);
+                         newCommentView.setText("");
+
+                     } catch (InterruptedException e) {
+                         e.printStackTrace();
+                     }
+                 }
+
+             }
+         });
 
         loadCommentsFromParse();
-
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setItemAnimator((RecyclerView.ItemAnimator) animator);
-
-
-/////////Add/Remove/Complete Drop from within ViewDrop//////////////////////////////////////////////////
-        //To do Switch
-//        if (viewedDropTodoSwitch != null) {
-           /* viewedDropTodoSwitch = (Switch) findViewById(R.id.switch_todo);
-            viewedDropTodoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        getDropObjectToAdd(mDropObjectId);
-                    } else {
-                        getDropObjectToRemove(mDropObjectId);
-                    }
-                }
-            });*/
-//        }
-
-       /* // Complete CheckBox Listener
-        if (completeDropButton != null) {
-            completeDropButton = (Button) findViewById(R.id.button_complete);
-            completeDropButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        getDropObjectToComplete(mDropObjectId);
-                    }
-                }
-            });
-        }*/
     }
 
     private void getViewedUserProfilePicture(String mAuthorId) {
@@ -261,109 +249,20 @@ public class DropCommentsActivity extends AppCompatActivity {
         });
     }
 
-    private void viewCompletedBy(){
+    private void viewCompletedBy() {
 
         Intent intent = new Intent(DropCommentsActivity.this, DropCompletedActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);
+        intent.putExtra("authorRank", mAuthorRank);
         intent.putExtra("dropDescription", mDropDescription);
         intent.putExtra("ripleCount", mRipleCount);
         intent.putExtra("commentCount", mCommentCount);
         intent.putExtra("createdAt", mCreatedAt);
+
         this.startActivity(intent);
     }
-
-    /*private void getDropObjectToAdd(String mDropObjectId) {
-
-        ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
-        viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    todoDrop(object);
-                }
-            }
-        });
-    }
-
-    private void getDropObjectToRemove(String mDropObjectId) {
-
-        ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
-        viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    removeFromTodo(object);
-                }
-            }
-        });
-    }
-
-    private void getDropObjectToComplete(String mDropObjectId) {
-
-        ParseQuery<ParseObject> viewedDropQuery = ParseQuery.getQuery("Drop");
-        viewedDropQuery.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    completeDrop(object);
-                }
-            }
-        });
-    }
-
-    public static void todoDrop(ParseObject viewedDropObject) {
-
-        ParseUser user = ParseUser.getCurrentUser();
-
-        ParseRelation<ParseObject> todoRelation1 = user.getRelation("todoDrops");
-        todoRelation1.add(viewedDropObject);
-        user.saveInBackground();
-
-        ParseRelation<ParseObject> todoRelation2 = user.getRelation("hasRelationTo");
-        todoRelation2.add(viewedDropObject);
-        user.saveInBackground();
-    }
-
-    public void removeFromTodo(ParseObject viewedDropObject) {
-
-        ParseUser user = ParseUser.getCurrentUser();
-
-        ParseRelation<ParseObject> removeRelation1 = user.getRelation("todoDrops");
-        removeRelation1.remove(viewedDropObject);
-        user.saveInBackground();
-
-        ParseRelation<ParseObject> removeRelation2 = user.getRelation("hasRelationTo");
-        removeRelation2.remove(viewedDropObject);
-        user.saveInBackground();
-    }
-
-    public void completeDrop(ParseObject viewedDropObject) {
-
-        //Increment the user
-        ParseUser user = ParseUser.getCurrentUser();
-        user.increment("userRipleCount");
-        user.saveInBackground();
-
-        //Increment the Drop
-        viewedDropObject.increment("ripleCount");
-        viewedDropObject.saveInBackground();
-
-        ParseRelation completeRelation1 = user.getRelation("completedDrops");
-        completeRelation1.add(viewedDropObject);
-
-        ParseRelation completeRelation2 = user.getRelation("todoDrops");
-        completeRelation2.remove(viewedDropObject);
-        user.saveInBackground();
-
-        ParseRelation completeRelation3 = user.getRelation("hasRelationTo");
-        completeRelation3.add(viewedDropObject);
-        user.saveInBackground();
-
-        //Todo Add completed timestamp and update the data on parse
-       *//* Date date = new Date();
-        Long time = (date.getTime());*//*
-    }*/
-/////////////////////////////////////////////////////////////////////
-
 
     public void loadCommentsFromParse() {
         final List<CommentItem> commentList = new ArrayList<>();
@@ -388,7 +287,6 @@ public class DropCommentsActivity extends AppCompatActivity {
 
                         ParseObject commenterData = (ParseObject) list.get(i).get("commenterPointer");
 
-
                         //Commenter data////////////////////////////////////////////////////////////
                         ParseFile profilePicture = (ParseFile) commenterData.get("parseProfilePicture");
                         if (profilePicture != null) {
@@ -399,7 +297,7 @@ public class DropCommentsActivity extends AppCompatActivity {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                       commentItem.setParseProfilePicture(bmp);
+                                        commentItem.setParseProfilePicture(bmp);
                                         updateRecyclerView(commentList);
                                     }
                                 }
@@ -414,7 +312,7 @@ public class DropCommentsActivity extends AppCompatActivity {
                         commentItem.setCommenterName((String) commenterData.get("displayName"));
 
                         //Rank
-                        commentItem.setCommenterRank((String)commenterData.get("userRank"));
+                        commentItem.setCommenterRank((String) commenterData.get("userRank"));
 
                         //Comment Data/////////////////////////////////////////////////////////////
                         // DropId
@@ -425,23 +323,6 @@ public class DropCommentsActivity extends AppCompatActivity {
 
                         //Date
                         commentItem.setCreatedAt(list.get(i).getCreatedAt());
-
-//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
-                        //Drop Title
-//                        dropItem.setTitle(list.get(i).getString("title"));
-
-                        //Drop description
-//                        dropItem.setDescription(list.get(i).getString("description"));
-
-                        //Riple Count
-//                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-
-                        //Comment Count
-//                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-                        //Id that connects commenterName to drop
-//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
 
                         commentList.add(commentItem);
                     }
@@ -470,16 +351,11 @@ public class DropCommentsActivity extends AppCompatActivity {
         if (commentText != null) {
             comment.put("dropId", mDropObjectId);
             comment.put("commenterPointer", user);
-//            comment.put("commenterId", user.getObjectId());
-//            comment.put("commenterName", user.get("username"));
-//            comment.put("commenterProfilePicture", user.getParseFile("parseProfilePicture"));
             comment.put("commentText", commentText);
             comment.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
                     Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
-
-//                    recreate();
                     loadCommentsFromParse();
                 }
             });
@@ -508,7 +384,7 @@ public class DropCommentsActivity extends AppCompatActivity {
 
         //get parse profile picture if exists, if not, store Facebook picture on Parse and show
 
-        if(parseProfilePicture != null) {
+        if (parseProfilePicture != null) {
             Glide.with(this)
                     .load(parseProfilePicture.getUrl())
                     .crossFade()
@@ -517,7 +393,7 @@ public class DropCommentsActivity extends AppCompatActivity {
                     .signature(new StringSignature(UUID.randomUUID().toString()))
                     .into(commenterProfilePictureView);
         } else {
-            Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
             startActivity(intent);
         }
@@ -540,7 +416,7 @@ public class DropCommentsActivity extends AppCompatActivity {
     }
 
     public void hideSoftKeyboard() {
-        if(getCurrentFocus()!=null) {
+        if (getCurrentFocus() != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
@@ -570,7 +446,7 @@ public class DropCommentsActivity extends AppCompatActivity {
 
     public void showTrickleMenu() {
 
-        CharSequence trickleDrop[] = new CharSequence[] {"Share", "Report"};
+        CharSequence trickleDrop[] = new CharSequence[]{"Share", "Report"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
@@ -590,7 +466,7 @@ public class DropCommentsActivity extends AppCompatActivity {
 
     public void showDropMenu() {
 
-        CharSequence todoDrop[] = new CharSequence[] {"Share", "Remove From Todo", "Report"};
+        CharSequence todoDrop[] = new CharSequence[]{"Share", "Remove From Todo", "Report"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
@@ -600,8 +476,8 @@ public class DropCommentsActivity extends AppCompatActivity {
                 if (selected == 0) {
                     //share
                 } else if (selected == 1) {
-                   getDropObject(mDropObjectId);
-                } else if (selected == 2){
+                    getDropObject(mDropObjectId);
+                } else if (selected == 2) {
                     //report
                 }
             }
@@ -618,6 +494,7 @@ public class DropCommentsActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     public void removeFromTodo(ParseObject dropObject) {
@@ -631,6 +508,9 @@ public class DropCommentsActivity extends AppCompatActivity {
         ParseRelation<ParseObject> removeRelation2 = user.getRelation("hasRelationTo");
         removeRelation2.remove(dropObject);
         user.saveInBackground();
+
+        Intent intent = new Intent(DropCommentsActivity.this, MainActivity.class);
+        startActivity(intent);
 
 //        DropAdapter.data.remove(mPosition);
     }

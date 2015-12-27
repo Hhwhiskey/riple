@@ -52,8 +52,6 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
  */
 public class RipleTabFragment extends Fragment {
 
-
-
     private ImageView profilePictureView;
     private TextView nameView;
     private RecyclerView ripleRecyclerView;
@@ -67,18 +65,22 @@ public class RipleTabFragment extends Fragment {
     private boolean ripleTipBoolean;
     private TextView ripleEmptyView;
     private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
-    private ParseUser currentUser = ParseUser.getCurrentUser();
+    private ParseUser currentUser;
 
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        updateUserInfo();
-    }
+//    @Override
+//    public void onActivityCreated(Bundle savedInstanceState) {
+//        super.onActivityCreated(savedInstanceState);
+//
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
+
+        currentUser =  ParseUser.getCurrentUser();
+
+        //loadSavedPreferences();
 
         ripleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         ripleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -86,13 +88,44 @@ public class RipleTabFragment extends Fragment {
 
         ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
 
-        //Profile Card
+        //Displays data on profile Card
         profilePictureView = (ImageView) view.findViewById(R.id.profile_card_picture);
         nameView = (TextView) view.findViewById(R.id.profile_name);
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
+
+        //Update riple list and profile card
+        loadRipleItemsFromParse();
+        updateUserInfo();
+
         savePreferences("ripleTipBoolean", true);
 
+        profilePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewCurrentUserProfileExtra();
+            }
+        });
+
+        nameView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                viewCurrentUserProfileExtra();
+            }
+        });
+
+        profileRankView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                viewCurrentUserProfileExtra();
+            }
+        });
+
+        profileRipleCountView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                viewCurrentUserProfileExtra();
+            }
+        });
+
+        //Pull refresh fetch
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.riple_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
@@ -102,44 +135,6 @@ public class RipleTabFragment extends Fragment {
                 new Task().execute();
             }
         });
-
-
-//        loadSavedPreferences();
-
-
-
-        currentUser = ParseUser.getCurrentUser();
-
-        //Query the users created and completed drops_blue
-
-        loadRipleItemsFromParse();
-
-        nameView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                viewOtherUser();
-            }
-        });
-
-        profileRankView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                viewOtherUser();
-            }
-        });
-
-        profileRipleCountView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                viewOtherUser();
-            }
-        });
-
-//        int size = (int) getResources().getDimension(R.dimen.com_facebook_profilepictureview_preset_size_large);
-//        profilePictureView.setPresetSize(ProfilePictureView.LARGE);
-
-//        Fetch Facebook user info if it is logged
-//        ParseUser currentUser = ParseUser.getCurrentUser();
-//        if ((currentUser != null) && currentUser.isAuthenticated()) {
-//
-//        }
 
         return view;
     }
@@ -194,13 +189,12 @@ public class RipleTabFragment extends Fragment {
         builder.show();
     }
 
-    private void viewOtherUser() {
+
+    // Extra for currentUser profile view
+    private void viewCurrentUserProfileExtra() {
 
         String currentUserId = currentUser.getObjectId();
         String currentUserName = currentUser.getString("displayName");
-
-        Log.d("sDropViewUser", "Clicked User's Id = " + currentUserId);
-        Log.d("sDropViewUser", "Clicked User's Name = " + currentUserName);
 
         Intent intent = new Intent(getActivity(), ViewUserActivity.class);
         intent.putExtra("clickedUserId", currentUserId);
@@ -208,22 +202,11 @@ public class RipleTabFragment extends Fragment {
         getActivity().startActivity(intent);
     }
 
-
-    // Listen
-    // Action
-    public interface onDropPostListener {
-        public void onDropPost();
-    }
-
-    public onDropPostListener dropPostListener;
-
     public void loadRipleItemsFromParse() {
         final ArrayList<DropItem> ripleList = new ArrayList<>();
 
-        ParseUser user = ParseUser.getCurrentUser();
-
-        ParseRelation createdRelation = user.getRelation("createdDrops");
-        ParseRelation completedRelation = user.getRelation("completedDrops");
+        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
+        ParseRelation completedRelation = currentUser.getRelation("completedDrops");
 
         ParseQuery createdQuery = createdRelation.getQuery();
         ParseQuery completedQuery = completedRelation.getQuery();
@@ -301,8 +284,6 @@ public class RipleTabFragment extends Fragment {
 
                     }
                 }
-
-
             }
         });
     }
@@ -326,7 +307,6 @@ public class RipleTabFragment extends Fragment {
 
     private void updateUserInfo() {
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
         String userName = currentUser.getString("displayName");
         String facebookId = currentUser.getString("facebookId");
 
@@ -357,12 +337,11 @@ public class RipleTabFragment extends Fragment {
         if (userName != null) {
             nameView.setText(userName);
         } else {
-            nameView.setText("Set your name!");
+            nameView.setText("Anonymous");
         }
 
 
         //Update Riple count and Rank
-
         ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
         userRipleCountQuery.whereEqualTo("userPointer", currentUser);
         userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
@@ -397,13 +376,13 @@ public class RipleTabFragment extends Fragment {
         if (ripleCount > 639) {
             ripleRank = ("\"Humanitarian\"");//7
         }
-        if (ripleCount > 1279) {
+        if (ripleCount > 1299) {
             ripleRank = ("\"Saint\"");//8
         }
-        if (ripleCount > 2559) {
+        if (ripleCount > 2499) {
             ripleRank = ("\"Gandhi\"");//9
         }
-        if (ripleCount > 5119) {
+        if (ripleCount > 4999) {
             ripleRank = ("\"Mother Teresa\"");//10
         }
 

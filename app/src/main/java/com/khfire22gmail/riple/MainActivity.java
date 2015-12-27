@@ -58,35 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //uncomment below if you want to test if messaging service is starting
-        /*progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-
-        //broadcast receiver to listen for the broadcast
-        //from MessageService
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Boolean success = intent.getBooleanExtra("success", false);
-                progressDialog.dismiss();
-
-                //show a toast message if the Sinch
-                //service failed to start
-                if (!success) {
-                    Toast.makeText(getApplicationContext(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.khfire22gmail.riple.MainActivity"));*/
-
-
-
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         startService(serviceIntent);
-
-//        ScrollingFABBehavior(this, obtainStyledAttributes(R.attr.toolBarHeight));
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {

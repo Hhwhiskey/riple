@@ -35,7 +35,7 @@
         android:text="This is where your activity will be displayed. Start making Riples!"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
     </FrameLayout>
 
 </LinearLayout>

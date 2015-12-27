@@ -266,13 +266,6 @@ public class MessagingActivity extends AppCompatActivity {
                 final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
                 messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
 
-
-                //Later, I'll show you how to store the
-                //message in Parse, so you can retrieve and
-                //display them every time the conversation is opened
-
-
-//only add message to parse database if it doesn't already exist there
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
                 query.whereEqualTo("sinchId", message.getMessageId());
                 query.findInBackground(new FindCallback<ParseObject>() {

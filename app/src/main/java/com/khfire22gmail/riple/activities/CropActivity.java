@@ -1,5 +1,6 @@
 package com.khfire22gmail.riple.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +29,7 @@ public class CropActivity extends AppCompatActivity {
     private static final int GUIDELINES_ON_TOUCH = 1;
     private CropImageView selectedPicture;
     private ParseUser currentUser = ParseUser.getCurrentUser();
+    ProgressDialog saveDialog;
 
     // Activity Methods ////////////////////////////////////////////////////////////////////////////
 
@@ -175,6 +177,15 @@ public class CropActivity extends AppCompatActivity {
                 croppedImage.recycle();
                 byte[] byteArray = stream.toByteArray();
                 saveImageToParse(byteArray);
+
+                saveDialog = new ProgressDialog(CropActivity.this);
+                saveDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                saveDialog.setMessage("Saving picture... Please wait...");
+                saveDialog.setIndeterminate(true);
+                saveDialog.setCanceledOnTouchOutside(false);
+                saveDialog.show();
+                Intent intent = new Intent(CropActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -189,8 +200,8 @@ public class CropActivity extends AppCompatActivity {
                     currentUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            Intent intent = new Intent(CropActivity.this, MainActivity.class);
-                            startActivity(intent);
+                            saveDialog.dismiss();
+
                         }
                     });
                 }

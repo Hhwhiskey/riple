@@ -139,7 +139,8 @@ public class ParseLoginActivity extends AppCompatActivity {
                                             emailVerified = user.getBoolean("emailVerified");
 //                                            if (emailVerified) {
                                                 startActivity(intent);
-//                                            } else {
+
+//                                           } else {
                                                 Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
                                                                 " address before you begin using Riple!",
                                                         Toast.LENGTH_LONG ).show();

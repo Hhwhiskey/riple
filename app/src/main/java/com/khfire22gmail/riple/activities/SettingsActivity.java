@@ -1,5 +1,6 @@
 package com.khfire22gmail.riple.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -69,6 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Bitmap resizedBitmap;
     private Bitmap resizedAndCroppedBitmap;
     private Bitmap bitmap;
+    private ProgressDialog selectDialog;
 
 
     @Override
@@ -223,6 +225,7 @@ public class SettingsActivity extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         // Always show the chooser (if there are multiple options available)
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CODE);
+
     }
 
 
@@ -238,6 +241,7 @@ public class SettingsActivity extends AppCompatActivity {
             try {
 
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -245,6 +249,7 @@ public class SettingsActivity extends AppCompatActivity {
             resizedBitmap = scaleBitmap(bitmap);
 
             try {
+
                 //Write file
                 String filename = "bitmap.png";
                 FileOutputStream stream = this.openFileOutput(filename, Context.MODE_PRIVATE);
@@ -265,6 +270,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private Bitmap scaleBitmap(Bitmap bm) {
+
         int width = bm.getWidth();
         int height = bm.getHeight();
 
@@ -291,6 +297,7 @@ public class SettingsActivity extends AppCompatActivity {
         Log.v("Pictures", "after scaling Width and height are " + width + "--" + height);
 
         bm = Bitmap.createScaledBitmap(bm, width, height, true);
+
         return bm;
     }
 

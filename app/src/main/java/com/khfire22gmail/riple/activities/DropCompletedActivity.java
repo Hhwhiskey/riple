@@ -54,6 +54,8 @@ public class DropCompletedActivity extends AppCompatActivity {
     private TextView commentCountView;
     private TextView createdAtView;
     private ImageView authorProfilePicture;
+    private String mAuthorRank;
+    private TextView mAuthorRankView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,7 @@ public class DropCompletedActivity extends AppCompatActivity {
         mDropObjectId = intent.getStringExtra("dropObjectId");
         mAuthorId = intent.getStringExtra("authorId");
         mAuthorName = intent.getStringExtra("commenterName");
+        mAuthorRank = intent.getStringExtra("authorRank");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
@@ -75,6 +78,9 @@ public class DropCompletedActivity extends AppCompatActivity {
 
         nameView = (TextView) findViewById(R.id.name);
         nameView.setText(mAuthorName);
+
+        mAuthorRankView = (TextView) findViewById(R.id.author_rank);
+        mAuthorRankView.setText(mAuthorRank);
 
         descriptionView = (TextView) findViewById(R.id.description);
         descriptionView.setText(mDropDescription);

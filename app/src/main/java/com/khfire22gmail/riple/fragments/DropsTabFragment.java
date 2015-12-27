@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnticipateInterpolator;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
@@ -50,8 +49,6 @@ public class DropsTabFragment extends Fragment {
     private List<DropItem> mDropList;
     private List<DropItem> dropList;
     private DropAdapter mDropAdapter;
-    private RecyclerView.ItemAnimator animator;
-    private CheckBox completeCheckBox;
     public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();
     public static ArrayList<DropItem> dropTabInteractionList;
     private boolean dropTips;
@@ -63,11 +60,11 @@ public class DropsTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
 
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
         mRecyclerView.getItemAnimator().setRemoveDuration(500);
+        dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
 
         //Swipe Refresh
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.drop_swipe);
@@ -81,7 +78,7 @@ public class DropsTabFragment extends Fragment {
 
 
 
-        dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
+
 
 
         //        loadSavedPreferences();
@@ -122,7 +119,6 @@ public class DropsTabFragment extends Fragment {
 
             }
         });
-
 
         builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
             @Override
@@ -233,10 +229,8 @@ public class DropsTabFragment extends Fragment {
 
         mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
-        scaleAdapter.setDuration(500);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-
-
+        scaleAdapter.setDuration(500);
     }
 
     @Override
