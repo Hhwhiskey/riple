@@ -386,7 +386,6 @@ public class RipleTabFragment extends Fragment {
             ripleRank = ("\"Mother Teresa\"");//10
         }
 
-
         // Save the currentUser ripleCount and rank to the user table
         currentUser.put("userRipleCount", ripleCount);
         currentUser.put("userRank", ripleRank);
@@ -400,6 +399,22 @@ public class RipleTabFragment extends Fragment {
         }
         profileRankView.setText(ripleRank);
     }
+
+//    public void updateReportCount() {
+//        ParseQuery userReportCountQuery = ParseQuery.getQuery("UserReportCount");
+//        userReportCountQuery.whereEqualTo("userPointer", currentUser);
+//        userReportCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+//            @Override
+//            public void done(ParseObject parseObject, ParseException e) {
+//                updateReportCount(parseObject);
+//                String reportCount = parseObject.getString("reportCount");
+//
+//            }
+//        });
+//
+//
+//    }
+
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImageView;

@@ -348,7 +348,7 @@ public class DropCommentsActivity extends AppCompatActivity {
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseObject comment = new ParseObject("Comments");
 
-        if (commentText != null) {
+        if(commentText != null && !commentText.isEmpty()) {
             comment.put("dropId", mDropObjectId);
             comment.put("commenterPointer", user);
             comment.put("commentText", commentText);
@@ -359,19 +359,22 @@ public class DropCommentsActivity extends AppCompatActivity {
                     loadCommentsFromParse();
                 }
             });
-        }
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
 
-        query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-            public void done(ParseObject drop, ParseException e) {
-                if (e == null) {
+            query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+                public void done(ParseObject drop, ParseException e) {
+                    if (e == null) {
 
-                    drop.increment("commentCount");
-                    drop.saveInBackground();
+                        drop.increment("commentCount");
+                        drop.saveInBackground();
+                    }
                 }
-            }
-        });
+            });
+
+        } else {
+            Toast.makeText(DropCommentsActivity.this, "Please enter some text first!", Toast.LENGTH_LONG).show();
+        }
 
         hideSoftKeyboard();
     }

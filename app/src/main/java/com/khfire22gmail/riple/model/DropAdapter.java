@@ -48,7 +48,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private ParseFile parseProfilePictureCheck;
     private String displayNameCheck;
 
-    public DropAdapter(Context context, List<DropItem> data, String tabName){
+    public DropAdapter(Context context, List<DropItem> data, String tabName) {
         mContext = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -125,8 +125,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         interactedDropQuery.getInBackground(interactedDrop.getObjectId(), new GetCallback<ParseObject>() {
             public void done(ParseObject dropObject, ParseException e) {
                 if (e == null) {
-                    ParseObject dropAuthor = dropObject.getParseObject("authorPointer");
-                    completeDropAndIncrement(dropObject, dropAuthor);
+                    ParseObject dropAuthorPointer = dropObject.getParseObject("authorPointer");
+                    completeDropAndIncrement(dropObject, dropAuthorPointer);
                 }
             }
         });
@@ -137,7 +137,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         ParseUser user = ParseUser.getCurrentUser();
 
-        ParseRelation <ParseObject> todoRelation1 = user.getRelation("todoDrops");
+        ParseRelation<ParseObject> todoRelation1 = user.getRelation("todoDrops");
         todoRelation1.add(trickleObject);
         user.saveInBackground();
 
@@ -168,23 +168,20 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         //Modify currentUser relations to Drop
         ParseRelation completeRelation1 = currentUser.getRelation("completedDrops");
         completeRelation1.add(mDropObject);
-
         ParseRelation completeRelation2 = currentUser.getRelation("todoDrops");
         completeRelation2.remove(mDropObject);
-        currentUser.saveInBackground();
-
         ParseRelation completeRelation3 = currentUser.getRelation("hasRelationTo");
         completeRelation3.add(mDropObject);
-        currentUser.saveInBackground();
+
+        currentUser.saveEventually();
 
         //Add to completedBy list
         ParseRelation completedByRelation = mDropObject.getRelation("completedBy");
         completedByRelation.add(currentUser);
-        mDropObject.saveInBackground();
-
         //Increment the Drop
         mDropObject.increment("ripleCount");
-        mDropObject.saveInBackground();
+
+        mDropObject.saveEventually();
 
         //Increment the Author
         ParseQuery ripleCountQuery = ParseQuery.getQuery("UserRipleCount");
@@ -316,7 +313,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         mContext.startActivity(intent);
     }
 
-    private void viewCompletedBy(int position){
+    private void viewCompletedBy(int position) {
 
         String mDropObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
@@ -348,200 +345,292 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         mContext.startActivity(intent);
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
+    //Report the Drop author and store the Drop in question in UserReportCount table
+    public void reportDropAuthor(final int position) {
+
+        final String dropObjectId = data.get(position).getObjectId();
+
+        //Get Drop data, which includes the Author pointer
+        ParseQuery parseQuery = ParseQuery.getQuery("Drop");
+        parseQuery.whereEqualTo("objectId", dropObjectId);
+        parseQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(final ParseObject dropObject, ParseException e) {
+                if (e == null) {
+                    //Get author pointer out of Drop
+                    final ParseObject reportedDropAuthorPointer = dropObject.getParseObject("authorPointer");
+
+                    //Get author for report
+                    ParseQuery reportQuery = ParseQuery.getQuery("UserReportCount");
+                    reportQuery.whereEqualTo("userPointer", reportedDropAuthorPointer);
+                    reportQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(final ParseObject reportedUser, ParseException e) {
+                            //Increment the author's report count and save mark the Drop in question
+                            ParseRelation reportRelation = reportedUser.getRelation("reportedDrops");
+                            reportRelation.add(dropObject);
+                            reportedUser.increment("reportCount");
+                            reportedUser.saveEventually();
+                        }
+                    });
+                }
+            }
+        });
     }
 
-    /**
-     * If the Drop belongs to the current user, they may delete it or share it
-     *
-     * If the Drop does not belong to the current user, they may report it/the author or share it.
-     */
+    /*public void reportDropAuthor(final int position) {
+
+        final DropItem reportedDrop = data.get(position);
+        final String dropObjectId = data.get(position).getObjectId();
+        //Get the reported author
+        ParseQuery<ParseObject> reportedDropQuery = ParseQuery.getQuery("Drop");
+        reportedDropQuery.getInBackground(reportedDrop.getObjectId(), new GetCallback<ParseObject>() {
+            public void done(ParseObject dropObject, ParseException e) {
+                if (e == null) {
+                    final ParseObject reportedDropAuthorPointer = dropObject.getParseObject("authorPointer");
+                    ParseQuery reportQuery = ParseQuery.getQuery("UserReportCount");
+                    reportQuery.whereEqualTo("userPointer", reportedDropAuthorPointer);
+                    reportQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(final ParseObject reportedUser, ParseException e) {
+                            //Increment the reported authors report count
+                            reportedUser.increment("reportCount");
+                            reportedUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    //Add the reported Drop to reported Drops relational list
+                                    ParseQuery parseQuery = ParseQuery.getQuery("Drop");
+                                    parseQuery.whereEqualTo("objectId", dropObjectId);
+                                    parseQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                                        @Override
+                                        public void done(ParseObject dropObject, ParseException e) {
 
 
-    //DropViewHolder//////////////////////////////////////////////////////////////////////////////
-    public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+                                            ParseRelation reportRelation = reportedDropAuthorPointer.getRelation("reportedDrops");
+                                            reportRelation.add(dropObject);
+                                            reportedDropAuthorPointer.saveInBackground();
 
-        private final Button todoButton;
-        private final Button completeButton;
-        private ImageView menuButton;
-        public TextView authorName;
-        public TextView createdAt;
-        public TextView description;
-        public TextView ripleCount;
-        public TextView commentCount;
-        public TextView authorRank;
-        private ImageView parseProfilePicture;
+//                                            ParseObject reportedDrop = new ParseObject("UserReportCount");
+//                                            ParseRelation reportRelation = reportedDrop.getRelation("reportedDrops");
+//                                            reportRelation.add(dropObject);
+//                                            reportedDrop.saveInBackground();
+
+//
+//
+//
+//                                         ParseObject reportedDrop = new ParseObject("UserReportCount");
+//                                            reportedDrop.put("userPointer", dropObject);
+//                                            reportedDrop.saveInBackground();
 
 
-        public DropViewHolder(View itemView) {
-            super(itemView);
+                                        }
+                                    });
+                                }
 
-            parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
-            todoButton = (Button) itemView.findViewById(R.id.button_todo);
-            completeButton = (Button) itemView.findViewById(R.id.button_complete);
-            createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
-            authorName = (TextView) itemView.findViewById(R.id.name);
-            description = (TextView) itemView.findViewById(R.id.description);
-            ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
-            commentCount = (TextView) itemView.findViewById(R.id.comment_count);
-            authorRank = (TextView) itemView.findViewById(R.id.author_rank);
-            menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
-
-            if (todoButton != null) {
-                todoButton.setOnClickListener(this);
-            }
-
-            if (completeButton != null) {
-                completeButton.setOnClickListener(this);
-            }
-
-            if (menuButton != null) {
-                menuButton.setOnClickListener(this);
-            }
-
-            if (itemView != null) {
-                itemView.setOnLongClickListener(this);
-            }
-
-            if(parseProfilePicture != null) {
-                parseProfilePicture.setOnLongClickListener(this);
-            }
-            if(authorName != null) {
-                authorName.setOnLongClickListener(this);
-            }
-            if(authorRank != null) {
-                authorRank.setOnLongClickListener(this);
-            }
-            if(createdAt != null) {
-                createdAt.setOnLongClickListener(this);
-            }
-            if(description != null) {
-                description.setOnLongClickListener(this);
-            }
-            if(commentCount != null) {
-                commentCount.setOnLongClickListener(this);
-            }
-            if(ripleCount != null) {
-                ripleCount.setOnLongClickListener(this);
-            }
-        }
-
-        public void update(int position){
-
-            DropItem current = data.get(position);
-
-            parseProfilePicture.setImageBitmap(current.parseProfilePicture);
-            createdAt.setText(String.valueOf(current.createdAt));
-            authorName.setText(current.authorName);
-            description.setText(current.description);
-            ripleCount.setText(String.valueOf(current.ripleCount));
-            commentCount.setText(String.valueOf(current.commentCount));
-            authorRank.setText(current.authorRank);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (view == todoButton) {
-
-                ParseUser currentUser = ParseUser.getCurrentUser();
-                parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
-                displayNameCheck = (String) currentUser.get("displayName");
-
-                if (parseProfilePictureCheck == null && displayNameCheck == null) {
-                    Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(mContext, SettingsActivity.class);
-                    mContext.startActivity(intent);
-                } else if (parseProfilePicture == null) {
-                    Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(mContext, SettingsActivity.class);
-                    mContext.startActivity(intent);
-
-                } else if (displayNameCheck == null) {
-                    Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(mContext, SettingsActivity.class);
-                    mContext.startActivity(intent);
-                } else {
-
-                    getTrickleObjectFromRowToAdd(getAdapterPosition());
-                    removeDropFromView(getAdapterPosition());
+                            });
+                        }
+                    });
                 }
             }
+        });
+    }*/
 
-            if (view == completeButton) {
-                getDropObjectFromRowToComplete(getAdapterPosition());
-                removeDropFromView(getAdapterPosition());
+
+
+
+            @Override
+            public int getItemCount() {
+                return data.size();
             }
 
-            if (view == menuButton) {
-                if (mTabName.equals(drop)) {
-                    showDropMenu();
-                } else {
-                    showTrickleMenu();
-                }
-            }
-        }
+            /**
+             * If the Drop belongs to the current user, they may delete it or share it
+             *
+             * If the Drop does not belong to the current user, they may report it/the author or share it.
+             */
 
-        @Override
-        public boolean onLongClick(View v) {
-            if (mTabName.equals(drop)) {
-                showDropMenu();
-            } else {
-                showTrickleMenu();
-            }
-            return false;
-        }
 
-        public void showTrickleMenu() {
+            //DropViewHolder//////////////////////////////////////////////////////////////////////////////
+            public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-            CharSequence trickleDrop[] = new CharSequence[] {"Share", "Report"};
+                private final Button todoButton;
+                private final Button completeButton;
+                private ImageView menuButton;
+                public TextView authorName;
+                public TextView createdAt;
+                public TextView description;
+                public TextView ripleCount;
+                public TextView commentCount;
+                public TextView authorRank;
+                private ImageView parseProfilePicture;
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-            builder.setTitle("Drop Menu");
-            builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int selected) {
-                    if (selected == 0) {
-                        //share
-                    } else {
-                        //report
+
+                public DropViewHolder(View itemView) {
+                    super(itemView);
+
+                    parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
+                    todoButton = (Button) itemView.findViewById(R.id.button_todo);
+                    completeButton = (Button) itemView.findViewById(R.id.button_complete);
+                    createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
+                    authorName = (TextView) itemView.findViewById(R.id.name);
+                    description = (TextView) itemView.findViewById(R.id.description);
+                    ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
+                    commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+                    authorRank = (TextView) itemView.findViewById(R.id.author_rank);
+                    menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
+
+                    if (todoButton != null) {
+                        todoButton.setOnClickListener(this);
                     }
 
+                    if (completeButton != null) {
+                        completeButton.setOnClickListener(this);
+                    }
+
+                    if (menuButton != null) {
+                        menuButton.setOnClickListener(this);
+                    }
+
+                    if (itemView != null) {
+                        itemView.setOnLongClickListener(this);
+                    }
+
+                    if (parseProfilePicture != null) {
+                        parseProfilePicture.setOnLongClickListener(this);
+                    }
+                    if (authorName != null) {
+                        authorName.setOnLongClickListener(this);
+                    }
+                    if (authorRank != null) {
+                        authorRank.setOnLongClickListener(this);
+                    }
+                    if (createdAt != null) {
+                        createdAt.setOnLongClickListener(this);
+                    }
+                    if (description != null) {
+                        description.setOnLongClickListener(this);
+                    }
+                    if (commentCount != null) {
+                        commentCount.setOnLongClickListener(this);
+                    }
+                    if (ripleCount != null) {
+                        ripleCount.setOnLongClickListener(this);
+                    }
                 }
-            });
-            builder.show();
-        }
 
-        public void showDropMenu() {
+                public void update(int position) {
 
-            CharSequence todoDrop[] = new CharSequence[] {"Share", "Remove From Todo", "Report"};
+                    DropItem current = data.get(position);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-            builder.setTitle("Drop Menu");
-            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                    parseProfilePicture.setImageBitmap(current.parseProfilePicture);
+                    createdAt.setText(String.valueOf(current.createdAt));
+                    authorName.setText(current.authorName);
+                    description.setText(current.description);
+                    ripleCount.setText(String.valueOf(current.ripleCount));
+                    commentCount.setText(String.valueOf(current.commentCount));
+                    authorRank.setText(current.authorRank);
+                }
+
                 @Override
-                public void onClick(DialogInterface dialog, int selected) {
-                    if (selected == 0) {
-                        //share
-                    } else if (selected == 1) {
-                        getDropObjectFromRowToRemove(getAdapterPosition());
+                public void onClick(View view) {
+                    if (view == todoButton) {
+
+                        ParseUser currentUser = ParseUser.getCurrentUser();
+                        parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
+                        displayNameCheck = (String) currentUser.get("displayName");
+
+                        if (parseProfilePictureCheck == null && displayNameCheck == null) {
+                            Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(mContext, SettingsActivity.class);
+                            mContext.startActivity(intent);
+                        } else if (parseProfilePicture == null) {
+                            Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(mContext, SettingsActivity.class);
+                            mContext.startActivity(intent);
+
+                        } else if (displayNameCheck == null) {
+                            Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(mContext, SettingsActivity.class);
+                            mContext.startActivity(intent);
+                        } else {
+
+                            getTrickleObjectFromRowToAdd(getAdapterPosition());
+                            removeDropFromView(getAdapterPosition());
+                        }
+                    }
+
+                    if (view == completeButton) {
+                        getDropObjectFromRowToComplete(getAdapterPosition());
                         removeDropFromView(getAdapterPosition());
-                    } else if (selected == 2){
-                        //report
+                    }
+
+                    if (view == menuButton) {
+                        if (mTabName.equals(drop)) {
+                            showDropMenu();
+                        } else {
+                            showTrickleMenu();
+                        }
                     }
                 }
-            });
-            builder.show();
+
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mTabName.equals(drop)) {
+                        showDropMenu();
+                    } else {
+                        showTrickleMenu();
+                    }
+                    return false;
+                }
+
+                public void showTrickleMenu() {
+
+                    CharSequence trickleDrop[] = new CharSequence[]{"Share", "Report"};
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                    builder.setTitle("Drop Menu");
+                    builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int selected) {
+                            if (selected == 0) {
+                                //share
+                            } else {
+                                reportDropAuthor(getAdapterPosition());
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+
+                public void showDropMenu() {
+
+                    CharSequence todoDrop[] = new CharSequence[]{"Share", "Remove From Todo", "Report"};
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                    builder.setTitle("Drop Menu");
+                    builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int selected) {
+                            if (selected == 0) {
+                                //share
+                            } else if (selected == 1) {
+                                getDropObjectFromRowToRemove(getAdapterPosition());
+                                removeDropFromView(getAdapterPosition());
+                            } else if (selected == 2) {
+                                reportDropAuthor(getAdapterPosition());
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+
+
+            }
+
+            public void removeDropFromView(int position) {
+                data.remove(position);
+                notifyItemRemoved(position);
+            }
         }
-
-
-    }
-
-    public void removeDropFromView(int position) {
-        data.remove(position);
-        notifyItemRemoved(position);
-    }
-}
 
 

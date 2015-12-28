@@ -184,8 +184,7 @@ public class CropActivity extends AppCompatActivity {
                 saveDialog.setIndeterminate(true);
                 saveDialog.setCanceledOnTouchOutside(false);
                 saveDialog.show();
-                Intent intent = new Intent(CropActivity.this, MainActivity.class);
-                startActivity(intent);
+
             }
         });
     }
@@ -201,7 +200,8 @@ public class CropActivity extends AppCompatActivity {
                         @Override
                         public void done(ParseException e) {
                             saveDialog.dismiss();
-
+                            Intent intent = new Intent(CropActivity.this, MainActivity.class);
+                            startActivity(intent);
                         }
                     });
                 }

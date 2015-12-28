@@ -228,7 +228,13 @@ public class TitleActivity extends AppCompatActivity {
                                         userRipleCount.put("ripleCount", 0);
                                         userRipleCount.saveInBackground();
 
-                                        //Also create riple count tracker on the currentUser table for ease of use
+                                        //Create report count tracker on UserReportCount table to avoid ACL restrictions
+                                        ParseObject userReportCount = new ParseObject("UserReportCount");
+                                        userReportCount.put("userPointer", currentUser);
+                                        userReportCount.put("reportCount", 0);
+                                        userReportCount.saveInBackground();
+
+//                                  //Also create riple count tracker on the currentUser table for ease of use
                                         currentUser.put("userRipleCount", 0);
                                         currentUser.saveInBackground();
                                     }

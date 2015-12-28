@@ -159,13 +159,18 @@ public class ParseLoginActivity extends AppCompatActivity {
                                     userRipleCount.put("ripleCount", 0);
                                     userRipleCount.saveInBackground();
 
+                                    //Create report count tracker on UserReportCount table to avoid ACL restrictions
+                                    ParseObject userReportCount = new ParseObject("UserReportCount");
+                                    userReportCount.put("userPointer", user);
+                                    userReportCount.put("reportCount", 0);
+                                    userReportCount.saveInBackground();
+
 //                                  //Also create riple count tracker on the currentUser table for ease of use
                                     user.put("userRipleCount", 0);
                                     user.saveInBackground();
 
                                 }
                             });
-
                         }
                     });
                     builder.show();
