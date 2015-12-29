@@ -231,7 +231,7 @@ public class TitleActivity extends AppCompatActivity {
                                         userReportCount.put("reportCount", 0);
                                         userReportCount.saveInBackground();
 
-//                                  //Also create riple count tracker on the currentUser table for ease of use
+                                        //Also create riple count tracker on the currentUser table for ease of use
                                         currentUser.put("userRipleCount", 0);
                                         currentUser.saveInBackground(new SaveCallback() {
                                             @Override
