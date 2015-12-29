@@ -168,8 +168,6 @@ public class TitleActivity extends AppCompatActivity {
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 
-    //Login Functions ///////////////////////////////////////////////////////////////////////////
-
     public void parseLogin() {
         Intent intent = new Intent(TitleActivity.this, ParseLoginActivity.class);
         startActivity(intent);
@@ -220,7 +218,6 @@ public class TitleActivity extends AppCompatActivity {
                                     @Override
                                     public void done(ParseException e) {
 
-                                        launchMainActivity();
                                         //Create riple count tracker on UserRipleCount table to avoid ACL restrictions
                                         ParseUser currentUser = ParseUser.getCurrentUser();
                                         ParseObject userRipleCount = new ParseObject("UserRipleCount");
@@ -236,7 +233,12 @@ public class TitleActivity extends AppCompatActivity {
 
 //                                  //Also create riple count tracker on the currentUser table for ease of use
                                         currentUser.put("userRipleCount", 0);
-                                        currentUser.saveInBackground();
+                                        currentUser.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                fbLogin();
+                                            }
+                                        });
                                     }
                                 });
 
@@ -273,14 +275,6 @@ public class TitleActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void fbLogout() {
-        // Log the user out
-        ParseUser.logOut();
-        Toast.makeText(getApplicationContext(), "You have logged out of Riple", Toast.LENGTH_SHORT).show();
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
@@ -66,19 +67,23 @@ public class RipleTabFragment extends Fragment {
     private TextView ripleEmptyView;
     private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
     private ParseUser currentUser;
+    public String userName;
+    public String facebookId;
 
-
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//
-//    }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        updateUserInfo();
+    }
+
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
 
         currentUser =  ParseUser.getCurrentUser();
+        userName  = currentUser.getString("displayName");
+        facebookId = currentUser.getString("facebookId");
 
         //loadSavedPreferences();
 
@@ -96,14 +101,19 @@ public class RipleTabFragment extends Fragment {
 
         //Update riple list and profile card
         loadRipleItemsFromParse();
-        updateUserInfo();
+//        updateUserInfo();
 
         savePreferences("ripleTipBoolean", true);
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (parseProfilePicture == null) {
+                    Intent settingIntent = new Intent(getActivity(), SettingsActivity.class);
+                    startActivity(settingIntent);
+                } else {
                 viewCurrentUserProfileExtra();
+                }
             }
         });
 
@@ -131,7 +141,7 @@ public class RipleTabFragment extends Fragment {
             @Override public void onRefresh() {
                 // Do work to refresh the list here.
                 loadRipleItemsFromParse();
-                updateUserInfo();
+//                updateUserInfo();
                 new Task().execute();
             }
         });
@@ -203,6 +213,9 @@ public class RipleTabFragment extends Fragment {
     }
 
     public void loadRipleItemsFromParse() {
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
         final ArrayList<DropItem> ripleList = new ArrayList<>();
 
         ParseRelation createdRelation = currentUser.getRelation("createdDrops");
@@ -307,13 +320,10 @@ public class RipleTabFragment extends Fragment {
 
     private void updateUserInfo() {
 
-        String userName = currentUser.getString("displayName");
-        String facebookId = currentUser.getString("facebookId");
-
-        if ((currentUser != null) && currentUser.isAuthenticated()) {
+//        if ((currentUser != null) && currentUser.isAuthenticated()) {
 
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
-        }
+//        }
 
         //get parse profile picture if exists, if not, store Facebook picture on Parse and show
         if (parseProfilePicture != null) {
@@ -329,7 +339,6 @@ public class RipleTabFragment extends Fragment {
                 Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
                 new DownloadImageTask(profilePictureView)
                         .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
-                //loader.displayImage("https://graph.facebook.com/" + fbId + "/picture?type=large", mProfPicField);
             }
         }
 
@@ -400,22 +409,6 @@ public class RipleTabFragment extends Fragment {
         profileRankView.setText(ripleRank);
     }
 
-//    public void updateReportCount() {
-//        ParseQuery userReportCountQuery = ParseQuery.getQuery("UserReportCount");
-//        userReportCountQuery.whereEqualTo("userPointer", currentUser);
-//        userReportCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-//            @Override
-//            public void done(ParseObject parseObject, ParseException e) {
-//                updateReportCount(parseObject);
-//                String reportCount = parseObject.getString("reportCount");
-//
-//            }
-//        });
-//
-//
-//    }
-
-
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImageView;
 
@@ -471,5 +464,11 @@ public class RipleTabFragment extends Fragment {
             mWaveSwipeRefreshLayout.setRefreshing(false);
             super.onPostExecute(result);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUserInfo();
     }
 }

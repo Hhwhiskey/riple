@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
-    <!-- <uses-permission android:author="android.Permission.PUBLIC_PROFILE"/> -->
+     <!--<uses-permission android:author="android.Permission.PUBLIC_PROFILE"/> -->
     <application
         android:name=".application.RipleApplication"
         android:allowBackup="true"
@@ -73,6 +73,7 @@
         <activity
             android:name=".activities.MessagingActivity"
             android:label="@string/title_activity_messaging">
+
         </activity>
         <activity
             android:name=".activities.ParseLoginActivity"
@@ -92,10 +93,14 @@
 
         <service android:name=".utils.MessageService"/>
 
-        <activity android:name=".activities.DropCompletedActivity">
+        <activity android:name=".activities.DropCompletedActivity"
+                  android:screenOrientation="portrait">
+
         </activity>
-        <activity android:name=".activities.CropActivity">
+        <activity android:name=".activities.CropActivity"
+                  android:screenOrientation="portrait">
         </activity>
+
     </application>
 
 </manifest>
