@@ -1,8 +1,12 @@
 package com.khfire22gmail.riple.model;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,12 +18,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.DropCommentsActivity;
 import com.khfire22gmail.riple.activities.DropCompletedActivity;
+import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -35,6 +44,7 @@ import java.util.List;
 
 public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder> {
 
+
     Context mContext;
     public final String mTabName;
     private LayoutInflater inflater;
@@ -46,6 +56,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     public ParseUser currentUser;
     private ParseFile parseProfilePictureCheck;
     private String displayNameCheck;
+    private ContentResolver contentResolver;
+    private Bitmap storedImage;
+    private boolean storeImage;
+    private boolean stop;
+    private Context applicationContext;
+
 
     public DropAdapter(Context context, List<DropItem> data, String tabName) {
         mContext = context;
@@ -251,18 +267,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
     }
 
-    // TODO: 11/19/2015 SHare function
-    public void shareDrop(int position) {
-
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("String");// might be text, sound, whatever
-        share.putExtra(Intent.EXTRA_STREAM, (data.get(position).getAuthorId()) + " has shared a Drop from Riple! " +
-                "A Drop is an idea to make the world a better place. If you have an" +
-                " adroid phone you can download Riple from the Play Store and" +
-                " start making Riples right now!" + (data.get(position).getDescription()));
-        mContext.startActivity(Intent.createChooser(share, "share"));
-    }
-
     public void viewDrop(int position) {
         String mDropObjectId = (data.get(position).getObjectId());
         String mAuthorId = (data.get(position).getAuthorId());
@@ -344,6 +348,30 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         mContext.startActivity(intent);
     }
 
+
+    private void messageTheAuthor(int position) {
+
+        String author = data.get(position).getAuthorId();
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("objectId", author);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> user, ParseException e) {
+                if (e == null) {
+                    Intent messageIntent = new Intent(mContext, MessagingActivity.class);
+                    mContext.startActivity(messageIntent);
+                    messageIntent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
+                    mContext.startActivity(messageIntent);
+                } else {
+                    Toast.makeText(mContext,
+                            "Error finding that user",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
     //Report the Drop author and store the Drop in question in UserReportCount table
     public void reportDropAuthor(final int position) {
 
@@ -377,106 +405,88 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         });
     }
 
-    /*public void reportDropAuthor(final int position) {
+    public void shareToFacebook(int position) {
+        String displayName = currentUser.getString("displayName");
+        String shareAuthor = data.get(position).getAuthorName();
+        String shareDescription = data.get(position).getDescription();
+        Bitmap sharedImage = data.get(position).getParseProfilePicture();
 
-        final DropItem reportedDrop = data.get(position);
-        final String dropObjectId = data.get(position).getObjectId();
-        //Get the reported author
-        ParseQuery<ParseObject> reportedDropQuery = ParseQuery.getQuery("Drop");
-        reportedDropQuery.getInBackground(reportedDrop.getObjectId(), new GetCallback<ParseObject>() {
-            public void done(ParseObject dropObject, ParseException e) {
-                if (e == null) {
-                    final ParseObject reportedDropAuthorPointer = dropObject.getParseObject("authorPointer");
-                    ParseQuery reportQuery = ParseQuery.getQuery("UserReportCount");
-                    reportQuery.whereEqualTo("userPointer", reportedDropAuthorPointer);
-                    reportQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-                        @Override
-                        public void done(final ParseObject reportedUser, ParseException e) {
-                            //Increment the reported authors report count
-                            reportedUser.increment("reportCount");
-                            reportedUser.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    //Add the reported Drop to reported Drops relational list
-                                    ParseQuery parseQuery = ParseQuery.getQuery("Drop");
-                                    parseQuery.whereEqualTo("objectId", dropObjectId);
-                                    parseQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-                                        @Override
-                                        public void done(ParseObject dropObject, ParseException e) {
+        ShareDialog shareDialog;
+        FacebookSdk.sdkInitialize(mContext);
+        shareDialog = new ShareDialog((Activity) mContext);
 
+        ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                .setContentTitle("Make a Riple...")
+                .setContentDescription(displayName + " shared " + shareAuthor + "'s" + " Drop from \"Riple\":\n\n" + "\"" + shareDescription + "\"\n\n" + "If you have an Android device you can download \"Riple\" now and start making Riples of your own. Click the link to get started!\n" + "facebook.com/kevinhodges0")
+                .setContentUrl(Uri.parse("https://play.google.com/store/search?q=pub:Google%20Inc."))
+                .setImageUrl(Uri.parse("https://scontent-ord1-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/923007_665600676799506_1701143490_n.png?oh=9a224427d5c5807ed0db56582363057b&oe=57079C4E"))
+                .build();
 
-                                            ParseRelation reportRelation = reportedDropAuthorPointer.getRelation("reportedDrops");
-                                            reportRelation.add(dropObject);
-                                            reportedDropAuthorPointer.saveInBackground();
+        shareDialog.show(linkContent);
+    }
 
-//                                            ParseObject reportedDrop = new ParseObject("UserReportCount");
-//                                            ParseRelation reportRelation = reportedDrop.getRelation("reportedDrops");
-//                                            reportRelation.add(dropObject);
-//                                            reportedDrop.saveInBackground();
+    // TODO: 11/19/2015 Include pics with share
+    public void shareWithOther(int position) {
+        String displayName = currentUser.getString("displayName");
+        String shareAuthor = data.get(position).getAuthorName();
+        String shareDescription = data.get(position).getDescription();
+        Bitmap sharedImage = data.get(position).getParseProfilePicture();
 
-//
-//
-//
-//                                         ParseObject reportedDrop = new ParseObject("UserReportCount");
-//                                            reportedDrop.put("userPointer", dropObject);
-//                                            reportedDrop.saveInBackground();
+        //Share to Other
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, (displayName + " shared " + shareAuthor + "'s" + " Drop from \"Riple\":\n\n" + "\"" + shareDescription + "\"\n\n" + "If you have an Android device you can download \"Riple\" now and start making Riples of your own. Click the link to get started!\n" + "facebook.com/kevinhodges0"));
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//      Uri imageUri = Uri.parse("https://scontent-ord1-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/923007_665600676799506_1701143490_n.png?oh=9a224427d5c5807ed0db56582363057b&oe=57079C4E");
+//      shareIntent.setType("*/*");
+//      shareIntent.putExtra(Intent.EXTRA_STREAM, String.valueOf(imageUri));
+//      shareIntent.setType("image/*");
+        mContext.startActivity(Intent.createChooser(shareIntent, "Share this Drop with friends"));
 
 
-                                        }
-                                    });
-                                }
+    }
 
-                            });
-                        }
-                    });
-                }
-            }
-        });
-    }*/
+    @Override
+    public int getItemCount() {
+        return data.size();
+    }
 
-
-
-
-            @Override
-            public int getItemCount() {
-                return data.size();
-            }
-
-            /**
-             * If the Drop belongs to the current user, they may delete it or share it
-             *
-             * If the Drop does not belong to the current user, they may report it/the author or share it.
-             */
+    /**
+     * If the Drop belongs to the current user, they may delete it or share it
+     * <p/>
+     * If the Drop does not belong to the current user, they may report it/the author or share it.
+     */
 
 
-            //DropViewHolder//////////////////////////////////////////////////////////////////////////////
-            public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    //DropViewHolder//////////////////////////////////////////////////////////////////////////////
+    public class DropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-                private final Button todoButton;
-                private final Button completeButton;
-                private ImageView menuButton;
-                public TextView authorName;
-                public TextView createdAt;
-                public TextView description;
-                public TextView ripleCount;
-                public TextView commentCount;
-                public TextView authorRank;
-                private ImageView parseProfilePicture;
+        private final Button todoButton;
+        private final Button completeButton;
+        private ImageView menuButton;
+        public TextView authorName;
+        public TextView createdAt;
+        public TextView description;
+        public TextView ripleCount;
+        public TextView commentCount;
+        public TextView authorRank;
+        private ImageView parseProfilePicture;
 
 
-                public DropViewHolder(View itemView) {
-                    super(itemView);
+        public DropViewHolder(View itemView) {
+            super(itemView);
 
-                    parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
-                    todoButton = (Button) itemView.findViewById(R.id.button_todo);
-                    completeButton = (Button) itemView.findViewById(R.id.button_complete);
-                    createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
-                    authorName = (TextView) itemView.findViewById(R.id.name);
-                    description = (TextView) itemView.findViewById(R.id.description);
-                    ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
-                    commentCount = (TextView) itemView.findViewById(R.id.comment_count);
-                    authorRank = (TextView) itemView.findViewById(R.id.author_rank);
-                    menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
+            parseProfilePicture = (ImageView) itemView.findViewById(R.id.profile_picture);
+            todoButton = (Button) itemView.findViewById(R.id.button_todo);
+            completeButton = (Button) itemView.findViewById(R.id.button_complete);
+            createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
+            authorName = (TextView) itemView.findViewById(R.id.name);
+            description = (TextView) itemView.findViewById(R.id.description);
+            ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
+            commentCount = (TextView) itemView.findViewById(R.id.comment_count);
+            authorRank = (TextView) itemView.findViewById(R.id.author_rank);
+            menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
 
 
 //                    menuButton.setOnClickListener(this);
@@ -493,41 +503,39 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //                    }
 
 
-                    itemView.setOnLongClickListener(this);
+            itemView.setOnLongClickListener(this);
 
-                    parseProfilePicture.setOnClickListener(this);
-                    parseProfilePicture.setOnLongClickListener(this);
+            parseProfilePicture.setOnClickListener(this);
+            parseProfilePicture.setOnLongClickListener(this);
 
-                    authorName.setOnClickListener(this);
-                    authorName.setOnLongClickListener(this);
+            authorName.setOnClickListener(this);
+            authorName.setOnLongClickListener(this);
 
-                    authorRank.setOnClickListener(this);
-                    authorRank.setOnLongClickListener(this);
+            authorRank.setOnClickListener(this);
+            authorRank.setOnLongClickListener(this);
 
-                    createdAt.setOnClickListener(this);
-                    createdAt.setOnLongClickListener(this);
+            createdAt.setOnClickListener(this);
+            createdAt.setOnLongClickListener(this);
 
-                    description.setOnClickListener(this);
-                    description.setOnLongClickListener(this);
+            description.setOnClickListener(this);
+            description.setOnLongClickListener(this);
 
-                    ripleCount.setOnClickListener(this);
-                    ripleCount.setOnLongClickListener(this);
+            ripleCount.setOnClickListener(this);
+            ripleCount.setOnLongClickListener(this);
 
-                    commentCount.setOnClickListener(this);
-                    commentCount.setOnLongClickListener(this);
+            commentCount.setOnClickListener(this);
+            commentCount.setOnLongClickListener(this);
 
-                    //Click Listeners
-                    if (todoButton != null) {
-                        todoButton.setOnClickListener(this);
-                    }
-                    if (completeButton != null) {
-                        completeButton.setOnClickListener(this);
-                    }
-                    if (menuButton != null) {
-                        menuButton.setOnClickListener(this);
-                    }
-
-
+            //Click Listeners
+            if (todoButton != null) {
+                todoButton.setOnClickListener(this);
+            }
+            if (completeButton != null) {
+                completeButton.setOnClickListener(this);
+            }
+            if (menuButton != null) {
+                menuButton.setOnClickListener(this);
+            }
 
 
 //                    //Longclick listeners
@@ -555,27 +563,27 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //                    if (ripleCount != null) {
 //                        ripleCount.setOnLongClickListener(this);
 //                    }
-                }
+        }
 
-                public void update(int position) {
+        public void update(int position) {
 
-                    DropItem current = data.get(position);
+            DropItem current = data.get(position);
 
-                    parseProfilePicture.setImageBitmap(current.parseProfilePicture);
-                    createdAt.setText(String.valueOf(current.createdAt));
-                    authorName.setText(current.authorName);
-                    description.setText(current.description);
-                    ripleCount.setText(String.valueOf(current.ripleCount));
-                    commentCount.setText(String.valueOf(current.commentCount));
-                    authorRank.setText(current.authorRank);
-                }
+            parseProfilePicture.setImageBitmap(current.parseProfilePicture);
+            createdAt.setText(String.valueOf(current.createdAt));
+            authorName.setText(current.authorName);
+            description.setText(current.description);
+            ripleCount.setText(String.valueOf(current.ripleCount));
+            commentCount.setText(String.valueOf(current.commentCount));
+            authorRank.setText(current.authorRank);
+        }
 
-                @Override
-                public void onClick(View view) {
-                    if (view == todoButton) {
-                        ParseUser currentUser = ParseUser.getCurrentUser();
-                        parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
-                        displayNameCheck = (String) currentUser.get("displayName");
+        @Override
+        public void onClick(View view) {
+            if (view == todoButton) {
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
+                displayNameCheck = (String) currentUser.get("displayName");
 
 // TODO: 12/28/2015 Uncomment this before launch
 //                        if (parseProfilePictureCheck == null && displayNameCheck == null) {
@@ -592,122 +600,136 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //                            Intent intent = new Intent(mContext, SettingsActivity.class);
 //                            mContext.startActivity(intent);
 //                        } else {
-                        getTrickleObjectFromRowToAdd(getAdapterPosition());
-                        removeDropFromView(getAdapterPosition());
+                getTrickleObjectFromRowToAdd(getAdapterPosition());
+                removeDropFromView(getAdapterPosition());
 //                        }
 
-                    }else if (view == completeButton) {
-                        getDropObjectFromRowToComplete(getAdapterPosition());
-                        removeDropFromView(getAdapterPosition());
-                    } else if (view == menuButton) {
-                        if (mTabName.equals(drop)) {
-                            showDropMenu();
-                        } else {
-                            showTrickleMenu();
-                        }
-
-                    } else if (view == commentCount || view == description || view == createdAt) {
-                        viewDrop(getAdapterPosition());
-
-                    } else if (view == ripleCount) {
-                        viewCompletedBy(getAdapterPosition());
-
-                    } else {
-                        viewOtherUser(getAdapterPosition());
-                    }
+            } else if (view == completeButton) {
+                getDropObjectFromRowToComplete(getAdapterPosition());
+                removeDropFromView(getAdapterPosition());
+            } else if (view == menuButton) {
+                if (mTabName.equals(drop)) {
+                    showDropMenu();
+                } else {
+                    showTrickleMenu();
                 }
 
-                @Override
-                public boolean onLongClick(View view) {
-                    if (mTabName.equals(drop)) {
-                        showDropMenu();
-                    } else {
-                        showTrickleMenu();
-                    }
-                    return false;
-                }
+            } else if (view == commentCount || view == description || view == createdAt) {
+                viewDrop(getAdapterPosition());
 
-                public void showTrickleMenu() {
+            } else if (view == ripleCount) {
+                viewCompletedBy(getAdapterPosition());
 
-                    CharSequence trickleDrop[] = new CharSequence[]{"Share", "Report"};
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-                    builder.setTitle("Drop Menu");
-                    builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int selected) {
-                            if (selected == 0) {
-                                //share
-                            } else {
-
-                                final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-                                builderVerify.setTitle("Report Drop Author");
-                                builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
-                                builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    }
-                                });
-
-                                builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        reportDropAuthor(getAdapterPosition());
-                                        Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                                builderVerify.show();
-                            }
-                        }
-                    });
-                    builder.show();
-                }
-
-                public void showDropMenu() {
-
-                    CharSequence todoDrop[] = new CharSequence[]{"Share", "Remove From Todo", "Report"};
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-                    builder.setTitle("Drop Menu");
-                    builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int selected) {
-                            if (selected == 0) {
-                                //share
-                            } else if (selected == 1) {
-                                getDropObjectFromRowToRemove(getAdapterPosition());
-                                removeDropFromView(getAdapterPosition());
-                            } else if (selected == 2) {
-                                final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-                                builderVerify.setTitle("Report Drop Author");
-                                builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
-                                builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    }
-                                });
-
-                                builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        reportDropAuthor(getAdapterPosition());
-                                        Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
-
-                                    }
-                                });
-                                builderVerify.show();
-
-                            }
-                        }
-                    });
-                    builder.show();
-                }
-            }
-
-            public void removeDropFromView(int position) {
-                data.remove(position);
-                notifyItemRemoved(position);
+            } else {
+                viewOtherUser(getAdapterPosition());
             }
         }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (mTabName.equals(drop)) {
+                showDropMenu();
+            } else {
+                showTrickleMenu();
+            }
+            return false;
+        }
+
+        public void showTrickleMenu() {
+
+            CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share with other", "Report"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Drop Menu");
+            builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+                    if (selected == 0) {
+                        messageTheAuthor(getAdapterPosition());
+                    }else if (selected == 1) {
+                        shareToFacebook(getAdapterPosition());
+
+                    } else if (selected == 2) {
+                        shareWithOther(getAdapterPosition());
+
+                    }else if (selected == 3) {
+                        final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                        builderVerify.setTitle("Report Drop Author");
+                        builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
+                        builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+
+                        builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                reportDropAuthor(getAdapterPosition());
+                                Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        builderVerify.show();
+                    }
+                }
+            });
+            builder.show();
+        }
+
+        public void showDropMenu() {
+
+            CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share with other", "Remove From Todo", "Report"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Drop Menu");
+            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+
+                    if (selected == 0) {
+                        messageTheAuthor(getAdapterPosition());
+
+                    }else if (selected == 1) {
+                        shareToFacebook(getAdapterPosition());
+
+                    }else if (selected == 2) {
+                        shareWithOther(getAdapterPosition());
+
+                    } else if (selected == 3) {
+                        getDropObjectFromRowToRemove(getAdapterPosition());
+                        removeDropFromView(getAdapterPosition());
+
+                    } else if (selected == 4) {
+                        final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                        builderVerify.setTitle("Report Drop Author");
+                        builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
+                        builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+
+                        builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                reportDropAuthor(getAdapterPosition());
+                                Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                        builderVerify.show();
+
+                    }
+                }
+            });
+            builder.show();
+        }
+    }
+
+    public void removeDropFromView(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
+    }
+}
 
 

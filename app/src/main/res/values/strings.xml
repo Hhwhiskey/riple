@@ -52,6 +52,16 @@
     <string name="aspectRatioYHeader"/>
     <string name="showGuidelines"/>
     <string name="croppedImageDesc"/>
+    <string name="message_self_1">Talking to yourself again, I see...</string>
+    <string name="message_self_2">We could send this, but do you really want to receive it?</string>
+    <string name="message_self_3">If a message is received by the same person that sent it, did the message really happen at all?</string>
+    <string name="message_self_4">We will send this if you promise not to receive it</string>
+    <string name="message_self_5">Still talking to yourself?</string>
+    <string name="message_self_6">Go make some Riples, it\'s way more fun than talking to yourself</string>
+    <string name="message_self_7">I am sure there are some people on here that would love to talk to you, try messaging them</string>
+    <string name="message_self_8">We are going to pretend we don\'t see these</string>
+    <string name="message_self_9">Ok ok! We\'ll send it!...You may or may not receive it.</string>
+    <string name="message_self_10">You certainly are persistent!</string>
 
     <string-array name="showGuidelinesArray">showGuidlinesArray
         <item>Off</item>

@@ -82,7 +82,7 @@ public class RipleTabFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
 
         currentUser =  ParseUser.getCurrentUser();
-        userName  = currentUser.getString("displayName");
+//        userName  = currentUser.getString("displayName");
         facebookId = currentUser.getString("facebookId");
 
         //loadSavedPreferences();
@@ -320,10 +320,10 @@ public class RipleTabFragment extends Fragment {
 
     private void updateUserInfo() {
 
-//        if ((currentUser != null) && currentUser.isAuthenticated()) {
+        if ((currentUser != null) && currentUser.isAuthenticated()) {
 
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
-//        }
+        }
 
         //get parse profile picture if exists, if not, store Facebook picture on Parse and show
         if (parseProfilePicture != null) {
@@ -341,6 +341,8 @@ public class RipleTabFragment extends Fragment {
                         .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
             }
         }
+
+         String userName =currentUser.getString("displayName");
 
         // Update UserName
         if (userName != null) {
