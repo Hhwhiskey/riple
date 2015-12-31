@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -27,13 +28,18 @@ import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.slider.SlidingTabLayout;
 import com.khfire22gmail.riple.slider.ViewPagerAdapter;
 import com.khfire22gmail.riple.utils.MessageService;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.sinch.android.rtc.SinchClient;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -187,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
-        if(dropDescription != null) {
+        if (dropDescription != null) {
 
             drop.put("authorPointer", currentUser);
             drop.put("description", dropDescription);
@@ -196,11 +202,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void done(ParseException e) {
                     ParseRelation<ParseObject> relationCreatedDrops = currentUser.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
-                    currentUser.saveInBackground();
 
                     ParseRelation<ParseObject> relationHasRelationTo = currentUser.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
-                    currentUser.saveInBackground(new SaveCallback() {
+
+                    currentUser.saveEventually(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
@@ -209,8 +215,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 finish();
                                 startActivity(intent);
 
-//                                RipleTabFragment localFrag = (RipleTabFragment) getSupportFragmentManager().findFragmentById(R.id.riple_layout);
-//                                localFrag.loadRipleItemsFromParse();
+                                ParseQuery query = ParseQuery.getQuery("UserReportCount");
+                                query.whereEqualTo("userPointer", currentUser);
+                                query.getFirstInBackground(new GetCallback<ParseObject>() {
+                                    @Override
+                                    public void done(final ParseObject parseObject, ParseException e) {
+                                        int reportCount = parseObject.getInt("reportCount");
+
+                                        if (reportCount > 0) {
+
+                                            ParseQuery deleteUserQuery = ParseQuery.getQuery("Drop");
+                                            deleteUserQuery.whereEqualTo("authorPointer", currentUser);
+                                            deleteUserQuery.findInBackground(new FindCallback<ParseObject>() {
+                                                @Override
+                                                public void done(List list, ParseException e) {
+
+                                                    try {
+                                                        ParseObject.deleteAll(list);
+                                                    } catch (ParseException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+
+                                                    currentUser.put("isBan", true);
+                                                    currentUser.saveInBackground(new SaveCallback() {
+                                                        @Override
+                                                        public void done(ParseException e) {
+                                                            Toast.makeText(MainActivity.this, "As a result of reports against you, you have been permanently banned.", Toast.LENGTH_LONG).show();
+
+                                                            Handler handler = new Handler();
+                                                            handler.postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+
+                                                                    ParseUser.logOut();
+                                                                    Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
+                                                                    startActivity(intentLogout);
+                                                                }
+                                                            }, 3000);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
                             }
                         }
                     });
@@ -278,19 +326,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 editor.apply();
                 Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
             }
-                return true;
+            return true;
         }
 
-            //noinspection SimplifiableIfStatement
-            if (id == R.id.logoutButton) {
-                ParseUser.logOut();
-                Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
-                startActivity(intentLogout);
-                return true;
-            }
-
-            return super.onOptionsItemSelected(item);
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.logoutButton) {
+            ParseUser.logOut();
+            Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
+            startActivity(intentLogout);
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     /*public void savePreferences(String key, Boolean value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -298,11 +346,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putBoolean(key, value);
         editor.apply();
     }*/
-
-
-
-
-
 
 
     @Override

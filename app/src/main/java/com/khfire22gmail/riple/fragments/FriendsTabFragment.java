@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
-import com.khfire22gmail.riple.model.CommentItem;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
 import com.khfire22gmail.riple.utils.Constants;
@@ -41,6 +41,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
@@ -59,9 +60,7 @@ public class FriendsTabFragment extends Fragment {
     private BroadcastReceiver receiver;
     private ArrayList<String> displayNames;
     private TextView friendsEmptyView;
-    public static ArrayList<FriendItem> friendTabInteractionList = new ArrayList<>();
-    private CommentItem mCurrentUser;
-
+    private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,8 +72,17 @@ public class FriendsTabFragment extends Fragment {
 
         friendsEmptyView = (TextView) view.findViewById(R.id.friends_tab_empty_view);
 
-//        setConversationsList();
+        getConversationList();
 //        loadSavedPreferences();
+
+        //Pull refresh conversation list
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.friend_swipe);
+        mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
+            @Override public void onRefresh() {
+                getConversationList();
+                new refreshTask().execute();
+            }
+        });
 
         return view;
     }
@@ -118,11 +126,11 @@ public class FriendsTabFragment extends Fragment {
     }
 
 //    Show list of all users
-    private void setConversationsList() {
+    private void getConversationList() {
 
         final ArrayList<FriendItem> friendsList = new ArrayList<>();
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
 
         ParseQuery senderQuery = ParseQuery.getQuery("Friends");
         ParseQuery recipientQuery = ParseQuery.getQuery("Friends");
@@ -151,7 +159,7 @@ public class FriendsTabFragment extends Fragment {
 
                         final FriendItem friendItem = new FriendItem();
 
-                        if (userId.equals(mCurrentUser.getObjectId())) {
+                        if (userId.equals(currentUser.getObjectId())) {
                             recipient = (ParseUser) list.get(i).get(Constants.USER2);
                         } else {
                             recipient = (ParseUser) list.get(i).get(Constants.USER1);
@@ -175,13 +183,13 @@ public class FriendsTabFragment extends Fragment {
                         }
 
                         friendItem.setFriendName(recipient.getString("displayName"));
-                        friendItem.setObjectId(recipient.getString("objectId"));
+                        friendItem.setObjectId(recipient.getObjectId());
 //                        friendItem.setLastMessage(list.get(i).getString("lastMessage"));
 
                         friendsList.add(friendItem);
                     }
                 }
-                friendTabInteractionList = friendsList;
+//                friendTabInteractionList = friendsList;
             }
         });
     }
@@ -255,7 +263,7 @@ public class FriendsTabFragment extends Fragment {
 
     @Override
     public void onResume() {
-//  todo      setConversationsList();
+//  todo      getConversationList();
         super.onResume();
     }
 
@@ -272,6 +280,19 @@ public class FriendsTabFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class refreshTask extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+            return new String[0];
+        }
+
+        @Override protected void onPostExecute(String[] result) {
+            // Call setRefreshing(false) when the list has been refreshed.
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+            super.onPostExecute(result);
+        }
     }
 }
 

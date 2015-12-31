@@ -27,12 +27,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom|center_horizontal"
-        android:visibility="gone"
-        android:text="This is where this users activity will be displayed. Start making Riples!"
+        android:visibility="visible"
+        android:text="This is where you can see this users activity, once they get started."
         android:textSize="18sp"
         android:textStyle="italic"
         android:foregroundGravity="center"
-        android:paddingBottom="150dp"
+        android:paddingBottom="100dp"
         android:textAlignment="center"/>
 
     <android.support.design.widget.AppBarLayout

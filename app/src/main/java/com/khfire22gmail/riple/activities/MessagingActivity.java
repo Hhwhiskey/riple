@@ -1,5 +1,6 @@
 package com.khfire22gmail.riple.activities;
 
+import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -80,11 +81,13 @@ public class MessagingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
         currentUserId = ParseUser.getCurrentUser().getObjectId();
-        checkForRelation();
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
         String[] userIds = {currentUserId, recipientId};
+
+        checkForRelation();
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
         query.whereContainedIn("senderId", Arrays.asList(userIds));
         query.whereContainedIn("recipientId", Arrays.asList(userIds));
@@ -148,18 +151,22 @@ public class MessagingActivity extends AppCompatActivity {
         });
     }
 
+
+    //Check to see if this relation already exists on parse
     public void checkForRelation() {
         ParseQuery<ParseUser> addToFriendsQuery = ParseUser.getQuery();
         addToFriendsQuery.getInBackground(recipientId, new GetCallback<ParseUser>() {
             public void done(ParseUser recipient, ParseException e) {
                 if (e == null) {
-                    addFriendsRelation(recipient);
+                    if (!recipientId.equals(currentUserId)) {
+                        addFriendsRelation(recipient);
+                    }
                 }
             }
         });
     }
 
-
+    //If this relation does not exist, create it so it can be displayed in the Friends tab
     public void addFriendsRelation(final ParseUser recipient) {
 
         final ArrayList mRecipientsList = new ArrayList<>();
@@ -168,7 +175,6 @@ public class MessagingActivity extends AppCompatActivity {
         query1.whereEqualTo(Constants.USER1, mCurrentUser);
         ParseQuery<ParseObject> query2 = ParseQuery.getQuery(Constants.FRIENDS);
         query2.whereEqualTo(Constants.USER2, mCurrentUser);
-
 
         List<ParseQuery<ParseObject>> queries = new ArrayList<>();
         queries.add(query1);
@@ -182,7 +188,6 @@ public class MessagingActivity extends AppCompatActivity {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
-
 
                     mRecipientsList.clear();
 
@@ -225,22 +230,7 @@ public class MessagingActivity extends AppCompatActivity {
             relation.saveInBackground();
         }
     }
-        /*ParseQuery<ParseUser> viewUserQuery = ParseQuery.getQuery("_User");
-        viewUserQuery.getInBackground(recipientId, new GetCallback<ParseUser>() {
-            @Override
-            public void done(ParseUser messagedUser, ParseException e) {
-                if (e == null) {
-                    addYouToTheirFriends(messagedUser);
-                }
-            }
-        });
-    }*/
 
-    /* public static void addYouToTheirFriends(ParseObject messagedUser) {
-        ParseUser clickedUser = ParseUser.getString("_User");
-         ParseQuery query = ParseQuery.getQuery("_User");
-         query.whereEqualTo("objectId", recipientId);
-     }*/
     //unbind the service when the activity is destroyed
     @Override
     public void onDestroy() {
@@ -268,7 +258,7 @@ public class MessagingActivity extends AppCompatActivity {
         @Override
         public void onMessageFailed(MessageClient client, Message message,
                                     MessageFailureInfo failureInfo) {
-            //Log.d("Kevin" , "send error messages" + message + failureInfo);
+            Log.d("Kevin" , "send error messages" + message + ", " + failureInfo);
             Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_LONG).show();
         }
 
@@ -345,5 +335,15 @@ public class MessagingActivity extends AppCompatActivity {
         push.sendInBackground();
     }
 
-
+    @Override
+    public void onBackPressed(){
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            Log.i("MainActivity", "popping backstack");
+            fm.popBackStack();
+        } else {
+            Log.i("MainActivity", "nothing on backstack, calling super");
+            super.onBackPressed();
+        }
+    }
 }

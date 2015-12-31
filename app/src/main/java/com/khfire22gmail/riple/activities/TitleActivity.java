@@ -114,7 +114,7 @@ public class TitleActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TitleActivity.this, R.style.MyAlertDialogStyle);
                 builder.setTitle("Not so fast...");
-                builder.setMessage("I will not post any offensive material and I will report any offensive material I encounter");
+                builder.setMessage("I will not post any spam or inappropriate/offensive material and I will report any that I encounter while I use Riple");
                 builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

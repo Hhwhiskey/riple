@@ -1,8 +1,11 @@
 package com.khfire22gmail.riple.model;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +15,9 @@ import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
-import com.khfire22gmail.riple.fragments.FriendsTabFragment;
-import com.parse.FindCallback;
+import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -51,20 +52,20 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     @Override
     public void onBindViewHolder(FriendViewHolder viewHolder, int position) {
         viewHolder.update(position);
+    }
 
-        ParseUser user = null;
-        ParseUser currentUser = ParseUser.getCurrentUser();
+    private void viewFriendProfile(int position) {
 
-        /*if (data != null) {
-            String senderName = data.get("displayName");
-            String userObjectId = user1.getObjectId();
-            if (userObjectId.equals(currentUser.getObjectId())) {
-                user = (ParseUser) holder.get(position);
-            }
-            else {
-                user = (ParseUser) holder.get(position);
-            }
-        }*/
+        String mClickedUserId = (data.get(position).getObjectId());
+        String mClickedUserName = (data.get(position).getFriendName());
+
+        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
+        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+
+        Intent intent = new Intent(mContext, ViewUserActivity.class);
+        intent.putExtra("clickedUserId", mClickedUserId);
+        intent.putExtra("clickedUserName", mClickedUserName);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -73,32 +74,26 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     }
 
 
-
-
     //FriendsViewHolder/////////////////////////////////////////////////////////////////////////////
-    public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private ImageView friendProfilePicture;
         private TextView friendName;
         private TextView lastMessage;
-        private View itemView;
-
+        private ImageView menuButton;
 
         public FriendViewHolder(View itemView) {
             super(itemView);
 
             friendProfilePicture = (ImageView) itemView.findViewById(R.id.friend_profile_picture);
             friendName = (TextView) itemView.findViewById(R.id.friend_name);
-
-
+            menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
 //            lastMessage = (TextView) itemView.findViewById(R.id.last_message_snippit);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getFriendObjectFromRow(getAdapterPosition());
-                }
-            });
+            friendProfilePicture.setOnClickListener(this);
+            friendName.setOnClickListener(this);
+//            menuButton.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         public void update(int position) {
@@ -112,36 +107,64 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
         @Override
         public void onClick(View v) {
-
+            if (v == menuButton) {
+                openConversationMenu(getAdapterPosition());
+            } else {
+                openConversation(getAdapterPosition());
+            }
         }
 
-        private void getFriendObjectFromRow(int position) {
-            FriendItem conversation = FriendsTabFragment.friendTabInteractionList.get(position);
-            ParseQuery<ParseObject> conversationQuery = ParseQuery.getQuery("Friends");
-            conversationQuery.getInBackground(conversation.getObjectId(), new GetCallback<ParseObject>() {
-                public void done(ParseObject object, ParseException e) {
-                    if (e == null) {
-                        openConversation(object);
+
+        @Override
+        public boolean onLongClick(View v) {
+            openConversationMenu(getAdapterPosition());
+            return false;
+        }
+
+        public void openConversationMenu(int Position) {
+
+            CharSequence todoDrop[] = new CharSequence[]{"View profile", "Remove Friend"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Drop Menu");
+            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+
+                    if (selected == 0) {
+                        viewFriendProfile(getAdapterPosition());
+                    } else if (selected == 1) {
+//                        RemoveFriend(getAdapterPosition());
+
                     }
                 }
             });
         }
+
 
         // Opens sinch conversation when it is clicked
-        public void openConversation(ParseObject conversation) {
+        public void openConversation(int position) {
+            final String friendId = data.get(position).getObjectId();
+
             ParseQuery<ParseUser> query = ParseUser.getQuery();
-            query.whereEqualTo("objectId", conversation);
-            query.findInBackground(new FindCallback<ParseUser>() {
-                public void done(List<ParseUser> user, ParseException e) {
+            query.whereEqualTo("objectId", friendId);
+            query.getFirstInBackground(new GetCallback<ParseUser>() {
+                @Override
+                public void done(ParseUser parseUser, ParseException e) {
                     if (e == null) {
-                        Intent intent = new Intent(mContext, MessagingActivity.class);
-                        intent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
-                        mContext.startActivity(intent);
+                        Intent messageIntent = new Intent(mContext, MessagingActivity.class);
+                        mContext.startActivity(messageIntent);
+                        messageIntent.putExtra("RECIPIENT_ID", parseUser.getObjectId());
+                        mContext.startActivity(messageIntent);
                     } else {
-                        Toast.makeText(mContext, "Error finding that user", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,
+                                "Error finding that user",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         }
+
+
     }
 }

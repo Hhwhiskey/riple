@@ -43,7 +43,7 @@ public class ParseLoginActivity extends AppCompatActivity {
         intent = new Intent(getApplicationContext(), MainActivity.class);
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
-        ParseUser user = ParseUser.getCurrentUser();
+        final ParseUser user = ParseUser.getCurrentUser();
 
         if (user != null) {
             emailVerified = user.getBoolean("emailVerified");
@@ -51,7 +51,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                 startActivity(intent);
             } else {
                 Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
-                                " address before you begin using Riple!",
+                                " address. Once done, tap Login to begin using Riple",
                         Toast.LENGTH_LONG ).show();
             }
         }
@@ -74,20 +74,25 @@ public class ParseLoginActivity extends AppCompatActivity {
 
                 ParseUser.logInInBackground(email, password, new LogInCallback() {
                     public void done(ParseUser user, com.parse.ParseException e) {
-                        if (user != null) {
-                            emailVerified = user.getBoolean("emailVerified");
-                            if (emailVerified) {
-                                startActivity(intent);
 
+                        if (user != null) {
+
+                            final boolean banBoolean = user.getBoolean("isBan");
+                            emailVerified = user.getBoolean("emailVerified");
+
+                            if (emailVerified) {
+                                if (!banBoolean) {
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(ParseLoginActivity.this, "You have been banned from Riple. If you decide to use Riple again, please follow the rules. Thank you.", Toast.LENGTH_LONG).show();
+                                }
                             } else {
                                Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
                                        " address before you begin using Riple!",
                                        Toast.LENGTH_LONG ).show();
                             }
                         } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "Wrong username/password combo",
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(ParseLoginActivity.this, "Wrong username/password combo", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -115,7 +120,7 @@ public class ParseLoginActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
                     builder.setTitle("Not so fast...");
-                    builder.setMessage("I will not post any offensive material and I will report any offensive material I encounter");
+                    builder.setMessage("I will not post any spam or inappropriate/offensive material and I will report any that I encounter while I use Riple");
                     builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

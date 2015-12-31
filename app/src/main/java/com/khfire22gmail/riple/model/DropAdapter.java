@@ -25,6 +25,7 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.DropCommentsActivity;
 import com.khfire22gmail.riple.activities.DropCompletedActivity;
 import com.khfire22gmail.riple.activities.MessagingActivity;
+import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
@@ -586,23 +587,23 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 displayNameCheck = (String) currentUser.get("displayName");
 
 // TODO: 12/28/2015 Uncomment this before launch
-//                        if (parseProfilePictureCheck == null && displayNameCheck == null) {
-//                            Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-//                            Intent intent = new Intent(mContext, SettingsActivity.class);
-//                            mContext.startActivity(intent);
-//                        } else if (parseProfilePicture == null) {
-//                            Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-//                            Intent intent = new Intent(mContext, SettingsActivity.class);
-//                            mContext.startActivity(intent);
-//
-//                        } else if (displayNameCheck == null) {
-//                            Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-//                            Intent intent = new Intent(mContext, SettingsActivity.class);
-//                            mContext.startActivity(intent);
-//                        } else {
+                        if (parseProfilePictureCheck == null && displayNameCheck == null) {
+                            Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(mContext, SettingsActivity.class);
+                            mContext.startActivity(intent);
+                        } else if (parseProfilePicture == null) {
+                            Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(mContext, SettingsActivity.class);
+                            mContext.startActivity(intent);
+
+                        } else if (displayNameCheck == null) {
+                            Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(mContext, SettingsActivity.class);
+                            mContext.startActivity(intent);
+                        } else {
                 getTrickleObjectFromRowToAdd(getAdapterPosition());
                 removeDropFromView(getAdapterPosition());
-//                        }
+                        }
 
             } else if (view == completeButton) {
                 getDropObjectFromRowToComplete(getAdapterPosition());
@@ -655,7 +656,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     }else if (selected == 3) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Drop Author");
-                        builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
+                        builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
                         builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -702,7 +703,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     } else if (selected == 4) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Drop Author");
-                        builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
+                        builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
                         builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

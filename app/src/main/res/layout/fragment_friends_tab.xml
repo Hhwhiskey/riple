@@ -6,10 +6,17 @@
     android:background="@color/Primary_Background_Color"
     android:orientation="vertical">
 
+    <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+        android:id="@+id/friend_swipe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friends_list_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
     <TextView
         android:id="@+id/friends_tab_empty_view"
