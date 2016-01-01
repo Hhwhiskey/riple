@@ -4,39 +4,34 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.khfire22gmail.riple.MainViewPager.DropPagerAdapter;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.khfire22gmail.riple.model.CompletedByItem;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 
-public class DropCompletedActivity extends AppCompatActivity {
-
+public class CompletedActivity extends AppCompatActivity {
 
     private String mDropObjectId;
     private String mAuthorId;
@@ -60,7 +55,15 @@ public class DropCompletedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_completed_by);
+        setContentView(R.layout.activity_view_drop);
+
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new DropPagerAdapter(getSupportFragmentManager(), CompletedActivity.this));
+
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
 
         Intent intent = getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
@@ -97,15 +100,15 @@ public class DropCompletedActivity extends AppCompatActivity {
             }
         });
 
-        createdAtView = (TextView) findViewById(R.id.comment_created_at);
-        createdAtView.setText(String.valueOf(mCreatedAt));
+//        createdAtView = (TextView) findViewById(R.id.comment_created_at);
+//        createdAtView.setText(String.valueOf(mCreatedAt));
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.completed_by_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
+//        mRecyclerView = (RecyclerView) findViewById(R.id.completed_by_recycler_view);
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
 
 
-        loadCompletedListFromParse();
+//        loadCompletedListFromParse();
     }
 
     private void getViewedUserProfilePicture(String mAuthorId) {
@@ -132,64 +135,11 @@ public class DropCompletedActivity extends AppCompatActivity {
         });
     }
 
-    private void loadCompletedListFromParse() {
-        final ArrayList<CompletedByItem> completedByList = new ArrayList<>();
 
-        ParseQuery dropQuery = ParseQuery.getQuery("Drop");
-        dropQuery.whereEqualTo("objectId", mDropObjectId);
-        dropQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                ParseRelation<ParseObject> completedByRelation = parseObject.getRelation("completedBy");
-                ParseQuery completedByQuery = completedByRelation.getQuery();
-                completedByQuery.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> list, ParseException e) {
-
-                        if (e != null) {
-
-                        } else {
-                            for (int i = 0; i < list.size(); i++) {
-
-                                Log.d("list", "list= " + list);
-
-                                final CompletedByItem completedByItem = new CompletedByItem();
-
-                                ParseFile parseProfilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
-                                if (parseProfilePicture != null) {
-                                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                        @Override
-                                        public void done(byte[] data, ParseException e) {
-                                            if (e == null) {
-                                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                                completedByItem.setParseProfilePicture(bmp);
-                                                updateRecyclerView(completedByList);
-                                            }
-                                        }
-                                    });
-                                }
-
-                                completedByItem.setUserObjectId(list.get(i).getObjectId());
-                                completedByItem.setDisplayName((String) list.get(i).get("displayName"));
-                                completedByItem.setUserRank(list.get(i).getString("userRank"));
-                                completedByItem.setUserRipleCount(list.get(i).getInt("userRipleCount"));
-
-
-                                completedByList.add(completedByItem);
-                            }
-                        }
-
-
-                    }
-                });
-            }
-        });
-    }
 
     private void viewDrop(){
 
-        Intent intent = new Intent(DropCompletedActivity.this, DropCommentsActivity.class);
+        Intent intent = new Intent(CompletedActivity.this, ViewDropActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);

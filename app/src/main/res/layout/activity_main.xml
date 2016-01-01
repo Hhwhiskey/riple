@@ -23,7 +23,7 @@
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
             app:layout_scrollFlags="scroll|enterAlways|snap"/>
 
-        <com.khfire22gmail.riple.slider.SlidingTabLayout
+        <com.khfire22gmail.riple.MainViewPager.MainSlidingTabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

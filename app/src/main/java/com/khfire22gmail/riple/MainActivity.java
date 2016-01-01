@@ -25,8 +25,8 @@ import android.widget.Toast;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
-import com.khfire22gmail.riple.slider.SlidingTabLayout;
-import com.khfire22gmail.riple.slider.ViewPagerAdapter;
+import com.khfire22gmail.riple.MainViewPager.MainSlidingTabLayout;
+import com.khfire22gmail.riple.MainViewPager.MainViewPagerAdapter;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Toolbar toolbar;
     ViewPager mPager;
-    ViewPagerAdapter adapter;
-    SlidingTabLayout tabs;
+    MainViewPagerAdapter adapter;
+    MainSlidingTabLayout tabs;
     CharSequence Titles[] = {"Riple", "Drops", "Trickle", "Friends"};
     int numOfTabs = 4;
     private AutoCompleteTextView dropDescriptionView;
@@ -117,8 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // mViewPager.setCurrentItem(R.layout.fragment_drop_tab);
         // mViewPager.setCurrentItem(position);
 
-        // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles, numOfTabs);
+        // Creating The MainViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
+        adapter = new MainViewPagerAdapter(getSupportFragmentManager(), Titles, numOfTabs);
 
         // Assigning ViewPager View and setting the adapter
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -131,11 +131,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setOffscreenPageLimit(3);
 
         // Assigning the Sliding Tab Layout View
-        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+        tabs = (MainSlidingTabLayout) findViewById(R.id.tabs);
         tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
 
         // Setting Custom Color for the Scroll bar indicator of the Tab View
-        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+        tabs.setCustomTabColorizer(new MainSlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
                 return getResources().getColor(R.color.tabsScrollColor);

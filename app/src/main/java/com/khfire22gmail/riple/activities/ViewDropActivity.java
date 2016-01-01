@@ -7,10 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -32,8 +32,9 @@ import com.facebook.login.widget.ProfilePictureView;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.MainActivity;
+import com.khfire22gmail.riple.MainViewPager.DropPagerAdapter;
+import com.khfire22gmail.riple.MainViewPager.MainViewPagerAdapter;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.parse.FindCallback;
@@ -47,12 +48,11 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class DropCommentsActivity extends AppCompatActivity {
+public class ViewDropActivity extends AppCompatActivity {
 
 
     private Object animator;
@@ -94,19 +94,27 @@ public class DropCommentsActivity extends AppCompatActivity {
     private String displayName;
     Context mContext;
     private ParseUser currentUser;
+    ViewPager mViewPager;
+    private MainViewPagerAdapter mCustomPagerAdapter;
+    private TextView mViewDropEmptyView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_drop);
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new DropPagerAdapter(getSupportFragmentManager(), ViewDropActivity.this));
+
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
         currentUser = ParseUser.getCurrentUser();
 
         drop = "drop";
         trickle = "trickle";
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.view_drop_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Author and Drop Information
         Intent intent = getIntent();
@@ -155,15 +163,6 @@ public class DropCommentsActivity extends AppCompatActivity {
         descriptionView = (TextView) findViewById(R.id.description);
         descriptionView.setText(mDropDescription);
 
-        ripleCountView = (TextView) findViewById(R.id.riple_count);
-        ripleCountView.setText(mRipleCount);
-        ripleCountView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewCompletedBy();
-            }
-        });
-
         ImageView menuButton = (ImageView) findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,9 +174,6 @@ public class DropCommentsActivity extends AppCompatActivity {
                 }
             }
         });
-
-        commentCountView = (TextView) findViewById(R.id.comment_count);
-        commentCountView.setText(mCommentCount);
 
         createdAtView = (TextView) findViewById(R.id.comment_created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
@@ -203,16 +199,16 @@ public class DropCommentsActivity extends AppCompatActivity {
 
                  if (parseProfilePicture == null && displayName == null) {
                      Toast.makeText(getApplicationContext(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                     Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+                     Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
                      startActivity(intent);
                  } else if (parseProfilePicture == null) {
                      Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-                     Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+                     Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
                      startActivity(intent);
 
                  } else if (displayName == null) {
                      Toast.makeText(getApplicationContext(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                     Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+                     Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
                      startActivity(intent);
                  } else  {
                      commentText = newCommentView.getEditableText().toString();
@@ -227,10 +223,6 @@ public class DropCommentsActivity extends AppCompatActivity {
 
              }
          });
-
-        loadCommentsFromParse();
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setItemAnimator((RecyclerView.ItemAnimator) animator);
     }
 
     private void getViewedUserProfilePicture(String mAuthorId) {
@@ -259,7 +251,7 @@ public class DropCommentsActivity extends AppCompatActivity {
 
     private void viewCompletedBy() {
 
-        Intent intent = new Intent(DropCommentsActivity.this, DropCompletedActivity.class);
+        Intent intent = new Intent(ViewDropActivity.this, CompletedActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);
@@ -272,84 +264,9 @@ public class DropCommentsActivity extends AppCompatActivity {
         this.startActivity(intent);
     }
 
-    public void loadCommentsFromParse() {
-        final List<CommentItem> commentList = new ArrayList<>();
-
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Comments");
-        query.whereEqualTo("dropId", mDropObjectId);
-        query.orderByDescending("createdAt");
-        query.include("commenterPointer");
-//        query.setLimit(25);
-
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-
-                if (e != null) {
-                    Log.d("KEVIN", "error error");
-
-                } else {
-                    for (int i = 0; i < list.size(); i++) {
-
-                        final CommentItem commentItem = new CommentItem();
-
-                        ParseObject commenterData = (ParseObject) list.get(i).get("commenterPointer");
-
-                        //Commenter data////////////////////////////////////////////////////////////
-                        ParseFile profilePicture = (ParseFile) commenterData.get("parseProfilePicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
-
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        commentItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(commentList);
-                                    }
-                                }
-                            });
-                        }
 
 
-                        //CommenterId
-                        commentItem.setCommenterId(commenterData.getObjectId());
 
-                        //Commenter Name
-                        commentItem.setCommenterName((String) commenterData.get("displayName"));
-
-                        //Rank
-                        commentItem.setCommenterRank((String) commenterData.get("userRank"));
-
-                        //Comment Data/////////////////////////////////////////////////////////////
-                        // DropId
-                        commentItem.setDropId(list.get(i).getString("dropId"));
-
-                        //Comment
-                        commentItem.setCommentText(list.get(i).getString("commentText"));
-
-                        //Date
-                        commentItem.setCreatedAt(list.get(i).getCreatedAt());
-
-                        commentList.add(commentItem);
-                    }
-
-                    Log.i("KEVIN", "PARSE LIST SIZE: " + commentList.size());
-
-                }
-            }
-        });
-    }
-
-    private void updateRecyclerView(List<CommentItem> items) {
-        Log.d("KEVIN", "VIEWDROP LIST SIZE: " + items.size());
-
-        mCommentList = items;
-
-        mCommentAdapter = new CommentAdapter(this, mCommentList);
-        mRecyclerView.setAdapter(mCommentAdapter);
-    }
 
     public void postNewComment(final String commentText) throws InterruptedException {
 
@@ -364,7 +281,6 @@ public class DropCommentsActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
-                    loadCommentsFromParse();
                 }
             });
 
@@ -381,7 +297,7 @@ public class DropCommentsActivity extends AppCompatActivity {
             });
 
         } else {
-            Toast.makeText(DropCommentsActivity.this, "Please enter some text first!", Toast.LENGTH_LONG).show();
+            Toast.makeText(ViewDropActivity.this, "Please enter some text first!", Toast.LENGTH_LONG).show();
         }
 
         hideSoftKeyboard();
@@ -405,7 +321,7 @@ public class DropCommentsActivity extends AppCompatActivity {
                     .into(commenterProfilePictureView);
         } else {
             Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(DropCommentsActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
             startActivity(intent);
         }
     }
@@ -464,7 +380,7 @@ public class DropCommentsActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {
-                    Intent messageIntent = new Intent(DropCommentsActivity.this, MessagingActivity.class);
+                    Intent messageIntent = new Intent(ViewDropActivity.this, MessagingActivity.class);
                     messageIntent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
                     startActivity(messageIntent);
                 } else {
@@ -570,7 +486,7 @@ public class DropCommentsActivity extends AppCompatActivity {
                     shareWithOther();
 
                 }else if (selected == 3) {
-                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(DropCommentsActivity.this, R.style.MyAlertDialogStyle);
+                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
                     builderVerify.setTitle("Report Drop Author");
                     builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
                     builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -598,7 +514,7 @@ public class DropCommentsActivity extends AppCompatActivity {
 
         CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Remove From Todo", "Report"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(DropCommentsActivity.this, R.style.MyAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
         builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
             @Override
@@ -666,7 +582,7 @@ public class DropCommentsActivity extends AppCompatActivity {
         removeRelation2.remove(dropObject);
         user.saveInBackground();
 
-        Intent intent = new Intent(DropCommentsActivity.this, MainActivity.class);
+        Intent intent = new Intent(ViewDropActivity.this, MainActivity.class);
         startActivity(intent);
 
 //        DropAdapter.data.remove(mPosition);

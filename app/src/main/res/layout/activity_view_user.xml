@@ -78,20 +78,3 @@
         app:layout_anchorGravity="bottom|right|end"/>
     <!--app:layout_behavior="pl.michalz.hideonscrollexample.ScrollingFABBehavior"/>-->
 </android.support.design.widget.CoordinatorLayout>
-
-
-    <!--<include
-        android:id="@+id/view_other_user_card"
-        layout="@layout/card_profile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>-->
-
-    <!--<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
-        android:id="@+id/riple_swipe"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/view_other_user_card">-->
-
-
-    <!--</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>-->
-

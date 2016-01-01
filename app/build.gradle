@@ -20,7 +20,8 @@ android {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://jitpack.io"
+        maven {
+            url "https://jitpack.io"
 
         }
     }
@@ -50,8 +51,10 @@ android {
         compile 'com.githang:com.edmodo.cropper:1.0.2'
 
 
-
     }
+}
+dependencies {
+    compile 'com.android.support:support-v4:23.1.1'
 }
 
 

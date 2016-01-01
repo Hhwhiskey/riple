@@ -61,7 +61,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.DropCommentsActivity"
+            android:name=".activities.ViewDropActivity"
             android:label="@string/title_activity_clicked_drop"
             android:screenOrientation="portrait">
         </activity>
@@ -93,7 +93,7 @@
 
         <service android:name=".utils.MessageService"/>
 
-        <activity android:name=".activities.DropCompletedActivity"
+        <activity android:name=".activities.CompletedActivity"
                   android:screenOrientation="portrait">
 
         </activity>

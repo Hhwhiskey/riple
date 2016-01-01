@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.DropCompletedActivity;
+import com.khfire22gmail.riple.activities.CompletedActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
     private LayoutInflater inflater;
     List<CompletedByItem> data = Collections.emptyList();
 
-    public CompletedByAdapter(DropCompletedActivity context, ArrayList<CompletedByItem> data) {
+    public CompletedByAdapter(CompletedActivity context, ArrayList<CompletedByItem> data) {
         mContext = context;
         this.inflater = LayoutInflater.from(context);
         this.data = data;

@@ -2,28 +2,160 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                xmlns:app="http://schemas.android.com/tools"
                 android:background="@color/Primary_Background_Color"
                 android:orientation="vertical"
                 android:weightSum="1">
 
 
-    <include
+    <android.support.v7.widget.CardView
         android:id="@+id/card_view_drop"
-        layout="@layout/card_view_drop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="none"
-        android:enabled="false"/>
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="#FFFFFF"
+        card_view:cardPreventCornerOverlap="false"
+        >
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            app:tabMode="scrollable"
+            android:layout_gravity="bottom"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:background="@android:color/white"/>
+
+        <RelativeLayout
+            android:id="@+id/click_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:background="@drawable/custom_bg">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/trickle_card_tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="#BBDEFB"
+                />
+
+            <ImageView
+                android:id="@+id/profile_picture"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_user_default"
+                android:background="@drawable/custom_bg"/>
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/profile_picture"
+                android:width="50dp"
+                android:text="Kevin Hodges"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:singleLine="true"
+                android:layout_alignTop="@+id/profile_picture"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_toStartOf="@+id/menu_button"
+                android:layout_toLeftOf="@+id/menu_button"
+                android:background="@drawable/custom_bg_blue"
+                android:clickable="true"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/comment_created_at"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="September 18, 2015 @ 3:32 p.m."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="10sp"
+                android:singleLine="true"
+                android:background="@drawable/custom_bg"
+                android:gravity="left"
+                android:layout_alignBottom="@+id/profile_picture"
+                android:layout_alignRight="@+id/menu_button"
+                android:layout_alignEnd="@+id/menu_button"
+                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_marginLeft="8dp"
+                />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:enabled="true"
+                android:focusable="false"
+                android:maxLines="5"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:singleLine="false"
+                android:text="Description"
+                android:layout_below="@+id/profile_picture"
+                android:textColor="@color/PrimaryText"
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/custom_bg"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/menu_button"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/menu_svg"
+                android:layout_alignBottom="@+id/trickle_card_tool_bar"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/custom_bg_blue"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&quot;Mother Teresa&quot;"
+                android:id="@+id/author_rank"
+                android:textSize="14sp"
+                android:singleLine="false"
+                android:gravity="left|center_vertical|center_horizontal"
+                android:layout_alignLeft="@+id/name"
+                android:layout_alignStart="@+id/name"
+                android:textStyle="italic"
+                android:layout_below="@+id/name"
+                android:layout_alignBottom="@+id/trickle_card_tool_bar"
+                android:textColor="#7d000000"
+                android:layout_toStartOf="@+id/menu_button"
+                android:layout_marginTop="-4dp"
+                android:layout_toLeftOf="@+id/menu_button"/>
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/view_drop_recycler_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/enter_comment_text"
-        android:layout_below="@+id/card_view_drop"
-        android:background="@color/Primary_Background_Color"
-        />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
     <AutoCompleteTextView
         android:id="@+id/enter_comment_text"
@@ -47,7 +179,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/view_drop_recycler_view"
         android:foregroundGravity="center_vertical"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_user_default"/>
@@ -66,258 +197,3 @@
         android:textColor="#ffffff"/>
 
 </RelativeLayout>
-
-
-    <!--
-    <?xml version="1.0" encoding="utf-8"?>
-    <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:context="com.khfire22gmail.riple.actions.ViewUserActivity">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/Primary_Background_Color"
-            android:orientation="vertical"
-            android:weightSum="1">
-
-            <android.support.design.widget.AppBarLayout
-                android:id="@+id/appbar_view_drop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-                <android.support.design.widget.CollapsingToolbarLayout
-                    android:id="@+id/view_drop_collapsing_tool_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:contentScrim="@color/Primary_Background_Color"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-                    <android.support.v7.widget.CardView
-                        android:id="@+id/card_view_drop"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginTop="4dp"
-                        card_view:cardCornerRadius="2dp"
-                        card_view:cardElevation="2dp"
-                        card_view:cardUseCompatPadding="true">
-
-                        <RelativeLayout
-                            android:id="@+id/top_layout"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:alpha="123124"
-                            android:background="#ffffff"
-                            android:paddingBottom="8dp">
-
-                            <android.support.v7.widget.Toolbar
-                                android:id="@+id/view_drop_card_tool_bar"
-                                android:layout_width="match_parent"
-                                android:layout_height="42dp"
-                                android:background="#BBDEFB"
-                                android:clickable="false"/>
-
-                            <com.facebook.login.widget.ProfilePictureView
-                                android:id="@+id/profile_picture"
-                                android:layout_width="65dp"
-                                android:layout_height="65dp"
-                                android:layout_alignParentLeft="true"
-                                android:layout_alignParentStart="true"
-                                android:layout_alignParentTop="true"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginTop="8dp"
-                                android:foregroundGravity="center_vertical"/>
-
-                            <TextView
-                                android:id="@+id/name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignEnd="@+id/created_at"
-                                android:layout_alignParentTop="true"
-                                android:layout_alignRight="@+id/created_at"
-                                android:layout_alignTop="@+id/profile_picture"
-                                android:layout_margin="8dp"
-                                android:layout_toRightOf="@+id/profile_picture"
-                                android:width="50dp"
-                                android:singleLine="true"
-                                android:text="Kevin Hodges"
-                                android:textAlignment="center"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textColor="#000000"
-                                android:textSize="20sp"/>
-
-                            <TextView
-                                android:id="@+id/created_at"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/name"
-                                android:layout_marginLeft="8dp"
-                                android:layout_toEndOf="@+id/profile_picture"
-                                android:layout_toRightOf="@+id/profile_picture"
-                                android:gravity="top"
-                                android:singleLine="true"
-                                android:text="September 18, 2015 @ 3:32 p.m."
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textSize="10sp"/>
-
-                            <ScrollView
-                                android:id="@+id/scrollView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_above="@+id/comment_count"
-                                android:layout_alignEnd="@+id/description"
-                                android:layout_alignLeft="@+id/profile_picture"
-                                android:layout_alignRight="@+id/description"
-                                android:layout_alignStart="@+id/profile_picture"
-                                android:layout_below="@+id/profile_picture"/>
-
-                            <TextView
-                                android:id="@+id/description"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_alignEnd="@+id/created_at"
-                                android:layout_alignRight="@+id/created_at"
-                                android:layout_below="@+id/profile_picture"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginRight="8dp"
-                                android:layout_marginTop="8dp"
-                                android:elegantTextHeight="false"
-                                android:ellipsize="end"
-                                android:enabled="true"
-                                android:focusable="false"
-                                android:paddingLeft="8dp"
-                                android:paddingRight="8dp"
-                                android:singleLine="false"
-                                android:text="Description"
-                                android:textColor="@color/PrimaryText"
-                                android:textSize="16sp"/>
-
-                            <TextView
-                                android:id="@+id/riple_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentLeft="true"
-                                android:layout_alignParentStart="true"
-                                android:layout_below="@+id/description"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginLeft="16dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_toLeftOf="@+id/comment_count"
-                                android:gravity="left"
-                                android:singleLine="true"
-                                android:text="205 riples"
-                                android:textAlignment="textStart"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textSize="10sp"/>
-
-                            <TextView
-                                android:id="@+id/comment_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignLeft="@+id/created_at"
-                                android:layout_alignStart="@+id/created_at"
-                                android:layout_alignTop="@+id/riple_count"
-                                android:layout_marginLeft="4dp"
-                                android:gravity="left"
-                                android:singleLine="true"
-                                android:text="12 comments"
-                                android:textAlignment="textStart"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textSize="10sp"
-                                />
-
-                            <ImageView
-                                android:id="@+id/trickle_share"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignBottom="@+id/switch_todo"
-                                android:layout_below="@+id/description"
-                                android:layout_marginTop="2dp"
-                                android:layout_toLeftOf="@+id/switch_todo"
-                                android:layout_toStartOf="@+id/switch_todo"
-                                android:background="#ffffff"
-                                android:src="@mipmap/ic_share_button"/>
-
-                            <Switch
-                                android:id="@+id/switch_todo"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_alignParentRight="true"
-                                android:layout_below="@+id/description"
-                                android:layout_marginLeft="24dp"
-                                android:layout_marginRight="16dp"
-                                android:checked="false"/>
-
-                        </RelativeLayout>
-                    </android.support.v7.widget.CardView>
-
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/view_drop_tool_bar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"/>
-
-                </android.support.design.widget.CollapsingToolbarLayout>
-            </android.support.design.widget.AppBarLayout>
-
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/view_drop_recycler_view"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_above="@+id/enter_comment_text"
-                android:layout_below="@+id/appbar_view_drop"
-                android:background="@color/Primary_Background_Color"
-                />
-
-            <AutoCompleteTextView
-                android:id="@+id/enter_comment_text"
-                android:layout_width="235dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignTop="@+id/button_post_comment"
-                android:layout_toLeftOf="@+id/button_post_comment"
-                android:layout_toRightOf="@+id/post_comment_profile_picture"
-                android:layout_toStartOf="@+id/button_post_comment"
-                android:background="#ffffff"
-                android:hint="Write a Comment..."
-                android:inputType="textAutoComplete|textAutoCorrect"
-                android:maxLength="250"
-                android:paddingLeft="8dp"/>
-
-            <com.facebook.login.widget.ProfilePictureView
-                android:id="@+id/post_comment_profile_picture"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/view_drop_recycler_view"
-                android:foregroundGravity="center_vertical"/>
-
-            <Button
-                android:id="@+id/button_post_comment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="10dp"
-                android:width="50dp"
-                android:background="@color/AccentColor"
-                android:text="Post"
-                android:textColor="#ffffff"/>
-
-        </RelativeLayout>
-    </android.support.design.widget.CoordinatorLayout>-->

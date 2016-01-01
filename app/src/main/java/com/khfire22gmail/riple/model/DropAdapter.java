@@ -24,8 +24,8 @@ import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.DropCommentsActivity;
-import com.khfire22gmail.riple.activities.DropCompletedActivity;
+import com.khfire22gmail.riple.activities.CompletedActivity;
+import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
@@ -101,7 +101,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         } else if (mTabName.equals(trickle)) {
             xmlLayoutId = R.layout.card_trickle;
 
-            //Todo Show card in DropCommentsActivity based on users relation to that Drop
+            //Todo Show card in ViewDropActivity based on users relation to that Drop
         } else if (mTabName.equals(viewUser)) {
             xmlLayoutId = R.layout.card_riple;
         }
@@ -289,7 +289,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
         Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
 
-        Intent intent = new Intent(mContext, DropCommentsActivity.class);
+        Intent intent = new Intent(mContext, ViewDropActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("authorRank", mAuthorRank);
@@ -338,7 +338,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
         Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
 
-        Intent intent = new Intent(mContext, DropCompletedActivity.class);
+        Intent intent = new Intent(mContext, CompletedActivity.class);
         intent.putExtra("dropObjectId", mDropObjectId);
         intent.putExtra("authorId", mAuthorId);
         intent.putExtra("commenterName", mAuthorName);
