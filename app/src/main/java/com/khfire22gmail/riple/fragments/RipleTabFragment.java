@@ -25,6 +25,7 @@ import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.EndlessRecyclerOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -73,6 +74,7 @@ public class RipleTabFragment extends Fragment {
     private ArrayList<DropItem> mRipleListLocal;
     private List<ParseObject> listFromParse;
     private List<ParseObject> mParseList;
+    private static String TAG = RipleTabFragment.class.getSimpleName() ;
 
 
     @Override
@@ -92,10 +94,19 @@ public class RipleTabFragment extends Fragment {
         facebookId = currentUser.getString("facebookId");
 
         //loadSavedPreferences();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         ripleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
-        ripleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        ripleRecyclerView.setLayoutManager(layoutManager);
         ripleRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        ripleRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                Log.d(TAG, "onLoadMore current_page: " + current_page);
+                loadRipleItemsFromParse();
+            }
+        });
+
 
         ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
 
@@ -238,6 +249,7 @@ public class RipleTabFragment extends Fragment {
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
         mainQuery.include("authorPointer");
         mainQuery.orderByDescending("createdAt");
+        mainQuery.setLimit(10);
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> listParse, ParseException e) {
@@ -401,6 +413,8 @@ public class RipleTabFragment extends Fragment {
     }
 
     public void updateRecyclerView(List<DropItem> mRipleList) {
+
+        Log.d(TAG, "updateRecyclerView: Now");
 
         if (mRipleList.isEmpty()) {
             ripleRecyclerView.setVisibility(View.GONE);
