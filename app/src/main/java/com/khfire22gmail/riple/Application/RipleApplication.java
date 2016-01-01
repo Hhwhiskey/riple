@@ -23,6 +23,8 @@ public class RipleApplication extends Application {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 
+        Parse.enableLocalDatastore(this);
+
         // Initializes parse in application
         Parse.initialize(this, getString(R.string.parse_id), getString(R.string.parse_client_key));
 

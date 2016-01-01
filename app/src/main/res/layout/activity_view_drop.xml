@@ -9,10 +9,9 @@
 
     <include
         android:id="@+id/card_view_drop"
-        layout="@layout/card_riple"
+        layout="@layout/card_view_drop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:checked="true"
         android:ellipsize="none"
         android:enabled="false"/>
 

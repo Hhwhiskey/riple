@@ -282,7 +282,9 @@ public class ViewUserActivity extends AppCompatActivity {
                         //Comment Count
                         dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
 
+
                         viewUserList.add(dropItem);
+                        ParseObject.pinAllInBackground(list);
                     }
 
 //                    Log.i("KEVIN", "PARSE LIST SIZE: " + clickedUsersList.size());

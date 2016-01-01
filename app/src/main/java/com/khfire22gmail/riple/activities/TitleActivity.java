@@ -182,17 +182,17 @@ public class TitleActivity extends AppCompatActivity {
 
                 if (user == null) {
                     Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
-                    Toast.makeText(getApplicationContext(), "Uh oh. The user cancelled the Facebook login.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Uh oh. Facebook login has been canceled.", Toast.LENGTH_SHORT).show();
 
                 } else if (user.isNew()) {
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(), "User signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "You have signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     storeFacebookUserOnParse();
 
 
                 } else {
                     Log.d(RipleApplication.TAG, "You have logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(), "User logged in through Facebook!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), "User logged in through Facebook!", Toast.LENGTH_SHORT).show();
                     launchMainActivity();
                 }
             }

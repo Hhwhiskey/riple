@@ -69,6 +69,10 @@ public class RipleTabFragment extends Fragment {
     private ParseUser currentUser;
     public String userName;
     public String facebookId;
+    private ArrayList <DropItem> mRipleListFromParse;
+    private ArrayList<DropItem> mRipleListLocal;
+    private List<ParseObject> listFromParse;
+    private List<ParseObject> mParseList;
 
 
     @Override
@@ -80,6 +84,8 @@ public class RipleTabFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
+
+        mRipleListFromParse = new ArrayList<>();
 
         currentUser =  ParseUser.getCurrentUser();
 //        userName  = currentUser.getString("displayName");
@@ -141,6 +147,7 @@ public class RipleTabFragment extends Fragment {
             @Override public void onRefresh() {
                 // Do work to refresh the list here.
                 loadRipleItemsFromParse();
+//                loadRipleItemsFromLocal();
 //                updateUserInfo();
                 new Task().execute();
             }
@@ -214,9 +221,9 @@ public class RipleTabFragment extends Fragment {
 
     public void loadRipleItemsFromParse() {
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ArrayList<DropItem> ripleListFromParse = new ArrayList<>();
 
-        final ArrayList<DropItem> ripleList = new ArrayList<>();
+        ParseUser currentUser = ParseUser.getCurrentUser();
 
         ParseRelation createdRelation = currentUser.getRelation("createdDrops");
         ParseRelation completedRelation = currentUser.getRelation("completedDrops");
@@ -233,18 +240,18 @@ public class RipleTabFragment extends Fragment {
         mainQuery.orderByDescending("createdAt");
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> list, ParseException e) {
+            public void done(List<ParseObject> listParse, ParseException e) {
 
                 if (e != null) {
                     Log.i("KEVIN", "error error");
 
                 } else {
-                    for (int i = 0; i < list.size(); i++) {
+                    for (int i = 0; i < listParse.size(); i++) {
 
                         final DropItem dropItem = new DropItem();
 
                         //Drop Author Data//////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
+                        ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
 
                         ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
                         if (parseProfilePicture != null) {
@@ -255,7 +262,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(ripleList);
+                                        updateRecyclerView(ripleListFromParse);
                                     }
                                 }
                             });
@@ -270,31 +277,123 @@ public class RipleTabFragment extends Fragment {
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
+                        dropItem.setObjectId(listParse.get(i).getObjectId());
                         //CreatedAt
-                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
+                        dropItem.setCreatedAt(listParse.get(i).getCreatedAt());
                         //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
                         //Drop description
-                        dropItem.setDescription(list.get(i).getString("description"));
+                        dropItem.setDescription(listParse.get(i).getString("description"));
 
                         //Riple Count
-                        int ripleCount = (list.get(i).getInt("ripleCount"));
+                        int ripleCount = (listParse.get(i).getInt("ripleCount"));
                         if (ripleCount == 1) {
-                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riple"));
+                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riple"));
                         } else {
-                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riples"));
                         }
 
                         //Comment Count
-                        int commentCount = (list.get(i).getInt("commentCount"));
+                        int commentCount = (listParse.get(i).getInt("commentCount"));
                         if (commentCount == 1) {
-                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comment"));
+                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
                         }else {
-                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
                         }
 
-                        ripleList.add(dropItem);
+                        ripleListFromParse.add(dropItem);
+//                        ParseObject.pinAllInBackground("pinnedQuery", listParse);
+                    }
+                }
+            }
+        });
+    }
 
+    public void loadRipleItemsFromLocal() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        mRipleListLocal = new ArrayList<>();
+
+        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
+        ParseRelation completedRelation = currentUser.getRelation("completedDrops");
+
+        ParseQuery createdQuery = createdRelation.getQuery();
+        ParseQuery completedQuery = completedRelation.getQuery();
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(createdQuery);
+        queries.add(completedQuery);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.include("authorPointer");
+        mainQuery.orderByDescending("createdAt");
+//        mainQuery.fromLocalDatastore();
+//        mainQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> listLocal, ParseException e) {
+
+                if (e != null) {
+                    Log.i("KEVIN", "error error");
+
+                    mRipleListFromParse.clear();
+
+                } else {
+                    for (int i = 0; i < mRipleListFromParse.size(); i++) {
+
+
+                        final DropItem dropItem = new DropItem();
+
+                        //Drop Author Data//////////////////////////////////////////////////////////
+                        ParseObject authorData = (ParseObject) listLocal.get(i).get("authorPointer");
+
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        if (parseProfilePicture != null) {
+                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(bmp);
+                                        updateRecyclerView(mRipleListFromParse);
+                                    }
+                                }
+                            });
+                        }
+
+                        //dropItemAll.setAuthorName(authorName);
+                        dropItem.setAuthorName((String) authorData.get("displayName"));
+                        //Author id
+                        dropItem.setAuthorId(authorData.getObjectId());
+                        //Author Rank
+                        dropItem.setAuthorRank(authorData.getString("userRank"));
+
+                        //Drop Data////////////////////////////////////////////////////////////////
+                        //DropObjectId
+                        dropItem.setObjectId(listLocal.get(i).getObjectId());
+                        //CreatedAt
+                        dropItem.setCreatedAt(listLocal.get(i).getCreatedAt());
+                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+                        //Drop description
+                        dropItem.setDescription(listLocal.get(i).getString("description"));
+
+                        //Riple Count
+                        int ripleCount = (listLocal.get(i).getInt("ripleCount"));
+                        if (ripleCount == 1) {
+                            dropItem.setRipleCount(String.valueOf(listLocal.get(i).getInt("ripleCount") + " Riple"));
+                        } else {
+                            dropItem.setRipleCount(String.valueOf(listLocal.get(i).getInt("ripleCount") + " Riples"));
+                        }
+
+                        //Comment Count
+                        int commentCount = (listLocal.get(i).getInt("commentCount"));
+                        if (commentCount == 1) {
+                            dropItem.setCommentCount(String.valueOf(listLocal.get(i).getInt("commentCount") + " Comment"));
+                        }else {
+                            dropItem.setCommentCount(String.valueOf(listLocal.get(i).getInt("commentCount") + " Comments"));
+                        }
+
+                        mRipleListFromParse.add(dropItem);
                     }
                 }
             }
@@ -316,6 +415,7 @@ public class RipleTabFragment extends Fragment {
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(ripleAdapter);
         ripleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
+
     }
 
     private void updateUserInfo() {

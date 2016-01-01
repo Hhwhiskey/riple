@@ -19,7 +19,7 @@
         card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
-            android:id="@+id/top_layout"
+            android:id="@+id/click_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/menu_button"
                 android:src="@drawable/menu_svg"
-                android:background="@drawable/custom_bg_blue"
+                android:background="@drawable/custom_bg"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="8dp"
                 android:layout_alignParentRight="true"

@@ -153,7 +153,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                 public void done(ParseUser parseUser, ParseException e) {
                     if (e == null) {
                         Intent messageIntent = new Intent(mContext, MessagingActivity.class);
-                        mContext.startActivity(messageIntent);
                         messageIntent.putExtra("RECIPIENT_ID", parseUser.getObjectId());
                         mContext.startActivity(messageIntent);
                     } else {

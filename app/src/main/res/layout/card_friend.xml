@@ -18,7 +18,7 @@
         android:layout_marginRight="8dp">
 
         <RelativeLayout
-            android:id="@+id/top_layout"
+            android:id="@+id/click_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"

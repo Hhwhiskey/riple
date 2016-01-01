@@ -1,9 +1,11 @@
 package com.khfire22gmail.riple.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +27,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
+import com.facebook.FacebookSdk;
 import com.facebook.login.widget.ProfilePictureView;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CommentAdapter;
@@ -87,12 +92,15 @@ public class DropCommentsActivity extends AppCompatActivity {
     private String trickle;
     private int mPosition;
     private String displayName;
+    Context mContext;
+    private ParseUser currentUser;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_drop);
+        currentUser = ParseUser.getCurrentUser();
 
         drop = "drop";
         trickle = "trickle";
@@ -447,9 +455,106 @@ public class DropCommentsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void messageTheAuthor() {
+
+        String author = mAuthorId;
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("objectId", author);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> user, ParseException e) {
+                if (e == null) {
+                    Intent messageIntent = new Intent(DropCommentsActivity.this, MessagingActivity.class);
+                    messageIntent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
+                    startActivity(messageIntent);
+                } else {
+                    Toast.makeText(mContext,
+                            "Error finding that user",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    //Report the Drop author and store the Drop in question in UserReportCount table
+    public void reportDropAuthor() {
+
+        final String dropObjectId = mDropObjectId;
+
+        //Get Drop data, which includes the Author pointer
+        ParseQuery parseQuery = ParseQuery.getQuery("Drop");
+        parseQuery.whereEqualTo("objectId", dropObjectId);
+        parseQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(final ParseObject dropObject, ParseException e) {
+                if (e == null) {
+                    //Get author pointer out of Drop
+                    final ParseObject reportedDropAuthorPointer = dropObject.getParseObject("authorPointer");
+
+                    //Get author for report
+                    ParseQuery reportQuery = ParseQuery.getQuery("UserReportCount");
+                    reportQuery.whereEqualTo("userPointer", reportedDropAuthorPointer);
+                    reportQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(final ParseObject reportedUser, ParseException e) {
+                            //Increment the author's report count and save mark the Drop in
+                            ParseRelation reportRelation = reportedUser.getRelation("reportedDrops");
+                            reportRelation.add(dropObject);
+                            reportedUser.increment("reportCount");
+                            reportedUser.saveEventually();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void shareToFacebook() {
+        String displayName = currentUser.getString("displayName");
+        String shareAuthor = mAuthorName;
+        String shareDescription = mDropDescription;
+//        Bitmap sharedImage = data.get(position).getParseProfilePicture();
+
+        ShareDialog shareDialog;
+        FacebookSdk.sdkInitialize(this);
+        shareDialog = new ShareDialog(this);
+
+        ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                .setContentTitle("Make a Riple...")
+                .setContentDescription(displayName + " shared " + shareAuthor + "'s" + " Drop from \"Riple\":\n\n" + "\"" + shareDescription + "\"\n\n" + "If you have an Android device you can download \"Riple\" now and start making Riples of your own. Click the link to get started!\n" + "facebook.com/kevinhodges0")
+                .setContentUrl(Uri.parse("https://play.google.com/store/search?q=pub:Google%20Inc."))
+                .setImageUrl(Uri.parse("https://scontent-ord1-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/923007_665600676799506_1701143490_n.png?oh=9a224427d5c5807ed0db56582363057b&oe=57079C4E"))
+                .build();
+
+        shareDialog.show(linkContent);
+    }
+
+    // TODO: 11/19/2015 Include pics with share
+    public void shareWithOther() {
+        String displayName = currentUser.getString("displayName");
+        String shareAuthor = mAuthorName;
+        String shareDescription = mDescription;
+//        Bitmap sharedImage = data.get(position).getParseProfilePicture();
+
+        //Share to Other
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, (displayName + " shared " + shareAuthor + "'s" + " Drop from \"Riple\":\n\n" + "\"" + shareDescription + "\"\n\n" + "If you have an Android device you can download \"Riple\" now and start making Riples of your own. Click the link to get started!\n" + "facebook.com/kevinhodges0"));
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//      Uri imageUri = Uri.parse("https://scontent-ord1-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/923007_665600676799506_1701143490_n.png?oh=9a224427d5c5807ed0db56582363057b&oe=57079C4E");
+//      shareIntent.setType("*/*");
+//      shareIntent.putExtra(Intent.EXTRA_STREAM, String.valueOf(imageUri));
+//      shareIntent.setType("image/*");
+        mContext.startActivity(Intent.createChooser(shareIntent, "Share this Drop with friends"));
+
+
+    }
+
     public void showTrickleMenu() {
 
-        CharSequence trickleDrop[] = new CharSequence[]{"Share", "Report"};
+        CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Report"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
@@ -457,40 +562,89 @@ public class DropCommentsActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int selected) {
                 if (selected == 0) {
-                    //share
-                } else {
-                    //report
-                }
+                    messageTheAuthor();
+                }else if (selected == 1) {
+                    shareToFacebook();
 
+                } else if (selected == 2) {
+                    shareWithOther();
+
+                }else if (selected == 3) {
+                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(DropCommentsActivity.this, R.style.MyAlertDialogStyle);
+                    builderVerify.setTitle("Report Drop Author");
+                    builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
+                    builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
+                    builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            reportDropAuthor();
+                            Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builderVerify.show();
+                }
             }
         });
         builder.show();
     }
 
+
     public void showDropMenu() {
 
-        CharSequence todoDrop[] = new CharSequence[]{"Share", "Remove From Todo", "Report"};
+        CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Remove From Todo", "Report"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(DropCommentsActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
         builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int selected) {
+
                 if (selected == 0) {
-                    //share
-                } else if (selected == 1) {
+                    messageTheAuthor();
+
+                }else if (selected == 1) {
+                    shareToFacebook();
+
+                }else if (selected == 2) {
+                    shareWithOther();
+
+                } else if (selected == 3) {
                     getDropObject(mDropObjectId);
-                } else if (selected == 2) {
-                    //report
+
+                } else if (selected == 4) {
+                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                    builderVerify.setTitle("Report Drop Author");
+                    builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
+                    builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
+                    builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            reportDropAuthor();
+                            Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
+
+                        }
+                    });
+                    builderVerify.show();
+
                 }
             }
         });
         builder.show();
     }
 
-    public void getDropObject(String dropObject) {
+    public void getDropObject(String dropObjectId) {
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
-        interactedDropQuery.getInBackground(dropObject, new GetCallback<ParseObject>() {
+        interactedDropQuery.getInBackground(dropObjectId, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     removeFromTodo(object);

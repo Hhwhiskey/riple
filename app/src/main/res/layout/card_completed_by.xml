@@ -18,7 +18,7 @@
         card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
-            android:id="@+id/top_layout"
+            android:id="@+id/click_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@color/AccentColor">
@@ -42,7 +42,7 @@
                 android:layout_alignParentTop="false"
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textColor="#FFFFFF"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/completed_by_profile_picture"
@@ -64,7 +64,7 @@
                 android:layout_alignBottom="@+id/completed_by_display_name"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textColor="#FFFFFF"
                 android:layout_marginRight="8dp"
                 android:layout_alignTop="@+id/completed_by_display_name"

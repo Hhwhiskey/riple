@@ -9,12 +9,14 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -473,6 +475,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         public TextView commentCount;
         public TextView authorRank;
         private ImageView parseProfilePicture;
+        private RelativeLayout topLayout;
+        private Toolbar toolbar;
+
 
 
         public DropViewHolder(View itemView) {
@@ -488,6 +493,9 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             commentCount = (TextView) itemView.findViewById(R.id.comment_count);
             authorRank = (TextView) itemView.findViewById(R.id.author_rank);
             menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
+            topLayout = (RelativeLayout) itemView.findViewById(R.id.click_layout);
+            toolbar = (Toolbar) itemView.findViewById(R.id.trickle_card_tool_bar);
+
 
 
 //                    menuButton.setOnClickListener(this);
@@ -504,28 +512,35 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //                    }
 
 
-            itemView.setOnLongClickListener(this);
+//            itemView.setOnLongClickListener(this);
+//
+//            parseProfilePicture.setOnClickListener(this);
+//            parseProfilePicture.setOnLongClickListener(this);
+//
+//            authorName.setOnClickListener(this);
+//            authorName.setOnLongClickListener(this);
+//
+//            authorRank.setOnClickListener(this);
+//            authorRank.setOnLongClickListener(this);
+//
+//            createdAt.setOnClickListener(this);
+//            createdAt.setOnLongClickListener(this);
+//
+//            description.setOnClickListener(this);
+//            description.setOnLongClickListener(this);
+//
+//            ripleCount.setOnClickListener(this);
+//            ripleCount.setOnLongClickListener(this);
+//
+//            commentCount.setOnClickListener(this);
+//            commentCount.setOnLongClickListener(this);
 
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+            toolbar.setOnClickListener(this);
+            toolbar.setOnLongClickListener(this);
             parseProfilePicture.setOnClickListener(this);
             parseProfilePicture.setOnLongClickListener(this);
-
-            authorName.setOnClickListener(this);
-            authorName.setOnLongClickListener(this);
-
-            authorRank.setOnClickListener(this);
-            authorRank.setOnLongClickListener(this);
-
-            createdAt.setOnClickListener(this);
-            createdAt.setOnLongClickListener(this);
-
-            description.setOnClickListener(this);
-            description.setOnLongClickListener(this);
-
-            ripleCount.setOnClickListener(this);
-            ripleCount.setOnLongClickListener(this);
-
-            commentCount.setOnClickListener(this);
-            commentCount.setOnLongClickListener(this);
 
             //Click Listeners
             if (todoButton != null) {
@@ -579,6 +594,54 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             authorRank.setText(current.authorRank);
         }
 
+//        @Override
+//        public void onClick(View view) {
+//            if (view == todoButton) {
+//                ParseUser currentUser = ParseUser.getCurrentUser();
+//                parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
+//                displayNameCheck = (String) currentUser.get("displayName");
+//
+//// TODO: 12/28/2015 Uncomment this before launch
+//                        if (parseProfilePictureCheck == null && displayNameCheck == null) {
+//                            Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+//                            Intent intent = new Intent(mContext, SettingsActivity.class);
+//                            mContext.startActivity(intent);
+//                        } else if (parseProfilePicture == null) {
+//                            Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+//                            Intent intent = new Intent(mContext, SettingsActivity.class);
+//                            mContext.startActivity(intent);
+//
+//                        } else if (displayNameCheck == null) {
+//                            Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+//                            Intent intent = new Intent(mContext, SettingsActivity.class);
+//                            mContext.startActivity(intent);
+//                        } else {
+//                getTrickleObjectFromRowToAdd(getAdapterPosition());
+//                removeDropFromView(getAdapterPosition());
+//                        }
+//
+//            } else if (view == completeButton) {
+//                getDropObjectFromRowToComplete(getAdapterPosition());
+//                removeDropFromView(getAdapterPosition());
+//            } else if (view == menuButton) {
+//                if (mTabName.equals(drop)) {
+//                    showDropMenu();
+//                } else {
+//                    showTrickleMenu();
+//                }
+//
+//            } else if (view == commentCount || view == description || view == createdAt) {
+//                viewDrop(getAdapterPosition());
+//
+//            } else if (view == ripleCount) {
+//                viewCompletedBy(getAdapterPosition());
+//
+//            } else {
+//                viewOtherUser(getAdapterPosition());
+//            }
+//        }
+
+
         @Override
         public void onClick(View view) {
             if (view == todoButton) {
@@ -586,7 +649,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
                 displayNameCheck = (String) currentUser.get("displayName");
 
-// TODO: 12/28/2015 Uncomment this before launch
                         if (parseProfilePictureCheck == null && displayNameCheck == null) {
                             Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(mContext, SettingsActivity.class);
@@ -601,13 +663,14 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                             Intent intent = new Intent(mContext, SettingsActivity.class);
                             mContext.startActivity(intent);
                         } else {
-                getTrickleObjectFromRowToAdd(getAdapterPosition());
-                removeDropFromView(getAdapterPosition());
+                            getTrickleObjectFromRowToAdd(getAdapterPosition());
+                            removeDropFromView(getAdapterPosition());
                         }
 
             } else if (view == completeButton) {
                 getDropObjectFromRowToComplete(getAdapterPosition());
                 removeDropFromView(getAdapterPosition());
+
             } else if (view == menuButton) {
                 if (mTabName.equals(drop)) {
                     showDropMenu();
@@ -615,16 +678,14 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     showTrickleMenu();
                 }
 
-            } else if (view == commentCount || view == description || view == createdAt) {
-                viewDrop(getAdapterPosition());
-
-            } else if (view == ripleCount) {
-                viewCompletedBy(getAdapterPosition());
-
-            } else {
+            } else if (view == parseProfilePicture || view == toolbar) {
                 viewOtherUser(getAdapterPosition());
+            } else {
+                viewDrop(getAdapterPosition());
             }
         }
+
+
 
         @Override
         public boolean onLongClick(View view) {
@@ -638,7 +699,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         public void showTrickleMenu() {
 
-            CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share with other", "Report"};
+            CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Report"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
             builder.setTitle("Drop Menu");
@@ -679,7 +740,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         public void showDropMenu() {
 
-            CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share with other", "Remove From Todo", "Report"};
+            CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Remove From Todo", "Report"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
             builder.setTitle("Drop Menu");
