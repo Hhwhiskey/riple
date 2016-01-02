@@ -35,9 +35,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +68,12 @@ public class RipleTabFragment extends Fragment {
     private ParseUser currentUser;
     public String userName;
     public String facebookId;
-    private ArrayList <DropItem> mRipleListFromParse;
+    private ArrayList <DropItem> mOnScrollListFromFromParse;
     private ArrayList<DropItem> mRipleListLocal;
     private List<ParseObject> listFromParse;
     private List<ParseObject> mParseList;
-    private static String TAG = RipleTabFragment.class.getSimpleName() ;
 
+    private static String TAG = RipleTabFragment.class.getSimpleName();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -87,7 +85,7 @@ public class RipleTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
 
-        mRipleListFromParse = new ArrayList<>();
+        mOnScrollListFromFromParse = new ArrayList<>();
 
         currentUser =  ParseUser.getCurrentUser();
 //        userName  = currentUser.getString("displayName");
@@ -99,14 +97,15 @@ public class RipleTabFragment extends Fragment {
         ripleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         ripleRecyclerView.setLayoutManager(layoutManager);
         ripleRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+
+        // Set onScroll Listener
         ripleRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
                 Log.d(TAG, "onLoadMore current_page: " + current_page);
-                loadRipleItemsFromParse();
+                loadRipleItemsOnScroll(current_page);
             }
         });
-
 
         ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
 
@@ -152,7 +151,7 @@ public class RipleTabFragment extends Fragment {
             }
         });
 
-        //Pull refresh fetch
+        //Pull refresh drops
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.riple_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
@@ -160,11 +159,41 @@ public class RipleTabFragment extends Fragment {
                 loadRipleItemsFromParse();
 //                loadRipleItemsFromLocal();
 //                updateUserInfo();
-                new Task().execute();
+                new refreshQuery().execute();
             }
         });
 
+
+
         return view;
+    }
+
+    private class refreshQuery extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+            return new String[0];
+        }
+
+        @Override protected void onPostExecute(String[] result) {
+            // Call setRefreshing(false) when the list has been refreshed.
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+
+//            final int resetPageNumer = 1;
+//
+//            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+//            ripleRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+//                @Override
+//                public void onLoadMore(int current_page) {
+//
+//                    current_page = resetPageNumer;
+//
+//                    Log.d(TAG, "onLoadMore current_page: " + current_page);
+//                    loadRipleItemsOnScroll(current_page);
+//                }
+//            });
+
+            super.onPostExecute(result);
+        }
     }
 
     public void loadSavedPreferences() {
@@ -217,7 +246,6 @@ public class RipleTabFragment extends Fragment {
         builder.show();
     }
 
-
     // Extra for currentUser profile view
     private void viewCurrentUserProfileExtra() {
 
@@ -229,6 +257,8 @@ public class RipleTabFragment extends Fragment {
         intent.putExtra("clickedUserName",currentUserName);
         getActivity().startActivity(intent);
     }
+
+
 
     public void loadRipleItemsFromParse() {
 
@@ -258,6 +288,9 @@ public class RipleTabFragment extends Fragment {
                     Log.i("KEVIN", "error error");
 
                 } else {
+
+                    mOnScrollListFromFromParse.clear();
+
                     for (int i = 0; i < listParse.size(); i++) {
 
                         final DropItem dropItem = new DropItem();
@@ -274,7 +307,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(ripleListFromParse);
+                                        updateRecyclerView(mOnScrollListFromFromParse);
                                     }
                                 }
                             });
@@ -312,7 +345,111 @@ public class RipleTabFragment extends Fragment {
                             dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
                         }
 
-                        ripleListFromParse.add(dropItem);
+                        mOnScrollListFromFromParse.add(dropItem);
+//                        ParseObject.pinAllInBackground("pinnedQuery", listParse);
+                    }
+                }
+            }
+        });
+    }
+
+    public void loadRipleItemsOnScroll(int page) {
+
+        // If the number isn't 0
+        // The page number minus 1 times 10
+
+        // Do not replace data in adapter but
+        // add to the dataset
+
+        // it should only replace it if we clear the
+        // list or reset the adapter
+
+        int skipNumber = 0;
+        if (page != 0) {
+            int pageMultiplier = page - 1;
+            skipNumber = pageMultiplier * 10;
+        }
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
+        ParseRelation completedRelation = currentUser.getRelation("completedDrops");
+
+        ParseQuery createdQuery = createdRelation.getQuery();
+        ParseQuery completedQuery = completedRelation.getQuery();
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(createdQuery);
+        queries.add(completedQuery);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.include("authorPointer");
+        mainQuery.orderByDescending("createdAt");
+        mainQuery.setLimit(10);
+        mainQuery.setSkip(skipNumber);
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> listParse, ParseException e) {
+
+                if (e != null) {
+                    Log.i("KEVIN", "error error");
+
+                } else {
+                    for (int i = 0; i < listParse.size(); i++) {
+
+                        final DropItem dropItem = new DropItem();
+
+                        //Drop Author Data//////////////////////////////////////////////////////////
+                        ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
+
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        if (parseProfilePicture != null) {
+                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                @Override
+                                public void done(byte[] data, ParseException e) {
+                                    if (e == null) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(bmp);
+                                        updateRecyclerView(mOnScrollListFromFromParse);
+                                    }
+                                }
+                            });
+                        }
+
+                        //dropItemAll.setAuthorName(authorName);
+                        dropItem.setAuthorName((String) authorData.get("displayName"));
+                        //Author id
+                        dropItem.setAuthorId(authorData.getObjectId());
+                        //Author Rank
+                        dropItem.setAuthorRank(authorData.getString("userRank"));
+
+                        //Drop Data////////////////////////////////////////////////////////////////
+                        //DropObjectId
+                        dropItem.setObjectId(listParse.get(i).getObjectId());
+                        //CreatedAt
+                        dropItem.setCreatedAt(listParse.get(i).getCreatedAt());
+                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+                        //Drop description
+                        dropItem.setDescription(listParse.get(i).getString("description"));
+
+                        //Riple Count
+                        int ripleCount = (listParse.get(i).getInt("ripleCount"));
+                        if (ripleCount == 1) {
+                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riple"));
+                        } else {
+                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riples"));
+                        }
+
+                        //Comment Count
+                        int commentCount = (listParse.get(i).getInt("commentCount"));
+                        if (commentCount == 1) {
+                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
+                        }else {
+                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
+                        }
+
+                        mOnScrollListFromFromParse.add(dropItem);
 //                        ParseObject.pinAllInBackground("pinnedQuery", listParse);
                     }
                 }
@@ -338,7 +475,7 @@ public class RipleTabFragment extends Fragment {
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
         mainQuery.include("authorPointer");
         mainQuery.orderByDescending("createdAt");
-//        mainQuery.fromLocalDatastore();
+        mainQuery.fromLocalDatastore();
 //        mainQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -347,10 +484,10 @@ public class RipleTabFragment extends Fragment {
                 if (e != null) {
                     Log.i("KEVIN", "error error");
 
-                    mRipleListFromParse.clear();
+                    mOnScrollListFromFromParse.clear();
 
                 } else {
-                    for (int i = 0; i < mRipleListFromParse.size(); i++) {
+                    for (int i = 0; i < mOnScrollListFromFromParse.size(); i++) {
 
 
                         final DropItem dropItem = new DropItem();
@@ -367,7 +504,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(mRipleListFromParse);
+                                        updateRecyclerView(mOnScrollListFromFromParse);
                                     }
                                 }
                             });
@@ -405,7 +542,7 @@ public class RipleTabFragment extends Fragment {
                             dropItem.setCommentCount(String.valueOf(listLocal.get(i).getInt("commentCount") + " Comments"));
                         }
 
-                        mRipleListFromParse.add(dropItem);
+                        mOnScrollListFromFromParse.add(dropItem);
                     }
                 }
             }
@@ -414,7 +551,7 @@ public class RipleTabFragment extends Fragment {
 
     public void updateRecyclerView(List<DropItem> mRipleList) {
 
-        Log.d(TAG, "updateRecyclerView: Now");
+        Log.d("Riple", "list size = " + mRipleList.size());
 
         if (mRipleList.isEmpty()) {
             ripleRecyclerView.setVisibility(View.GONE);
@@ -546,45 +683,15 @@ public class RipleTabFragment extends Fragment {
             }
             return mIcon;
         }
-
-        protected void onPostExecute(Bitmap result) {
-            if (bmImageView != null) {
-                bmImageView.setImageBitmap(result);
-                //convert bitmap to byte array and upload to Parse
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                result.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-
-                final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
-                file.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            currentUser.put("parseProfilePicture", file);
-                            currentUser.saveInBackground();
-                        }
-                    }
-                });
-            }
-        }
     }
 
-    private class Task extends AsyncTask<Void, Void, String[]> {
-        @Override
-        protected String[] doInBackground(Void... params) {
-            return new String[0];
-        }
 
-        @Override protected void onPostExecute(String[] result) {
-            // Call setRefreshing(false) when the list has been refreshed.
-            mWaveSwipeRefreshLayout.setRefreshing(false);
-            super.onPostExecute(result);
-        }
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         updateUserInfo();
     }
+
+
 }
