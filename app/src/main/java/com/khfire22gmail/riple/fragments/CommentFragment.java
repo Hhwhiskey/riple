@@ -11,31 +11,42 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateInterpolator;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 
 public class CommentFragment extends Fragment {
 
-    public static final String ARG_PAGE = "ARG_PAGE";
-
-    private int mPage;
     private String mDropObjectId;
     private String mAuthorId;
     private String mAuthorRank;
@@ -50,6 +61,16 @@ public class CommentFragment extends Fragment {
     private TextView mViewDropEmptyView;
     private ArrayList<CommentItem> mCommentList;
     private CommentAdapter mCommentAdapter;
+    private ParseFile parseProfilePicture;
+    private ImageView commenterProfilePictureView;
+    private Button postCommentButton;
+    private String displayName;
+    private String commentText;
+    private TextView newCommentView;
+    private ParseFile commenterProfilePicture;
+
+    public static final String ARG_PAGE = "COMMENT_PAGE";
+    private int mPage;
 
     public static CommentFragment newInstance(int page) {
         Bundle args = new Bundle();
@@ -66,14 +87,25 @@ public class CommentFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comment, container, false);
+
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.comment_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
+        mRecyclerView.getItemAnimator().setRemoveDuration(500);
 
         mViewDropEmptyView = (TextView) view.findViewById(R.id.comment_empty_view);
+
+        commenterProfilePictureView = (ImageView) view.findViewById(R.id.comment_post_profile_picture);
+
+        newCommentView = (AutoCompleteTextView) view.findViewById(R.id.enter_comment_text);
+
+        postCommentButton = (Button) view.findViewById(R.id.button_post_comment);
+
+        //Display current user picture
+        updateUserInfo();
 
         Intent intent = getActivity().getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
@@ -89,7 +121,102 @@ public class CommentFragment extends Fragment {
 
         loadCommentsFromParse();
 
+        // Allow user to input Drop
+        postCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
+                displayName = (String) currentUser.get("displayName");
+
+                if (parseProfilePicture == null && displayName == null) {
+                    Toast.makeText(getActivity(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    startActivity(intent);
+                } else if (parseProfilePicture == null) {
+                    Toast.makeText(getActivity(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    startActivity(intent);
+
+                } else if (displayName == null) {
+                    Toast.makeText(getActivity(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    startActivity(intent);
+                } else  {
+                    commentText = newCommentView.getEditableText().toString();
+                    try {
+                        postNewComment(commentText);
+                        newCommentView.setText("");
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+
         return view;
+    }
+
+    private void updateUserInfo() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        commenterProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
+        Bundle parametersPicture = new Bundle();
+        parametersPicture.putString("fields", "picture.width(150).height(150)");
+
+        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
+
+        if (commenterProfilePicture != null) {
+            Glide.with(this)
+                    .load(commenterProfilePicture.getUrl())
+                    .crossFade()
+                    .fallback(R.drawable.ic_user_default)
+                    .error(R.drawable.ic_user_default)
+                    .signature(new StringSignature(UUID.randomUUID().toString()))
+                    .into(commenterProfilePictureView);
+        } else {
+            Toast.makeText(getActivity(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    public void postNewComment(final String commentText) throws InterruptedException {
+
+        final ParseUser user = ParseUser.getCurrentUser();
+        final ParseObject comment = new ParseObject("Comments");
+
+        if(commentText != null && !commentText.isEmpty()) {
+            comment.put("dropId", mDropObjectId);
+            comment.put("commenterPointer", user);
+            comment.put("commentText", commentText);
+            comment.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Toast.makeText(getActivity(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
+                    loadCommentsFromParse();
+
+                }
+            });
+
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+
+            query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+                public void done(ParseObject drop, ParseException e) {
+                    if (e == null) {
+                        drop.increment("commentCount");
+                        drop.saveInBackground();
+                    }
+                }
+            });
+
+        } else {
+            Toast.makeText(getActivity(), "Please enter some text first!", Toast.LENGTH_LONG).show();
+        }
+
+        hideSoftKeyboard();
     }
 
     public void loadCommentsFromParse() {
@@ -177,6 +304,13 @@ public class CommentFragment extends Fragment {
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mCommentAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         mRecyclerView.setAdapter(mCommentAdapter);
+    }
+
+    public void hideSoftKeyboard() {
+        if (getActivity().getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
     }
 }
 

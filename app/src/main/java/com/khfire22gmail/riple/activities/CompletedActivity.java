@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.khfire22gmail.riple.MainViewPager.DropPagerAdapter;
+import com.khfire22gmail.riple.ViewPagers.DropPagerAdapter;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.khfire22gmail.riple.model.CompletedByItem;

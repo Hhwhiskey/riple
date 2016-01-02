@@ -78,6 +78,7 @@ public class TrickleTabFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
         mRecyclerView.getItemAnimator().setRemoveDuration(500);
+
         trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
         //Swipe Refresh

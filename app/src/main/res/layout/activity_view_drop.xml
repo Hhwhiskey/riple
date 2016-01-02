@@ -31,13 +31,6 @@
             app:tabMode="scrollable"
             android:layout_gravity="bottom"/>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1"
-            android:background="@android:color/white"/>
-
         <RelativeLayout
             android:id="@+id/click_layout"
             android:layout_width="fill_parent"
@@ -157,43 +150,13 @@
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
-    <AutoCompleteTextView
-        android:id="@+id/enter_comment_text"
-        android:layout_width="235dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/button_post_comment"
-        android:layout_toLeftOf="@+id/button_post_comment"
-        android:layout_toRightOf="@+id/post_comment_profile_picture"
-        android:layout_toStartOf="@+id/button_post_comment"
-        android:background="#ffffff"
-        android:hint="@string/write_comment_hint"
-        android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|text"
-        android:maxLength="250"
-        android:paddingLeft="8dp"/>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/card_view_drop"
+        android:background="@color/Primary_Background_Color"/>
 
-    <ImageView
-        android:id="@+id/post_comment_profile_picture"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:foregroundGravity="center_vertical"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_user_default"/>
 
-    <Button
-        android:id="@+id/button_post_comment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="10dp"
-        android:width="50dp"
-        android:background="@color/AccentColor"
-        android:text="Post"
-        android:textColor="#ffffff"/>
 
 </RelativeLayout>

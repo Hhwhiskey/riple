@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.MainViewPager;
+package com.khfire22gmail.riple.ViewPagers;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

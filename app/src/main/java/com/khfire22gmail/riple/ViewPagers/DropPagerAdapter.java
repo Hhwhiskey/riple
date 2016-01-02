@@ -1,4 +1,4 @@
-package com.khfire22gmail.riple.MainViewPager;
+package com.khfire22gmail.riple.ViewPagers;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.khfire22gmail.riple.fragments.CommentFragment;
+import com.khfire22gmail.riple.fragments.CompletedFragment;
 
 /**
  * Created by Kevin on 12/31/2015.
@@ -28,7 +29,14 @@ public class DropPagerAdapter extends FragmentPagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-        return CommentFragment.newInstance(position + 1);
+        Fragment fragment = null;
+        if (position == 0) {
+            fragment = CommentFragment.newInstance(position);
+        } else if (position == 1) {
+            fragment = CompletedFragment.newInstance(position);
+        }
+
+        return fragment;
     }
 
     @Override

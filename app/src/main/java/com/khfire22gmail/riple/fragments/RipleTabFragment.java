@@ -262,7 +262,7 @@ public class RipleTabFragment extends Fragment {
 
     public void loadRipleItemsFromParse() {
 
-        final ArrayList<DropItem> ripleListFromParse = new ArrayList<>();
+//        final ArrayList<DropItem> ripleListFromParse = new ArrayList<>();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 

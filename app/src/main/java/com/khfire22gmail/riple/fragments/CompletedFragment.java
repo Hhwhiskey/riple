@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.khfire22gmail.riple.model.CompletedByItem;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -26,12 +29,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+
 
 public class CompletedFragment extends Fragment {
 
-    public static final String ARG_PAGE = "ARG_PAGE";
-
-    private int mPage;
     private String mDropObjectId;
     private String mAuthorId;
     private String mAuthorRank;
@@ -42,6 +46,12 @@ public class CompletedFragment extends Fragment {
     private String mCommentCount;
     private Date mCreatedAt;
     private String mTabName;
+    private CompletedByAdapter mCompletedByAdapter;
+    private RecyclerView mRecyclerView;
+    private TextView mCompletedEmptyView;
+
+    public static final String ARG_PAGE = "COMPLETED_PAGE";
+    private int mPage;
 
     public static CompletedFragment newInstance(int page) {
         Bundle args = new Bundle();
@@ -61,8 +71,11 @@ public class CompletedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_completed, container, false);
-        TextView textView = (TextView) view;
-        textView.setText("Fragment #" + mPage);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.completed_by_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mCompletedEmptyView = (TextView) view.findViewById(R.id.completed_empty_view);
 
         Intent intent = getActivity().getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
@@ -76,7 +89,7 @@ public class CompletedFragment extends Fragment {
         mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
         mTabName = intent.getStringExtra("mTabName");
 
-//        loadCompletedListFromParse();
+        loadCompletedListFromParse();
 
         return view;
     }
@@ -113,7 +126,7 @@ public class CompletedFragment extends Fragment {
                                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                                 completedByItem.setParseProfilePicture(bmp);
-//                                                updateRecyclerView(completedByList);
+                                                updateRecyclerView(completedByList);
                                             }
                                         }
                                     });
@@ -134,6 +147,24 @@ public class CompletedFragment extends Fragment {
                 });
             }
         });
+    }
+
+    public void updateRecyclerView(ArrayList<CompletedByItem> mCompletedByList) {
+
+        if (mCompletedByList.isEmpty()) {
+            mRecyclerView.setVisibility(View.GONE);
+            mCompletedEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mCompletedEmptyView.setVisibility(View.GONE);
+        }
+
+        mCompletedByAdapter = new CompletedByAdapter(getActivity(), mCompletedByList);
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mCompletedByAdapter);
+        scaleAdapter.setDuration(250);
+        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
 }

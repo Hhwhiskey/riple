@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.khfire22gmail.riple.MainViewPager;
+package com.khfire22gmail.riple.ViewPagers;
 
 /**
  * Created by Kevin on 9/8/2015.

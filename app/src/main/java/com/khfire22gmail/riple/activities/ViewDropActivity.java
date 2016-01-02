@@ -25,16 +25,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
 import com.facebook.FacebookSdk;
 import com.facebook.login.widget.ProfilePictureView;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.MainActivity;
-import com.khfire22gmail.riple.MainViewPager.DropPagerAdapter;
-import com.khfire22gmail.riple.MainViewPager.MainViewPagerAdapter;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.ViewPagers.DropPagerAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.parse.FindCallback;
@@ -46,11 +43,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class ViewDropActivity extends AppCompatActivity {
 
@@ -94,16 +89,13 @@ public class ViewDropActivity extends AppCompatActivity {
     private String displayName;
     Context mContext;
     private ParseUser currentUser;
-    ViewPager mViewPager;
-    private MainViewPagerAdapter mCustomPagerAdapter;
-    private TextView mViewDropEmptyView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_drop);
 
+        // Get instance of ViewPager and set viewPager adapter
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(new DropPagerAdapter(getSupportFragmentManager(), ViewDropActivity.this));
 
@@ -143,7 +135,7 @@ public class ViewDropActivity extends AppCompatActivity {
 
         getViewedUserProfilePicture(mAuthorId);
 
-        commenterProfilePictureView = (ImageView) findViewById(R.id.post_comment_profile_picture);
+
 
         authorProfilePictureView = (ImageView) findViewById(R.id.profile_picture);
 
@@ -179,50 +171,12 @@ public class ViewDropActivity extends AppCompatActivity {
         createdAtView.setText(String.valueOf(mCreatedAt));
         ///////////////
 
-        //Update currentUser Commenter picture
-        updateUserInfo();
-
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
 
         final Button postCommentButton = (Button) findViewById(R.id.button_post_comment);
-        newCommentView = (AutoCompleteTextView) findViewById(R.id.enter_comment_text);
 
-        // Allow user to input Drop
-        postCommentButton.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
 
-                 ParseUser currentUser = ParseUser.getCurrentUser();
-                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
-                 displayName = (String) currentUser.get("displayName");
-
-                 if (parseProfilePicture == null && displayName == null) {
-                     Toast.makeText(getApplicationContext(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                     Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
-                     startActivity(intent);
-                 } else if (parseProfilePicture == null) {
-                     Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-                     Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
-                     startActivity(intent);
-
-                 } else if (displayName == null) {
-                     Toast.makeText(getApplicationContext(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                     Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
-                     startActivity(intent);
-                 } else  {
-                     commentText = newCommentView.getEditableText().toString();
-                     try {
-                         postNewComment(commentText);
-                         newCommentView.setText("");
-
-                     } catch (InterruptedException e) {
-                         e.printStackTrace();
-                     }
-                 }
-
-             }
-         });
     }
 
     private void getViewedUserProfilePicture(String mAuthorId) {
@@ -268,63 +222,6 @@ public class ViewDropActivity extends AppCompatActivity {
 
 
 
-    public void postNewComment(final String commentText) throws InterruptedException {
-
-        final ParseUser user = ParseUser.getCurrentUser();
-        final ParseObject comment = new ParseObject("Comments");
-
-        if(commentText != null && !commentText.isEmpty()) {
-            comment.put("dropId", mDropObjectId);
-            comment.put("commenterPointer", user);
-            comment.put("commentText", commentText);
-            comment.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    Toast.makeText(getApplicationContext(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
-
-            query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-                public void done(ParseObject drop, ParseException e) {
-                    if (e == null) {
-
-                        drop.increment("commentCount");
-                        drop.saveInBackground();
-                    }
-                }
-            });
-
-        } else {
-            Toast.makeText(ViewDropActivity.this, "Please enter some text first!", Toast.LENGTH_LONG).show();
-        }
-
-        hideSoftKeyboard();
-    }
-
-    private void updateUserInfo() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
-        Bundle parametersPicture = new Bundle();
-        parametersPicture.putString("fields", "picture.width(150).height(150)");
-
-        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
-
-        if (parseProfilePicture != null) {
-            Glide.with(this)
-                    .load(parseProfilePicture.getUrl())
-                    .crossFade()
-                    .fallback(R.drawable.ic_user_default)
-                    .error(R.drawable.ic_user_default)
-                    .signature(new StringSignature(UUID.randomUUID().toString()))
-                    .into(commenterProfilePictureView);
-        } else {
-            Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(ViewDropActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        }
-    }
 
 
     // Allow user to view the Drop's Author's profile

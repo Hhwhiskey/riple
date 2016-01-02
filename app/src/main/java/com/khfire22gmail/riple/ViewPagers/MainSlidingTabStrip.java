@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.khfire22gmail.riple.MainViewPager;
+package com.khfire22gmail.riple.ViewPagers;
 
 import android.R;
 import android.content.Context;

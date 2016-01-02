@@ -22,11 +22,11 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.khfire22gmail.riple.ViewPagers.MainSlidingTabLayout;
+import com.khfire22gmail.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
-import com.khfire22gmail.riple.MainViewPager.MainSlidingTabLayout;
-import com.khfire22gmail.riple.MainViewPager.MainViewPagerAdapter;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -214,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 Intent intent = getIntent();
                                 finish();
                                 startActivity(intent);
+
+//                                RipleTabFragment ripleTab = new RipleTabFragment();
+//                                ripleTab.updateRecyclerView(ripleTab.loadRipleItemsFromParse());
 
                                 ParseQuery query = ParseQuery.getQuery("UserReportCount");
                                 query.whereEqualTo("userPointer", currentUser);
