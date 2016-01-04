@@ -21,7 +21,7 @@
         >
 
         <RelativeLayout
-            android:id="@+id/click_layout"
+            android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
@@ -35,7 +35,7 @@
                 />
 
             <ImageView
-                android:id="@+id/profile_picture"
+                android:id="@+id/other_profile_picture"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:layout_marginTop="8dp"
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_toRightOf="@+id/other_profile_picture"
                 android:width="50dp"
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
@@ -57,7 +57,7 @@
                 android:textSize="16sp"
                 android:textColor="#000000"
                 android:singleLine="true"
-                android:layout_alignTop="@+id/profile_picture"
+                android:layout_alignTop="@+id/other_profile_picture"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_toStartOf="@+id/menu_button"
@@ -76,10 +76,10 @@
                 android:singleLine="true"
                 android:background="@drawable/custom_bg"
                 android:gravity="left"
-                android:layout_alignBottom="@+id/profile_picture"
+                android:layout_alignBottom="@+id/other_profile_picture"
                 android:layout_alignRight="@+id/menu_button"
                 android:layout_alignEnd="@+id/menu_button"
-                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_toRightOf="@+id/other_profile_picture"
                 android:layout_marginLeft="8dp"
                 />
 
@@ -94,7 +94,7 @@
                 android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Description"
-                android:layout_below="@+id/profile_picture"
+                android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
                 android:textSize="14sp"
                 android:layout_marginLeft="4dp"

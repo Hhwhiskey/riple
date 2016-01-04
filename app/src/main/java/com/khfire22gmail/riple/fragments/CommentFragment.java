@@ -278,8 +278,8 @@ public class CommentFragment extends Fragment {
         } else {
             Toast.makeText(getActivity(), "Please enter some text first!", Toast.LENGTH_LONG).show();
         }
-
         hideSoftKeyboard();
+//        mCommentAdapter.addCommentToView(0, comment);
     }
 
     public void loadCommentsFromParse() {

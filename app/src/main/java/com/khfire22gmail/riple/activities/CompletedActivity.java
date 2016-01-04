@@ -75,7 +75,7 @@ public class CompletedActivity extends AppCompatActivity {
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
 
-        authorProfilePicture = (ImageView) findViewById(R.id.profile_picture);
+        authorProfilePicture = (ImageView) findViewById(R.id.other_profile_picture);
 
         getViewedUserProfilePicture(mAuthorId);
 

@@ -23,7 +23,7 @@
         >
 
         <RelativeLayout
-            android:id="@+id/click_layout"
+            android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
@@ -33,25 +33,24 @@
                 android:id="@+id/trickle_card_tool_bar"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:background="#BBDEFB"
+                android:background="@drawable/custom_bg_blue"
                 />
 
             <ImageView
-                android:id="@+id/profile_picture"
+                android:id="@+id/other_profile_picture"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_user_default"
-                android:background="@drawable/custom_bg"/>
+                android:src="@drawable/ic_user_default"/>
 
             <TextView
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_toRightOf="@+id/other_profile_picture"
                 android:width="50dp"
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
@@ -59,12 +58,11 @@
                 android:textSize="16sp"
                 android:textColor="#000000"
                 android:singleLine="true"
-                android:layout_alignTop="@+id/profile_picture"
+                android:layout_alignTop="@+id/other_profile_picture"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_toStartOf="@+id/menu_button"
                 android:layout_toLeftOf="@+id/menu_button"
-                android:background="@drawable/custom_bg_blue"
                 android:textStyle="bold"/>
 
             <TextView
@@ -75,12 +73,11 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="10sp"
                 android:singleLine="true"
-                android:background="@drawable/custom_bg"
                 android:gravity="left"
-                android:layout_alignBottom="@+id/profile_picture"
+                android:layout_alignBottom="@+id/other_profile_picture"
                 android:layout_alignRight="@+id/menu_button"
                 android:layout_alignEnd="@+id/menu_button"
-                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_toRightOf="@+id/other_profile_picture"
                 android:layout_marginLeft="8dp"
                 />
 
@@ -97,14 +94,13 @@
                 android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Description"
-                android:layout_below="@+id/profile_picture"
+                android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
                 android:textSize="14sp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/custom_bg"/>
+                android:layout_marginBottom="8dp"/>
 
             <TextView
                 android:id="@+id/riple_count"
@@ -116,7 +112,6 @@
                 android:singleLine="true"
                 android:gravity="center|start"
                 android:layout_alignBottom="@+id/button_todo"
-                android:background="@drawable/custom_bg"
                 android:layout_below="@+id/description"
                 android:layout_marginTop="4dp"
                 android:layout_alignParentLeft="true"
@@ -137,7 +132,6 @@
                 android:textSize="12sp"
                 android:singleLine="true"
                 android:layout_alignBottom="@+id/button_todo"
-                android:background="@drawable/custom_bg"
                 android:layout_alignTop="@+id/riple_count"
                 android:layout_below="@+id/description"
                 android:gravity="center_vertical"
@@ -149,26 +143,6 @@
                 android:layout_alignEnd="@+id/comment_created_at"
                 android:layout_marginBottom="4dp"/>
 
-            Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:text="TODO"
-                android:id="@+id/button_todo"
-                android:layout_below="@+id/description"
-                android:layout_alignRight="@+id/description"
-                android:layout_alignEnd="@+id/description"
-                android:textSize="14sp"
-                android:textColor="#ffffff"
-                android:background="@drawable/button_bg"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp"
-                android:minHeight="32dp"
-
-                />
-
-
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -177,7 +151,6 @@
                 android:src="@drawable/menu_svg"
                 android:layout_alignBottom="@+id/trickle_card_tool_bar"
                 android:layout_marginBottom="16dp"
-                android:background="@drawable/custom_bg_blue"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"

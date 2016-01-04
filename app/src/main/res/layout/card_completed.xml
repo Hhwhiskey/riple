@@ -18,7 +18,7 @@
         android:layout_marginRight="8dp">
 
         <RelativeLayout
-            android:id="@+id/click_layout"
+            android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"
@@ -33,7 +33,7 @@
                 android:clickable="false"/>
 
             <ImageView
-                android:id="@+id/profile_picture"
+                android:id="@+id/other_profile_picture"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:layout_alignParentLeft="true"
@@ -52,7 +52,7 @@
                 android:layout_alignEnd="@+id/comment_created_at"
                 android:layout_alignParentTop="true"
                 android:layout_alignRight="@+id/comment_created_at"
-                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_toRightOf="@+id/other_profile_picture"
                 android:width="50dp"
                 android:text="Name"
                 android:textAlignment="center"
@@ -61,7 +61,7 @@
                 android:textColor="@color/PrimaryText"
                 android:singleLine="true"
                 android:layout_margin="8dp"
-                android:layout_alignTop="@+id/profile_picture"/>
+                android:layout_alignTop="@+id/other_profile_picture"/>
 
             <TextView
                 android:id="@+id/comment_created_at"
@@ -73,8 +73,8 @@
                 android:textSize="10sp"
                 android:singleLine="true"
                 android:layout_below="@+id/name"
-                android:layout_toRightOf="@+id/profile_picture"
-                android:layout_toEndOf="@+id/profile_picture"
+                android:layout_toRightOf="@+id/other_profile_picture"
+                android:layout_toEndOf="@+id/other_profile_picture"
                 android:layout_marginLeft="8dp"/>
 
             <TextView
@@ -92,7 +92,7 @@
                 android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Description"
-                android:layout_below="@+id/profile_picture"
+                android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
                 android:textSize="16sp"
                 android:layout_marginLeft="8dp"

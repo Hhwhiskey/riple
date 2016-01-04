@@ -3,6 +3,7 @@ package com.khfire22gmail.riple.model;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +19,7 @@ import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -44,7 +46,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public FriendViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.card_friend, parent, false);
+        View view = inflater.inflate(R.layout.card_user_view, parent, false);
         FriendViewHolder viewHolder = new FriendViewHolder(view);
         return viewHolder;
     }
@@ -56,7 +58,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     private void viewFriendProfile(int position) {
 
-        String mClickedUserId = (data.get(position).getObjectId());
+        String mClickedUserId = (data.get(position).getFriendObjectId());
         String mClickedUserName = (data.get(position).getFriendName());
 
         Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
@@ -77,74 +79,85 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     //FriendsViewHolder/////////////////////////////////////////////////////////////////////////////
     public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        private ImageView friendProfilePicture;
+        private ImageView otherProfilePicture;
         private TextView friendName;
-        private TextView lastMessage;
-        private ImageView menuButton;
-
+        private TextView ripleRank;
+        private TextView ripleCount;
+//        private ImageView menuButton;
+//        private RelativeLayout otherLayout;
         public FriendViewHolder(View itemView) {
             super(itemView);
 
-            friendProfilePicture = (ImageView) itemView.findViewById(R.id.friend_profile_picture);
-            friendName = (TextView) itemView.findViewById(R.id.friend_name);
-            menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
+            otherProfilePicture = (ImageView) itemView.findViewById(R.id.other_profile_picture);
+            friendName = (TextView) itemView.findViewById(R.id.other_display_name);
+            ripleRank = (TextView) itemView.findViewById(R.id.other_rank);
+            ripleCount = (TextView) itemView.findViewById(R.id.other_riple_count);
+//            menuButton = (ImageView) itemView.findViewById(R.id.other_menu);
+//            otherLayout = (RelativeLayout) itemView.findViewById(R.id.other_layout);
+
 //            lastMessage = (TextView) itemView.findViewById(R.id.last_message_snippit);
 
-            friendProfilePicture.setOnClickListener(this);
-            friendName.setOnClickListener(this);
-//            menuButton.setOnClickListener(this);
+            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
+            otherProfilePicture.setOnClickListener(this);
+
+//            menuButton.setOnClickListener(this);
+
         }
 
         public void update(int position) {
 
             FriendItem current = data.get(position);
 
-            friendProfilePicture.setImageBitmap(current.friendProfilePicture);
+            otherProfilePicture.setImageBitmap(current.friendProfilePicture);
             friendName.setText(current.friendName);
-//            lastMessage.setText(current.lastMessage);
+            ripleRank.setText(current.ripleRank);
+            ripleCount.setText(current.ripleCount);
         }
 
         @Override
         public void onClick(View v) {
-            if (v == menuButton) {
-                openConversationMenu(getAdapterPosition());
+
+            if (v == otherProfilePicture) {
+                viewFriendProfile(getAdapterPosition());
             } else {
                 openConversation(getAdapterPosition());
             }
         }
 
-
         @Override
         public boolean onLongClick(View v) {
-            openConversationMenu(getAdapterPosition());
+            Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
+            vb.vibrate(5);
+            openFriendMenu();
             return false;
         }
 
-        public void openConversationMenu(int Position) {
+        public void openFriendMenu() {
 
-            CharSequence todoDrop[] = new CharSequence[]{"View profile", "Remove Friend"};
+            CharSequence friendTitles[] = new CharSequence[]{"View profile", "Remove Friend"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-            builder.setTitle("Drop Menu");
-            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+            builder.setTitle("Friend Menu");
+            builder.setItems(friendTitles, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int selected) {
 
                     if (selected == 0) {
                         viewFriendProfile(getAdapterPosition());
                     } else if (selected == 1) {
-//                        RemoveFriend(getAdapterPosition());
+                        RemoveFriend(getAdapterPosition());
 
                     }
                 }
             });
+            builder.show();
         }
 
 
         // Opens sinch conversation when it is clicked
         public void openConversation(int position) {
-            final String friendId = data.get(position).getObjectId();
+            final String friendId = data.get(position).getFriendObjectId();
 
             ParseQuery<ParseUser> query = ParseUser.getQuery();
             query.whereEqualTo("objectId", friendId);
@@ -156,14 +169,35 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                         messageIntent.putExtra("RECIPIENT_ID", parseUser.getObjectId());
                         mContext.startActivity(messageIntent);
                     } else {
-                        Toast.makeText(mContext,
-                                "Error finding that user",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Error finding that user", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         }
+    }
 
+    private void RemoveFriend(final int position) {
+        final String relationshipToRemove = data.get(position).getRelationshipObjectId();
 
+        ParseQuery relationshipQuery = ParseQuery.getQuery("Friends");
+        relationshipQuery.whereEqualTo("objectId", relationshipToRemove);
+        relationshipQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                try {
+                    parseObject.delete();
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
+                Toast.makeText(mContext.getApplicationContext(), "Friend has been removed", Toast.LENGTH_LONG).show();
+                removeFriendFromView(position);
+            }
+        });
+
+    }
+
+    public void removeFriendFromView(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
     }
 }

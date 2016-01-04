@@ -136,7 +136,7 @@ public class ViewDropActivity extends AppCompatActivity {
 
 
 
-        authorProfilePictureView = (ImageView) findViewById(R.id.profile_picture);
+        authorProfilePictureView = (ImageView) findViewById(R.id.other_profile_picture);
 
         authorProfilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override

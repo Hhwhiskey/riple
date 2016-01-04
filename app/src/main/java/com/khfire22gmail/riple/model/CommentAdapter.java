@@ -191,7 +191,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         @Override
         public boolean onLongClick(View v) {
             Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
-            vb.vibrate(100);
+            vb.vibrate(5);
             showCommentMenu();
             return false;
         }
@@ -228,6 +228,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             });
             builder.show();
         }
+    }
+
+    public void addCommentToView(int position, CommentItem comment) {
+        data.add(0, comment);
+        notifyItemInserted(position);
     }
 }
 

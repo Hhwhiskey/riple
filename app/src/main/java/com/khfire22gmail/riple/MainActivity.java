@@ -152,6 +152,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void createDropDialog() {
 
+        final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Post a new Drop");
+
+        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.drop_description);
+
+        builder.setView(view);
+
+        // Set up the buttons
+        builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dropDescription = input.getText().toString();
+                int dropTextField = input.getText().length();
+
+                if (dropTextField > 0) {
+                    try {
+                        createDrop(dropDescription);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "This is a fairly short Drop, try " +
+                            "adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    /*public void createDropDialog() {
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final String copiedString = sharedPreferences.getString("sharedDropString", "");
 
@@ -200,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         builder.show();
-    }
+    }*/
 
 
 

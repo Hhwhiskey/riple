@@ -9,7 +9,43 @@ public class FriendItem {
 
     public Bitmap friendProfilePicture;
     public String friendName;
-    public String lastMessage;
+    public String ripleRank;
+    public String ripleCount;
+    public String relationshipObjectId;
+    public String friendObjectId;
+
+    public String getFriendObjectId() {
+        return friendObjectId;
+    }
+
+    public void setFriendObjectId(String friendObjectId) {
+        this.friendObjectId = friendObjectId;
+    }
+
+    public String getRelationshipObjectId() {
+        return relationshipObjectId;
+    }
+
+    public void setRelationshipObjectId(String relationshipObjectId) {
+        this.relationshipObjectId = relationshipObjectId;
+    }
+
+    public String getRipleRank() {
+        return ripleRank;
+    }
+
+    public void setRipleRank(String ripleRank) {
+        this.ripleRank = ripleRank;
+    }
+
+    public String getRipleCount() {
+        return ripleCount;
+    }
+
+    public void setRipleCount(String ripleCount) {
+        this.ripleCount = ripleCount;
+    }
+
     public String objectId;
 
     public String getObjectId() {
@@ -34,13 +70,5 @@ public class FriendItem {
 
     public void setFriendName(String friendName) {
         this.friendName = friendName;
-    }
-
-    public String getLastMessage() {
-        return lastMessage;
-    }
-
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
     }
 }

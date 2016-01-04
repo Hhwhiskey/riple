@@ -35,7 +35,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     @Override
     public CompletedByViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.card_completed_by, parent, false);
+        View view = inflater.inflate(R.layout.card_user_view, parent, false);
         CompletedByViewHolder viewHolder = new CompletedByViewHolder(view);
         return viewHolder;
     }
@@ -117,10 +117,10 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         public CompletedByViewHolder(View itemView) {
             super(itemView);
 
-            parseProfilePicture = (ImageView) itemView.findViewById(R.id.completed_by_profile_picture);
-            displayName = (TextView) itemView.findViewById(R.id.completed_by_display_name);
+            parseProfilePicture = (ImageView) itemView.findViewById(R.id.other_profile_picture);
+            displayName = (TextView) itemView.findViewById(R.id.other_display_name);
 //            userRank = (TextView) itemView.findViewById(R.id.completed_by_riple_rank);
-            userRipleCount = (TextView) itemView.findViewById(R.id.completed_by_riple_count);
+            userRipleCount = (TextView) itemView.findViewById(R.id.other_riple_count);
 
 
             itemView.setOnClickListener(this);

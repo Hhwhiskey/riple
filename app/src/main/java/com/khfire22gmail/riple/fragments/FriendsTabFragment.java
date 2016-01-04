@@ -44,7 +44,7 @@ import java.util.List;
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 /**
  * Created by Kevin on 9/8/2015.
@@ -52,7 +52,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class FriendsTabFragment extends Fragment {
 
-    private RecyclerView friendsRecyclerView;
+    private RecyclerView mRecyclerView;
     private String currentUserId;
     private ArrayList<String> clickedUserObjectId;
     private FriendAdapter friendAdapter;
@@ -66,9 +66,11 @@ public class FriendsTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_tab, container, false);
 
-        friendsRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
-        friendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        friendsRecyclerView.setItemAnimator(new SlideInUpAnimator());
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new LandingAnimator());
+        mRecyclerView.getItemAnimator().setRemoveDuration(500);
+
 
         friendsEmptyView = (TextView) view.findViewById(R.id.friends_tab_empty_view);
 
@@ -158,14 +160,14 @@ public class FriendsTabFragment extends Fragment {
                         ParseUser recipient;
 
                         final FriendItem friendItem = new FriendItem();
-
+                        //Assign recipient to the !currentUser
                         if (userId.equals(currentUser.getObjectId())) {
                             recipient = (ParseUser) list.get(i).get(Constants.USER2);
                         } else {
                             recipient = (ParseUser) list.get(i).get(Constants.USER1);
                         }
 
-                        // Get User1 data
+                        // Get recepient data
                         ParseFile profilePicture1 = (ParseFile) recipient.get("parseProfilePicture");
                         if (profilePicture1 != null) {
                             profilePicture1.getDataInBackground(new GetDataCallback() {
@@ -181,10 +183,13 @@ public class FriendsTabFragment extends Fragment {
                                 }
                             });
                         }
-
+                        //Get relation objectId
+                        friendItem.setRelationshipObjectId(list.get(i).getObjectId());
+                        //Get all friend info
+                        friendItem.setFriendObjectId(recipient.getObjectId());
                         friendItem.setFriendName(recipient.getString("displayName"));
-                        friendItem.setObjectId(recipient.getObjectId());
-//                        friendItem.setLastMessage(list.get(i).getString("lastMessage"));
+                        friendItem.setRipleRank(recipient.getString("userRank"));
+                        friendItem.setRipleCount(String.valueOf(recipient.getInt("userRipleCount")));
 
                         friendsList.add(friendItem);
                     }
@@ -196,18 +201,20 @@ public class FriendsTabFragment extends Fragment {
 
     public void updateFriendsListRecyclerView(ArrayList <FriendItem> friendsList) {
 
+        //Show textview if list is empty, otherwise show data
         if (friendsList.isEmpty()) {
-           friendsRecyclerView.setVisibility(View.GONE);
+           mRecyclerView.setVisibility(View.GONE);
             friendsEmptyView.setVisibility(View.VISIBLE);
         }
         else {
-            friendsRecyclerView.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
             friendsEmptyView.setVisibility(View.GONE);
         }
 
+        //Set animating adapter to recyclerView
         friendAdapter = new FriendAdapter(getActivity(), friendsList);
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(friendAdapter);
-        friendsRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
     }
 

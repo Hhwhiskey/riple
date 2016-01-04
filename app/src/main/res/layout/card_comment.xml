@@ -19,7 +19,7 @@
         card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
-            android:id="@+id/click_layout"
+            android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
