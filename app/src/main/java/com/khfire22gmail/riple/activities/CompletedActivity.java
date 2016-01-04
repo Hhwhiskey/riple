@@ -116,7 +116,7 @@ public class CompletedActivity extends AppCompatActivity {
         viewUserQuery.getInBackground(mAuthorId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser clickedUserObject, ParseException e) {
-                ParseFile viewUserProfilePicture = (ParseFile) clickedUserObject.get("parseProfilePicture");
+                ParseFile viewUserProfilePicture = (ParseFile) clickedUserObject.get("commenterParseProfilePicture");
                 parseProfilePicture = viewUserProfilePicture;
                 if (parseProfilePicture != null) {
                     parseProfilePicture.getDataInBackground(new GetDataCallback() {
@@ -176,15 +176,15 @@ public class CompletedActivity extends AppCompatActivity {
 
                         //Drop Author Data//////////////////////////////////////////////////////////
 
-                        ParseFile parseProfilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                        ParseFile commenterParseProfilePicture = (ParseFile) list.get(i).get("commenterParseProfilePicture");
+                        if (commenterParseProfilePicture != null) {
+                            commenterParseProfilePicture.getDataInBackground(new GetDataCallback() {
                                 @Override
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        completedByItem.setParseProfilePicture(bmp);
+                                        completedByItem.setCommenterParseProfilePicture(bmp);
                                     }
                                 }
                             });

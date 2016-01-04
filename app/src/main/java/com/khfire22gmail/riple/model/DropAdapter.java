@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,9 +26,9 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.CompletedActivity;
-import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
+import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
@@ -64,7 +65,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private boolean storeImage;
     private boolean stop;
     private Context applicationContext;
-
 
     public DropAdapter(Context context, List<DropItem> data, String tabName) {
         mContext = context;
@@ -247,7 +247,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //            }
 //        });
 //
-//        viewHolder.parseProfilePicture.setOnClickListener(new View.OnClickListener() {
+//        viewHolder.commenterParseProfilePicture.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
 //                viewOtherUser(position);
@@ -514,8 +514,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
 //            itemView.setOnLongClickListener(this);
 //
-//            parseProfilePicture.setOnClickListener(this);
-//            parseProfilePicture.setOnLongClickListener(this);
+//            commenterParseProfilePicture.setOnClickListener(this);
+//            commenterParseProfilePicture.setOnLongClickListener(this);
 //
 //            authorName.setOnClickListener(this);
 //            authorName.setOnLongClickListener(this);
@@ -558,8 +558,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //                    if (itemView != null) {
 //                        itemView.setOnLongClickListener(this);
 //                    }
-//                    if (parseProfilePicture != null) {
-//                        parseProfilePicture.setOnLongClickListener(this);
+//                    if (commenterParseProfilePicture != null) {
+//                        commenterParseProfilePicture.setOnLongClickListener(this);
 //                    }
 //                    if (authorName != null) {
 //                        authorName.setOnLongClickListener(this);
@@ -598,7 +598,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //        public void onClick(View view) {
 //            if (view == todoButton) {
 //                ParseUser currentUser = ParseUser.getCurrentUser();
-//                parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
+//                parseProfilePictureCheck = (ParseFile) currentUser.get("commenterParseProfilePicture");
 //                displayNameCheck = (String) currentUser.get("displayName");
 //
 //// TODO: 12/28/2015 Uncomment this before launch
@@ -606,7 +606,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 //                            Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
 //                            Intent intent = new Intent(mContext, SettingsActivity.class);
 //                            mContext.startActivity(intent);
-//                        } else if (parseProfilePicture == null) {
+//                        } else if (commenterParseProfilePicture == null) {
 //                            Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
 //                            Intent intent = new Intent(mContext, SettingsActivity.class);
 //                            mContext.startActivity(intent);
@@ -689,6 +689,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         @Override
         public boolean onLongClick(View view) {
+            Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
+            vb.vibrate(100);
             if (mTabName.equals(drop)) {
                 showDropMenu();
             } else {

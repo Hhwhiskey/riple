@@ -3,6 +3,7 @@ package com.khfire22gmail.riple.model;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +21,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
+import com.parse.ParseUser;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +33,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     //    private final String mTabName;
     private LayoutInflater inflater;
     List<CommentItem> data = Collections.emptyList();
-
+    private ParseUser currentUser = ParseUser.getCurrentUser();
 
     public CommentAdapter(Context context, List<CommentItem> data) {
 
@@ -67,7 +69,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     public void onBindViewHolder(CommentViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        /*viewHolder.parseProfilePicture.setOnClickListener(new View.OnClickListener() {
+        /*viewHolder.commenterParseProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 viewOtherUser(position);
@@ -98,27 +100,28 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     public void reportCommentAuthor(final int position) {
 
-        final String dropObjectId = data.get(position).getObjectId();
+        final String commentObjectId = data.get(position).getCommentObjectId();
 
         //Get Drop data, which includes the Author pointer
-        ParseQuery parseQuery = ParseQuery.getQuery("Drop");
-        parseQuery.whereEqualTo("objectId", dropObjectId);
+        ParseQuery parseQuery = ParseQuery.getQuery("Comments");
+        parseQuery.whereEqualTo("objectId", commentObjectId);
         parseQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(final ParseObject dropObject, ParseException e) {
+            public void done(final ParseObject commentObject, ParseException e) {
                 if (e == null) {
-                    //Get author pointer out of Drop
-                    final ParseObject reportedDropAuthorPointer = dropObject.getParseObject("authorPointer");
+                    //Get author data from comment
+                    ParseUser authorPointer = commentObject.getParseUser("commenterPointer");
+//                    ParseUser reportedCommenter = commentObject.getParseUser("commenterPointer");
 
                     //Get author for report
                     ParseQuery reportQuery = ParseQuery.getQuery("UserReportCount");
-                    reportQuery.whereEqualTo("userPointer", reportedDropAuthorPointer);
+                    reportQuery.whereEqualTo("userPointer", authorPointer);
                     reportQuery.getFirstInBackground(new GetCallback<ParseObject>() {
                         @Override
                         public void done(final ParseObject reportedUser, ParseException e) {
-                            //Increment the author's report count and save mark the Drop in
-                            ParseRelation reportRelation = reportedUser.getRelation("reportedDrops");
-                            reportRelation.add(dropObject);
+                            //Increment the author's report count and mark the comment
+                            ParseRelation reportRelation = reportedUser.getRelation("reportedComments");
+                            reportRelation.add(commentObject);
                             reportedUser.increment("reportCount");
                             reportedUser.saveEventually();
                         }
@@ -157,7 +160,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             menuButton.setOnClickListener(this);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-//            parseProfilePicture.setOnLongClickListener(this);
+//            commenterParseProfilePicture.setOnLongClickListener(this);
 //            createdAt.setOnLongClickListener(this);
 //            commenterName.setOnLongClickListener(this);
 //            commentText.setOnLongClickListener(this);
@@ -169,7 +172,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
             CommentItem current = data.get(position);
 
-            parseProfilePicture.setImageBitmap(current.parseProfilePicture);
+            parseProfilePicture.setImageBitmap(current.commenterParseProfilePicture);
             commenterName.setText(current.commenterName);
             commentText.setText(current.commentText);
             createdAt.setText(String.valueOf(current.createdAt));
@@ -187,6 +190,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         @Override
         public boolean onLongClick(View v) {
+            Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
+            vb.vibrate(100);
             showCommentMenu();
             return false;
         }
@@ -202,8 +207,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                 public void onClick(DialogInterface dialog, int selected) {
                     if (selected == 0) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
-                        builderVerify.setTitle("Report Drop Author");
-                        builderVerify.setMessage("Does this Drop contain inappropriate or offensive material?");
+                        builderVerify.setTitle("Report Comment Author");
+                        builderVerify.setMessage("Does this author or comment contain inappropriate or offensive material?");
                         builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -173,10 +172,6 @@ public class ViewDropActivity extends AppCompatActivity {
 
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
-
-        final Button postCommentButton = (Button) findViewById(R.id.button_post_comment);
-
-
     }
 
     private void getViewedUserProfilePicture(String mAuthorId) {
@@ -203,26 +198,20 @@ public class ViewDropActivity extends AppCompatActivity {
         });
     }
 
-    private void viewCompletedBy() {
-
-        Intent intent = new Intent(ViewDropActivity.this, CompletedActivity.class);
-        intent.putExtra("dropObjectId", mDropObjectId);
-        intent.putExtra("authorId", mAuthorId);
-        intent.putExtra("commenterName", mAuthorName);
-        intent.putExtra("authorRank", mAuthorRank);
-        intent.putExtra("dropDescription", mDropDescription);
-        intent.putExtra("ripleCount", mRipleCount);
-        intent.putExtra("commentCount", mCommentCount);
-        intent.putExtra("createdAt", mCreatedAt);
-
-        this.startActivity(intent);
-    }
-
-
-
-
-
-
+//    private void viewCompletedBy() {
+//
+//        Intent intent = new Intent(ViewDropActivity.this, CompletedActivity.class);
+//        intent.putExtra("dropObjectId", mDropObjectId);
+//        intent.putExtra("authorId", mAuthorId);
+//        intent.putExtra("commenterName", mAuthorName);
+//        intent.putExtra("authorRank", mAuthorRank);
+//        intent.putExtra("dropDescription", mDropDescription);
+//        intent.putExtra("ripleCount", mRipleCount);
+//        intent.putExtra("commentCount", mCommentCount);
+//        intent.putExtra("createdAt", mCreatedAt);
+//
+//        this.startActivity(intent);
+//    }
 
     // Allow user to view the Drop's Author's profile
     private void viewOtherUser(String mAuthorId, String mAuthorName) {
@@ -327,7 +316,7 @@ public class ViewDropActivity extends AppCompatActivity {
         String displayName = currentUser.getString("displayName");
         String shareAuthor = mAuthorName;
         String shareDescription = mDropDescription;
-//        Bitmap sharedImage = data.get(position).getParseProfilePicture();
+//        Bitmap sharedImage = data.get(position).getCommenterParseProfilePicture();
 
         ShareDialog shareDialog;
         FacebookSdk.sdkInitialize(this);
@@ -348,7 +337,7 @@ public class ViewDropActivity extends AppCompatActivity {
         String displayName = currentUser.getString("displayName");
         String shareAuthor = mAuthorName;
         String shareDescription = mDescription;
-//        Bitmap sharedImage = data.get(position).getParseProfilePicture();
+//        Bitmap sharedImage = data.get(position).getCommenterParseProfilePicture();
 
         //Share to Other
         Intent shareIntent = new Intent();

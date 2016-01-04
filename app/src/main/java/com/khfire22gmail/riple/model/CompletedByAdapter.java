@@ -59,7 +59,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
     public void onBindViewHolder(CompletedByViewHolder viewHolder, final int position) {
         viewHolder.update(position);
 
-        /*viewHolder.parseProfilePicture.setOnClickListener(new View.OnClickListener() {
+        /*viewHolder.commenterParseProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 viewOtherUser(position);

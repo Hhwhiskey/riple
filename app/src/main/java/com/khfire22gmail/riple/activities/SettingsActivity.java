@@ -203,12 +203,12 @@ public class SettingsActivity extends AppCompatActivity {
                 result.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
 
-                final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
+                final ParseFile file = new ParseFile("commenterParseProfilePicture.png", byteArray);
                 file.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
-                            currentUser.put("parseProfilePicture", file);
+                            currentUser.put("commenterParseProfilePicture", file);
                             currentUser.saveInBackground();
                         }
                     }
@@ -504,12 +504,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void saveImageToParse(byte[] byteArray) {
-        final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
+        final ParseFile file = new ParseFile("commenterParseProfilePicture.png", byteArray);
         file.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    currentUser.put("parseProfilePicture", file);
+                    currentUser.put("commenterParseProfilePicture", file);
                     currentUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {

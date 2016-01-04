@@ -9,13 +9,25 @@ import java.util.Date;
  */
 public class CommentItem {
 
-
+    public String dropObjectId;
+    public String commentObjectId;
+    public String commentText;
     public Date createdAt;
-    public String dropId;
-    public String objectId;
-    public String commenterFacebookId;
+
+    public String commenterId;
     public String commenterName;
-    public Bitmap parseProfilePicture;
+    public String commenterRank;
+    public Bitmap commenterParseProfilePicture;
+
+
+
+    public String getCommentObjectId() {
+        return commentObjectId;
+    }
+
+    public void setCommentObjectId(String commentObjectId) {
+        this.commentObjectId = commentObjectId;
+    }
 
     public String getCommenterRank() {
         return commenterRank;
@@ -25,14 +37,12 @@ public class CommentItem {
         this.commenterRank = commenterRank;
     }
 
-    public String commenterRank;
-
-    public Bitmap getParseProfilePicture() {
-        return parseProfilePicture;
+    public Bitmap getCommenterParseProfilePicture() {
+        return commenterParseProfilePicture;
     }
 
-    public void setParseProfilePicture(Bitmap parseProfilePicture) {
-        this.parseProfilePicture = parseProfilePicture;
+    public void setCommenterParseProfilePicture(Bitmap commenterParseProfilePicture) {
+        this.commenterParseProfilePicture = commenterParseProfilePicture;
     }
 
     public String getCommenterId() {
@@ -43,31 +53,12 @@ public class CommentItem {
         this.commenterId = commenterId;
     }
 
-    public String commenterId;
-    public String commentText;
-
-    public String getDropId() {
-        return dropId;
+    public String getDropObjectId() {
+        return dropObjectId;
     }
 
-    public void setDropId(String dropId) {
-        this.dropId = dropId;
-    }
-
-    public String getCommenterFacebookId() {
-        return commenterFacebookId;
-    }
-
-    public void setCommenterFacebookId(String commenterFacebookId) {
-        this.commenterFacebookId = commenterFacebookId;
-    }
-
-    public String getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
+    public void setDropObjectId(String dropObjectId) {
+        this.dropObjectId = dropObjectId;
     }
 
     public String getCommenterName() {
@@ -93,6 +84,4 @@ public class CommentItem {
     public void setCommentText(String commentText) {
         this.commentText = commentText;
     }
-
-
 }

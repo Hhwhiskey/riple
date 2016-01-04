@@ -48,11 +48,10 @@ public class ParseLoginActivity extends AppCompatActivity {
         if (user != null) {
             emailVerified = user.getBoolean("emailVerified");
             if (emailVerified) {
-                startActivity(intent);
-            } else {
-                Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
-                                " address. Once done, tap Login to begin using Riple",
-                        Toast.LENGTH_LONG ).show();
+                boolean banBoolean = user.getBoolean("isBan");
+                if (!banBoolean) {
+                    startActivity(intent);
+                }
             }
         }
 
@@ -61,6 +60,7 @@ public class ParseLoginActivity extends AppCompatActivity {
         loginButton = (Button) findViewById(R.id.button_login);
         signUpButton = (Button) findViewById(R.id.button_signup);
         emailField = (EditText) findViewById(R.id.email_login);
+        emailField.requestFocus();
         passwordField = (EditText) findViewById(R.id.password_login);
         forgotPassword = (TextView) findViewById(R.id.forgot_password_tv);
 
@@ -84,7 +84,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                                 if (!banBoolean) {
                                     startActivity(intent);
                                 } else {
-                                    Toast.makeText(ParseLoginActivity.this, "You have been banned from Riple. If you decide to use Riple again, please follow the rules. Thank you.", Toast.LENGTH_LONG).show();
+                                   showBanDialog();
                                 }
                             } else {
                                Toast.makeText(ParseLoginActivity.this, "Please verify your email" +
@@ -240,6 +240,32 @@ public class ParseLoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void showBanDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("You have been banned");
+        builder.setMessage("You have been banned from Riple, due to reports made against you. If you feel this is mistake, please email Riple for support and it will be investigated. If you do decide to use Riple again, please follow the rules so that everyone can enjoy what Riple has to offer. Thank you.");
+        builder.setNegativeButton("EMAIL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                emailIntent.setType("vnd.android.cursor.item/email");
+                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"kevinhodgesriple@gmail.com"});
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Ban investigation request");
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+                startActivity(Intent.createChooser(emailIntent, ""));
+            }
+        });
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
     }
 
     // TODO: 11/30/2015

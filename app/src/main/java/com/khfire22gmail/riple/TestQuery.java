@@ -57,7 +57,7 @@ public class TestQuery {
                         //Drop Author Data//////////////////////////////////////////////////////////
                         ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
 
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("commenterParseProfilePicture");
                         if (parseProfilePicture != null) {
                             parseProfilePicture.getDataInBackground(new GetDataCallback() {
                                 @Override

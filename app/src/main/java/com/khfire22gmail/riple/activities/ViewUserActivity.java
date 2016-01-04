@@ -297,118 +297,8 @@ public class ViewUserActivity extends AppCompatActivity {
         });
     }
 
-
-    /*public void loadCurrentUserRipleItemsFromParse() {
-
-        final ArrayList<DropItem> currentUsersList = new ArrayList<>();
-
-        ParseUser clickedUser = null;
-*//*        ParseQuery<ParseUser> getClickedUserquery = ParseQuery.getQuery("_User");
-        getClickedUserquery.whereEqualTo("objectId", mClickedUserId);
-
-        // TODO: Change this to findInBackground and pass in a callback to listen to when this inBackground finishes
-       *//**//* getClickedUserquery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {*//**//*
-
-        try {
-            if (getClickedUserquery.find().size() != 0) {
-                clickedUser = getClickedUserquery.find().get(0);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*//*
-
-        clickedUser = ParseUser.getCurrentUser();
-
-        ParseRelation createdRelation = clickedUser.getRelation("createdDrops");
-        ParseRelation completedRelation = clickedUser.getRelation("completedDrops");
-
-        ParseQuery createdQuery = createdRelation.getQuery();
-        ParseQuery completedQuery = completedRelation.getQuery();
-
-        Log.d("viewUserId", "Id is currently " + mClickedUserId);
-
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(createdQuery);
-        queries.add(completedQuery);
-
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-
-        mainQuery.orderByDescending("createdAt");
-
-        mainQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-
-                if (e != null) {
-                    Log.i("KEVIN", "error error");
-
-                } else {
-                    for (int i = 0; i < list.size(); i++) {
-
-                        final DropItem dropItem = new DropItem();
-
-                        ParseFile profilePicture = (ParseFile) list.get(i).get("authorPicture");
-                        if (profilePicture != null) {
-                            profilePicture.getDataInBackground(new GetDataCallback() {
-
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(bmp);
-                                    }
-                                }
-                            });
-                        }
-
-                        //ObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
-                        //Author name
-                        dropItem.setAuthorName(list.get(i).getString("name"));
-                        //Author id
-                        dropItem.setAuthorId(list.get(i).getString("author"));
-                        //Date
-                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
-//                      dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-
-                        //Drop Title
-//                        dropItem.setTitle(list.get(i).getString("title"));
-
-                        //Drop description
-                        dropItem.setDescription(list.get(i).getString("description"));
-
-                        //Riple Count
-                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-
-                        //Comment Count
-                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-                        //Id that connects commenterName to drop
-//                              dropItem.setCommenterName(list.get(i).getString("commenterName"));
-
-                        currentUsersList.add(dropItem);
-                    }
-
-                    Log.i("KEVIN", "CURRENT USER DROP LIST SIZE: " + currentUsersList.size());
-                    // Don't update this until we have the list of the current user's stuff as well
-                    // Then, we'll have the relations that we need to display the proper card.
-                    mCurrentUserDrops = currentUsersList;
-
-                }
-            }
-        });
-    }*/
-
-
-
-
-
     private void updateRecyclerView(ArrayList<DropItem> clickedUserList) {
         Log.d("VIEWUSERLIST", "CLICKED USER LIST SIZE: " + clickedUserList.size());
-//        Log.d("VIEWUSERLIST", "CURRENT USER LIST SIZE: " + mCurrentUserDrops.size());
 
         if (clickedUserList.isEmpty()) {
             mViewUserRecyclerView.setVisibility(View.GONE);
@@ -424,11 +314,6 @@ public class ViewUserActivity extends AppCompatActivity {
         scaleAdapter.setDuration(250);
         mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         mViewUserRecyclerView.setItemAnimator(new SlideInLeftAnimator());
-
-        /* mViewUserView = items;
-
-        mOtherUserAdapter = new DropAdapter(this, mViewUserView, "other");
-        mViewUserRecyclerView.setAdapter(mOtherUserAdapterrAdapter);*/
     }
 
     @Override

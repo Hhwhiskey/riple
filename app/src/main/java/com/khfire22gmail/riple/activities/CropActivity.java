@@ -199,12 +199,12 @@ public class CropActivity extends AppCompatActivity {
     }
 
     private void saveImageToParse(final byte[] byteArray) {
-        final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
+        final ParseFile file = new ParseFile("commenterParseProfilePicture.png", byteArray);
         file.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    currentUser.put("parseProfilePicture", file);
+                    currentUser.put("commenterParseProfilePicture", file);
                     currentUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -254,7 +254,7 @@ public class CropActivity extends AppCompatActivity {
                         //Drop Author Data//////////////////////////////////////////////////////////
                         ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
 
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                        ParseFile parseProfilePicture = (ParseFile) authorData.get("commenterParseProfilePicture");
                         if (parseProfilePicture != null) {
                             parseProfilePicture.getDataInBackground(new GetDataCallback() {
                                 @Override

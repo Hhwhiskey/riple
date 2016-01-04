@@ -25,7 +25,7 @@ import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
-import com.khfire22gmail.riple.utils.EndlessRecyclerOnScrollListener;
+import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -72,7 +72,7 @@ public class RipleTabFragment extends Fragment {
     private ArrayList<DropItem> mRipleListLocal;
     private List<ParseObject> listFromParse;
     private List<ParseObject> mParseList;
-
+    private EndlessRecyclerViewOnScrollListener mEndlessListener;
     private static String TAG = RipleTabFragment.class.getSimpleName();
 
     @Override
@@ -98,8 +98,9 @@ public class RipleTabFragment extends Fragment {
         ripleRecyclerView.setLayoutManager(layoutManager);
         ripleRecyclerView.setItemAnimator(new SlideInLeftAnimator());
 
+
         // Set onScroll Listener
-        ripleRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+        ripleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
                 Log.d(TAG, "onLoadMore current_page: " + current_page);
@@ -159,6 +160,7 @@ public class RipleTabFragment extends Fragment {
                 loadRipleItemsFromParse();
 //                loadRipleItemsFromLocal();
 //                updateUserInfo();
+                mEndlessListener.reset();
                 new refreshQuery().execute();
             }
         });
@@ -177,11 +179,12 @@ public class RipleTabFragment extends Fragment {
         @Override protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
             mWaveSwipeRefreshLayout.setRefreshing(false);
+//            mEndlessListener.reset();
 
 //            final int resetPageNumer = 1;
 //
 //            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-//            ripleRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+//            ripleRecyclerView.addOnScrollListener(new EndlessRecyclerViewOnScrollListener(layoutManager) {
 //                @Override
 //                public void onLoadMore(int current_page) {
 //

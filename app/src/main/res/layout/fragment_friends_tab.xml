@@ -28,6 +28,6 @@
         android:text="This is where conversations with your friends will show up. Start making friends!"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:visibility="gone"
+        android:visibility="visible"
         />
 </LinearLayout>

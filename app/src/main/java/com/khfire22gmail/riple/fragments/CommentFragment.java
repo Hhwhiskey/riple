@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.SettingsActivity;
+import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.model.CommentAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.parse.FindCallback;
@@ -71,6 +73,7 @@ public class CommentFragment extends Fragment {
 
     public static final String ARG_PAGE = "COMMENT_PAGE";
     private int mPage;
+    private ParseUser currentUser;
 
     public static CommentFragment newInstance(int page) {
         Bundle args = new Bundle();
@@ -84,6 +87,7 @@ public class CommentFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPage = getArguments().getInt(ARG_PAGE);
+        currentUser = ParseUser.getCurrentUser();
     }
 
     @Override
@@ -143,7 +147,7 @@ public class CommentFragment extends Fragment {
                     Toast.makeText(getActivity(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(getActivity(), SettingsActivity.class);
                     startActivity(intent);
-                } else  {
+                } else {
                     commentText = newCommentView.getEditableText().toString();
                     try {
                         postNewComment(commentText);
@@ -188,8 +192,8 @@ public class CommentFragment extends Fragment {
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseObject comment = new ParseObject("Comments");
 
-        if(commentText != null && !commentText.isEmpty()) {
-            comment.put("dropId", mDropObjectId);
+        if (commentText != null && !commentText.isEmpty()) {
+            comment.put("dropObjectId", mDropObjectId);
             comment.put("commenterPointer", user);
             comment.put("commentText", commentText);
             comment.saveInBackground(new SaveCallback() {
@@ -197,21 +201,80 @@ public class CommentFragment extends Fragment {
                 public void done(ParseException e) {
                     Toast.makeText(getActivity(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
                     loadCommentsFromParse();
+                    // At the time of a comment post, query the currentUser comment report count. If
+                    // over the threshold, ban the user and give dialog box.
+                    ParseQuery query = ParseQuery.getQuery("UserReportCount");
+                    query.whereEqualTo("userPointer", currentUser);
+                    query.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(final ParseObject parseObject, ParseException e) {
+                            int reportCount = parseObject.getInt("reportCount");
 
+                            if (reportCount > 0) {
+                                //Get the banned users Drops for deletion
+                                ParseQuery dropFlushQuery = ParseQuery.getQuery("Drop");
+                                dropFlushQuery.whereEqualTo("authorPointer", currentUser);
+                                dropFlushQuery.findInBackground(new FindCallback<ParseObject>() {
+                                    @Override
+                                    public void done(List dropFlushList, ParseException e) {
+                                    // Flush the banned users Drops
+                                        try {
+                                            ParseObject.deleteAll(dropFlushList);
+                                        } catch (ParseException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                        //Get the banned users comments for deletion
+                                        ParseQuery commentFlushQuery = ParseQuery.getQuery("Comments");
+                                        commentFlushQuery.whereEqualTo("commenterPointer", currentUser);
+                                        commentFlushQuery.findInBackground(new FindCallback<ParseObject>() {
+                                            @Override
+                                            public void done(List commentFlushList, ParseException e) {
+                                                //Flush the banned users Comments
+                                                try {
+                                                    ParseObject.deleteAll(commentFlushList);
+                                                } catch (ParseException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                        //Set the banned users banned boolean to true
+                                        currentUser.put("isBan", true);
+                                        currentUser.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                //Toast to notify user of ban
+                                                Toast.makeText(getActivity(), "As a result of reports against you, you have been permanently banned.", Toast.LENGTH_LONG).show();
+
+                                                Handler handler = new Handler();
+                                                handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        //Log user out and return to login activity after 3 seconds
+                                                        ParseUser.logOut();
+                                                        Intent intentLogout = new Intent(getActivity(), TitleActivity.class);
+                                                        getActivity().startActivity(intentLogout);
+                                                    }
+                                                }, 3000);
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                //Get the Drop object and increment the comment count then save in background
+                                ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+                                query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+                                    public void done(ParseObject drop, ParseException e) {
+                                        if (e == null) {
+                                            drop.increment("commentCount");
+                                            drop.saveInBackground();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             });
-
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
-
-            query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-                public void done(ParseObject drop, ParseException e) {
-                    if (e == null) {
-                        drop.increment("commentCount");
-                        drop.saveInBackground();
-                    }
-                }
-            });
-
         } else {
             Toast.makeText(getActivity(), "Please enter some text first!", Toast.LENGTH_LONG).show();
         }
@@ -223,7 +286,7 @@ public class CommentFragment extends Fragment {
         final ArrayList<CommentItem> commentList = new ArrayList<>();
 
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Comments");
-        query.whereEqualTo("dropId", mDropObjectId);
+        query.whereEqualTo("dropObjectId", mDropObjectId);
         query.orderByDescending("createdAt");
         query.include("commenterPointer");
 //        query.setLimit(25);
@@ -252,7 +315,7 @@ public class CommentFragment extends Fragment {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        commentItem.setParseProfilePicture(bmp);
+                                        commentItem.setCommenterParseProfilePicture(bmp);
                                         updateRecyclerView(commentList);
                                     }
                                 }
@@ -266,17 +329,17 @@ public class CommentFragment extends Fragment {
                         //Commenter Name
                         commentItem.setCommenterName((String) commenterData.get("displayName"));
 
-                        //Rank
+                        //Commenter Rank
                         commentItem.setCommenterRank((String) commenterData.get("userRank"));
 
                         //Comment Data/////////////////////////////////////////////////////////////
-                        // DropId
-                        commentItem.setDropId(list.get(i).getString("dropId"));
+                        // Comment Id
+                        commentItem.setCommentObjectId(list.get(i).getObjectId());
 
-                        //Comment
+                        //Comment text
                         commentItem.setCommentText(list.get(i).getString("commentText"));
 
-                        //Date
+                        //Comment create at Date
                         commentItem.setCreatedAt(list.get(i).getCreatedAt());
 
                         commentList.add(commentItem);
@@ -294,8 +357,7 @@ public class CommentFragment extends Fragment {
         if (comments.isEmpty()) {
             mRecyclerView.setVisibility(View.GONE);
             mViewDropEmptyView.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mRecyclerView.setVisibility(View.VISIBLE);
             mViewDropEmptyView.setVisibility(View.GONE);
         }

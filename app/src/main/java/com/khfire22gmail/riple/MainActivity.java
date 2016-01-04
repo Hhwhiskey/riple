@@ -3,6 +3,7 @@ package com.khfire22gmail.riple;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -57,12 +58,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String displayName;
     private ProgressDialog progressDialog;
     private BroadcastReceiver receiver;
-
+    Context mContext;
+    SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences settings = getSharedPreferences("MY_APP", MODE_PRIVATE);
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         startService(serviceIntent);
@@ -148,6 +152,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void createDropDialog() {
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final String copiedString = sharedPreferences.getString("sharedDropString", "");
+
         final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
@@ -162,10 +169,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                input.setText(copiedString);
                 dropDescription = input.getText().toString();
                 int dropTextField = input.getText().length();
 
-                if (dropTextField > 0) {
+
+
+                if (dropTextField > 25) {
                     try {
                         createDrop(dropDescription);
                     } catch (InterruptedException e) {
@@ -173,7 +183,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "This is a fairly short Drop, try " +
-                            "adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
+                    "adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
+
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("sharedDropString", dropDescription);
+                    editor.apply();
                 }
             }
         });
@@ -187,29 +202,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.show();
     }
 
+
+
     // Take user input and post the Drop
     public void createDrop(String dropDescription) throws InterruptedException {
-
+        //Create a Drop Object and get the currentUser
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
         if (dropDescription != null) {
-
+            //Add following fields to Drop data
             drop.put("authorPointer", currentUser);
             drop.put("description", dropDescription);
             drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
                 @Override
                 public void done(ParseException e) {
+                    //Get currentUser createdRelation instance
                     ParseRelation<ParseObject> relationCreatedDrops = currentUser.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
-
+                    //Get currentuser hasRelationTo instance
                     ParseRelation<ParseObject> relationHasRelationTo = currentUser.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
-
+                    //Save the currentUser eventually
                     currentUser.saveEventually(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
+                                // Notify the user that their Drop has been posted and show it in the RipleTabFragment
                                 Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
                                 Intent intent = getIntent();
                                 finish();
@@ -218,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                                RipleTabFragment ripleTab = new RipleTabFragment();
 //                                ripleTab.updateRecyclerView(ripleTab.loadRipleItemsFromParse());
 
+                                // Check the currentUser Report count
                                 ParseQuery query = ParseQuery.getQuery("UserReportCount");
                                 query.whereEqualTo("userPointer", currentUser);
                                 query.getFirstInBackground(new GetCallback<ParseObject>() {
@@ -226,30 +246,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int reportCount = parseObject.getInt("reportCount");
 
                                         if (reportCount > 0) {
-
+                                            //Get the banned users Drops for flush
                                             ParseQuery deleteUserQuery = ParseQuery.getQuery("Drop");
                                             deleteUserQuery.whereEqualTo("authorPointer", currentUser);
                                             deleteUserQuery.findInBackground(new FindCallback<ParseObject>() {
                                                 @Override
                                                 public void done(List list, ParseException e) {
-
+                                                    //Delete the banned users Drops
                                                     try {
                                                         ParseObject.deleteAll(list);
                                                     } catch (ParseException e1) {
                                                         e1.printStackTrace();
                                                     }
 
+                                                    //Get the banned users comments for flush
+                                                    ParseQuery commentFlushQuery = ParseQuery.getQuery("Comments");
+                                                    commentFlushQuery.whereEqualTo("commenterPointer", currentUser);
+                                                    commentFlushQuery.findInBackground(new FindCallback<ParseObject>() {
+                                                        @Override
+                                                        public void done(List commentFlushList, ParseException e) {
+                                                            //Delete the banned users comments
+                                                            try {
+                                                                ParseObject.deleteAll(commentFlushList);
+                                                            } catch (ParseException e1) {
+                                                                e1.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
+                                                    //Set the banned users banned boolean to true
                                                     currentUser.put("isBan", true);
                                                     currentUser.saveInBackground(new SaveCallback() {
                                                         @Override
                                                         public void done(ParseException e) {
+                                                            //Notify the user that they have been banned
                                                             Toast.makeText(MainActivity.this, "As a result of reports against you, you have been permanently banned.", Toast.LENGTH_LONG).show();
 
                                                             Handler handler = new Handler();
                                                             handler.postDelayed(new Runnable() {
                                                                 @Override
                                                                 public void run() {
-
+                                                                    //Log user out and return to login activity after 3 seconds
                                                                     ParseUser.logOut();
                                                                     Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
                                                                     startActivity(intentLogout);

@@ -74,9 +74,16 @@ public class TitleActivity extends AppCompatActivity {
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         ParseUser currentUser = ParseUser.getCurrentUser();
+
+
         if (currentUser != null) {
-            startActivity(intent);
-            startService(serviceIntent);
+            boolean banBoolean = currentUser.getBoolean("isBan");
+            if (!banBoolean) {
+                startActivity(intent);
+                startService(serviceIntent);
+            } else {
+                showBanDialog();
+            }
         }
 
         // Check if there is a currently logged in use and it's linked to a Facebook account.
@@ -96,8 +103,8 @@ public class TitleActivity extends AppCompatActivity {
         }
 
 
-        //Login Switches///////////////////////////////////////////////////////////////////////
-        //Parse login switch
+        //Login Buttons///////////////////////////////////////////////////////////////////////
+        //Parse login Button
         emailButton = (Button) findViewById(R.id.button_email);
         emailButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +114,7 @@ public class TitleActivity extends AppCompatActivity {
         });
 
 
-        //Facebook login switch
+        //Facebook login Button
         fbButton = (Button) findViewById(R.id.button_facebook);
         fbButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,21 +189,53 @@ public class TitleActivity extends AppCompatActivity {
 
                 if (user == null) {
                     Log.d(RipleApplication.TAG, "Uh oh. The user cancelled the Facebook login.");
-                    Toast.makeText(getApplicationContext(), "Uh oh. Facebook login has been canceled.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Uh oh. Facebook login has been canceled.", Toast.LENGTH_LONG).show();
 
                 } else if (user.isNew()) {
                     Log.d(RipleApplication.TAG, "User signed up and logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(), "You have signed up and logged in through Facebook!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "You have signed up and logged in through Facebook!", Toast.LENGTH_LONG).show();
                     storeFacebookUserOnParse();
-
 
                 } else {
                     Log.d(RipleApplication.TAG, "You have logged in through Facebook!");
 //                    Toast.makeText(getApplicationContext(), "User logged in through Facebook!", Toast.LENGTH_SHORT).show();
-                    launchMainActivity();
+
+                    boolean banBoolean = user.getBoolean("isBan");
+                    if (!banBoolean) {
+                        launchMainActivity();
+                    } else {
+//                        Toast.makeText(TitleActivity.this, "You have been banned from Riple. If you decide to use Riple again, please follow the rules. Thank you.", Toast.LENGTH_LONG).show();
+                        showBanDialog();
+
+                    }
                 }
             }
         });
+    }
+
+    private void showBanDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TitleActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("You have been banned");
+        builder.setMessage("You have been banned from Riple, due to reports made against you. If you feel this is mistake, please email Riple for support and it will be investigated. If you do decide to use Riple again, please follow the rules so that everyone can enjoy what Riple has to offer. Thank you.");
+        builder.setNegativeButton("EMAIL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                emailIntent.setType("vnd.android.cursor.item/email");
+                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"kevinhodgesriple@gmail.com"});
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Ban investigation request");
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+                startActivity(Intent.createChooser(emailIntent, ""));
+            }
+        });
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
     }
 
     private void storeFacebookUserOnParse() {
