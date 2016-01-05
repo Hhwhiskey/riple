@@ -141,8 +141,6 @@ public class CompletedFragment extends Fragment {
                                 completedByList.add(completedByItem);
                             }
                         }
-
-
                     }
                 });
             }

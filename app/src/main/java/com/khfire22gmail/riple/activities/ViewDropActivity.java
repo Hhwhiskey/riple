@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -102,6 +103,13 @@ public class ViewDropActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        tabLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         currentUser = ParseUser.getCurrentUser();
 
         drop = "drop";
@@ -119,8 +127,6 @@ public class ViewDropActivity extends AppCompatActivity {
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
         mTabName = intent.getStringExtra("mTabName");
-//        mPosition = Integer.parseInt(intent.getStringExtra("mPosition"));
-
 
         Log.d("rDropExtra", "mDropObjectId = " + mDropObjectId);
         Log.d("rDropExtra", "mAuthorId = " + mAuthorId);
@@ -132,28 +138,38 @@ public class ViewDropActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
         Log.d("rDropExtra", "mTabName = " + mTabName);
 
-        getViewedUserProfilePicture(mAuthorId);
+        //Get author profile picture and set it to TV
+        getAuthorProfilePicture(mAuthorId);
 
-
-
+        //Set toolbar onClick
+        Toolbar toolBar = (Toolbar) findViewById(R.id.tool_bar);
+        toolBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewOtherUser(mAuthorId, mAuthorName);
+            }
+        });
+        //Set toolbar onLongClick
+        toolBar.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mTabName.equals(drop)) {
+                    showDropMenu();
+                } else {
+                    showTrickleMenu();
+                }
+                return false;
+            }
+        });
+        //Set author picture OnClick
         authorProfilePictureView = (ImageView) findViewById(R.id.other_profile_picture);
-
         authorProfilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 viewOtherUser(mAuthorId, mAuthorName);
             }
         });
-
-        nameView = (TextView) findViewById(R.id.name);
-        nameView.setText(mAuthorName);
-
-        rankView = (TextView) findViewById(R.id.author_rank);
-        rankView.setText(mAuthorRank);
-
-        descriptionView = (TextView) findViewById(R.id.description);
-        descriptionView.setText(mDropDescription);
-
+        //Set overflow OnClick
         ImageView menuButton = (ImageView) findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +182,16 @@ public class ViewDropActivity extends AppCompatActivity {
             }
         });
 
+        //Set author name on Drop card
+        nameView = (TextView) findViewById(R.id.name);
+        nameView.setText(mAuthorName);
+        //Set author rank on Drop card
+        rankView = (TextView) findViewById(R.id.author_rank);
+        rankView.setText(mAuthorRank);
+        //Set drop descroption on Drop card
+        descriptionView = (TextView) findViewById(R.id.description);
+        descriptionView.setText(mDropDescription);
+        //Set createdAt on Drop card
         createdAtView = (TextView) findViewById(R.id.comment_created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
         ///////////////
@@ -174,7 +200,7 @@ public class ViewDropActivity extends AppCompatActivity {
         currentDrop = mObjectId;
     }
 
-    private void getViewedUserProfilePicture(String mAuthorId) {
+    private void getAuthorProfilePicture(String mAuthorId) {
         ParseQuery<ParseUser> viewUserQuery = ParseQuery.getQuery("_User");
         viewUserQuery.getInBackground(mAuthorId, new GetCallback<ParseUser>() {
             @Override

@@ -78,8 +78,7 @@
                 android:textStyle="italic"
                 android:layout_below="@+id/name"
                 android:textColor="#7d000000"
-                android:layout_alignBottom="@+id/trickle_card_tool_bar"
-                android:layout_marginTop="-4dp"
+                android:layout_marginTop="4dp"
                 android:layout_alignRight="@+id/name"
                 android:layout_alignEnd="@+id/name"/>
 

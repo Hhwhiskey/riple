@@ -14,7 +14,10 @@
         card_view:cardUseCompatPadding="true"
         android:layout_gravity="bottom"
         card_view:cardPreventCornerOverlap="false"
-        android:layout_margin="8dp">
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp">
 
         <RelativeLayout
             android:id="@+id/other_layout"
@@ -51,24 +54,23 @@
                 android:layout_toRightOf="@+id/other_profile_picture"
                 android:layout_marginLeft="8dp"
                 android:textStyle="bold"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                />
+                android:layout_toLeftOf="@+id/other_riple_count"
+                android:layout_toStartOf="@+id/other_riple_count"/>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="45000"
                 android:id="@+id/other_riple_count"
-                android:textSize="24sp"
+                android:textSize="30sp"
                 android:textColor="#FFFFFF"
-                android:gravity="center_vertical"
                 android:textStyle="bold"
-                android:layout_alignBottom="@+id/other_profile_picture"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:layout_alignTop="@+id/other_profile_picture"
-                android:layout_marginRight="16dp"
+                android:layout_marginRight="12dp"
+                android:layout_alignBottom="@+id/other_profile_picture"
+                android:gravity="center_vertical"
+                android:layout_alignParentTop="true"
                 />
 
             <TextView
@@ -86,7 +88,8 @@
                 android:textStyle="italic"
                 android:layout_below="@+id/other_display_name"
                 android:layout_marginTop="2dp"
-                />
+                android:layout_alignRight="@+id/other_display_name"
+                android:layout_alignEnd="@+id/other_display_name"/>
 
 
         </RelativeLayout>

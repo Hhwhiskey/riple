@@ -362,7 +362,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             public void done(List<ParseUser> user, ParseException e) {
                 if (e == null) {
                     Intent messageIntent = new Intent(mContext, MessagingActivity.class);
-                    mContext.startActivity(messageIntent);
                     messageIntent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
                     mContext.startActivity(messageIntent);
                 } else {
@@ -600,7 +599,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     }else if (selected == 3) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Drop Author");
-                        builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
+                        builderVerify.setMessage("Does this user or Drop contain spam or inappropriate/offensive material?");
                         builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -647,7 +646,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     } else if (selected == 4) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Drop Author");
-                        builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
+                        builderVerify.setMessage("Does this user or Drop contain spam or inappropriate/offensive material?");
                         builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

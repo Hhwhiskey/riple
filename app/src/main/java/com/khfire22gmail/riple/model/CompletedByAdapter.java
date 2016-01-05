@@ -4,7 +4,9 @@ package com.khfire22gmail.riple.model;
  * Created by Kevin on 12/13/2015.
  */
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,9 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,6 +110,27 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         mContext.startActivity(intent);
     }
 
+    private void messageTheAuthor(int position) {
+
+        String author = data.get(position).getUserObjectId();
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("objectId", author);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> user, ParseException e) {
+                if (e == null) {
+                    Intent messageIntent = new Intent(mContext, MessagingActivity.class);
+                    messageIntent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
+                    mContext.startActivity(messageIntent);
+                } else {
+                    Toast.makeText(mContext,
+                            "Error finding that user",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     @Override
     public int getItemCount() {
         return data.size();
@@ -110,43 +139,58 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
     class CompletedByViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         public TextView displayName;
-        public ImageView parseProfilePicture;
+        public ImageView otherProfilePicture;
         public TextView userRank;
         public TextView userRipleCount;
 
         public CompletedByViewHolder(View itemView) {
             super(itemView);
 
-            parseProfilePicture = (ImageView) itemView.findViewById(R.id.other_profile_picture);
+            otherProfilePicture = (ImageView) itemView.findViewById(R.id.other_profile_picture);
             displayName = (TextView) itemView.findViewById(R.id.other_display_name);
-//            userRank = (TextView) itemView.findViewById(R.id.completed_by_riple_rank);
+            userRank = (TextView) itemView.findViewById(R.id.other_rank);
             userRipleCount = (TextView) itemView.findViewById(R.id.other_riple_count);
 
-
+            //Set OCL
             itemView.setOnClickListener(this);
-//            itemView.setLongClickable(true);
-//            itemView.setOnLongClickListener(this);
+            itemView.setOnLongClickListener(this);
+            otherProfilePicture.setOnClickListener(this);
         }
-
+        //Update item based on position
         public void update(int position){
 
             CompletedByItem current = data.get(position);
 
-            parseProfilePicture.setImageBitmap(current.parseProfilePicture);
+            otherProfilePicture.setImageBitmap(current.parseProfilePicture);
             displayName.setText(current.displayName);
-//            userRank.setText(current.userRank);
+            userRank.setText(current.userRank);
             userRipleCount.setText(String.valueOf(current.userRipleCount));
         }
 
         @Override
         public void onClick(View v) {
             viewOtherUser(getAdapterPosition());
-
         }
 
         @Override
         public boolean onLongClick(View v) {
+            openFriendMenu();
             return false;
+        }
+
+        public void openFriendMenu() {
+
+            CharSequence friendTitles[] = new CharSequence[]{"Message"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Friend Menu");
+            builder.setItems(friendTitles, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+                    messageTheAuthor(getAdapterPosition());
+                }
+            });
+            builder.show();
         }
     }
 }

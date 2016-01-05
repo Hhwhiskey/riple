@@ -208,7 +208,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                     if (selected == 0) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Comment Author");
-                        builderVerify.setMessage("Does this author or comment contain inappropriate or offensive material?");
+                        builderVerify.setMessage("Does this user or comment contain spam or inappropriate/offensive material?");
                         builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
