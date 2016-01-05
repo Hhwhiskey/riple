@@ -27,15 +27,13 @@
             android:layout_width="match_parent"
             android:layout_height="32dp"
             app:tabMode="scrollable"
-            android:layout_gravity="bottom"
-            android:clickable="true"/>
+            android:layout_gravity="bottom"/>
 
         <RelativeLayout
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            android:background="@drawable/custom_bg">
+            android:paddingBottom="8dp">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/tool_bar"
@@ -96,15 +94,14 @@
                 android:enabled="true"
                 android:focusable="false"
                 android:maxLines="5"
-                android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Description"
                 android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
                 android:textSize="14sp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="32dp"/>
 

@@ -103,13 +103,6 @@ public class ViewDropActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
         currentUser = ParseUser.getCurrentUser();
 
         drop = "drop";
