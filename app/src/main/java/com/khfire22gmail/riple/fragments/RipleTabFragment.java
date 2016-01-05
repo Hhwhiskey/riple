@@ -105,6 +105,7 @@ public class RipleTabFragment extends Fragment {
             public void onLoadMore(int current_page) {
                 Log.d(TAG, "onLoadMore current_page: " + current_page);
                 loadRipleItemsOnScroll(current_page);
+                //pass current position in recyclerView so you can use it later
             }
         });
 
@@ -507,7 +508,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(mOnScrollListFromFromParse);
+                                        updateRecyclerViewOnScroll(mOnScrollListFromFromParse);
                                     }
                                 }
                             });
@@ -552,6 +553,7 @@ public class RipleTabFragment extends Fragment {
         });
     }
 
+    //Default updateRecyclerView method
     public void updateRecyclerView(List<DropItem> mRipleList) {
 
         Log.d("Riple", "list size = " + mRipleList.size());
@@ -569,7 +571,29 @@ public class RipleTabFragment extends Fragment {
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(ripleAdapter);
         ripleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
+        //set focus to the item it was on before... you'll have to pass the previous position to this method
 
+    }
+    //OnScroll updateRecyclerView method
+    public void updateRecyclerViewOnScroll(List<DropItem> mRipleList) {
+
+        Log.d("RipleList", "list size = " + mRipleList.size());
+
+        if (mRipleList.isEmpty()) {
+            ripleRecyclerView.setVisibility(View.GONE);
+            ripleEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            ripleRecyclerView.setVisibility(View.VISIBLE);
+            ripleEmptyView.setVisibility(View.GONE);
+        }
+
+//        ripleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
+
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(ripleAdapter);
+        ripleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        scaleAdapter.setDuration(500);
+        //set focus to the item it was on before... you'll have to pass the previous position to this method
     }
 
     private void updateUserInfo() {
