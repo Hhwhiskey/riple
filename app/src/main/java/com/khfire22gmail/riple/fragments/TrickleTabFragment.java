@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -66,13 +67,13 @@ public class TrickleTabFragment extends Fragment {
     public static final ArrayList <DropItem> allDropsList  = new ArrayList<>();
     public static ArrayList<DropItem> trickleTabInteractionList;
     private TextView trickleEmptyView;
-
-
-
+    private EndlessRecyclerViewOnScrollListener mEndlessListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -81,35 +82,38 @@ public class TrickleTabFragment extends Fragment {
 
         trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
+        mRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                new AllDropsTask(new LoadRelationDropsTask(false, current_page)).execute();
+            }
+        });
+
         //Swipe Refresh
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.trickle_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
                 // Load all drops and refresh
-                new AllDropsTask(new LoadRelationsDropsTask(false)).execute();
+                new AllDropsTask(new LoadRelationDropsTask(false)).execute();
             }
         });
 
-
-
-
-        AllDropsTask allDropsTask = new AllDropsTask(new LoadRelationsDropsTask(true));
+        //Start Async chain query by setting LoadRelationDropsTask boolean to true
+        AllDropsTask allDropsTask = new AllDropsTask(new LoadRelationDropsTask(true));
         allDropsTask.execute();
 
         return view;
     }
 
-    /**
-     * COMMENT ME AFTER YOU UNDERSTAND IT
-     */
+    //All Drops Async
     public class AllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
 
         List<ParseObject> listFromParse;
 
-        LoadRelationsDropsTask nextTask;
+        LoadRelationDropsTask nextTask;
 
 
-        public AllDropsTask(LoadRelationsDropsTask nextTask) {
+        public AllDropsTask(LoadRelationDropsTask nextTask) {
             this.nextTask = nextTask;
         }
 
@@ -123,7 +127,7 @@ public class TrickleTabFragment extends Fragment {
             super.onPreExecute();
         }
 
-
+        //Get all Drops from Parse in Async
         @Override
         protected ArrayList<DropItem> doInBackground(Void... params) {
             final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
@@ -183,8 +187,6 @@ public class TrickleTabFragment extends Fragment {
 
                 allDropsList.add(dropItemAll);
                 Log.d("KevinData", "ArrayListContains" + allDropsList.size());
-
-
             }
 
             return allDropsList;
@@ -200,26 +202,37 @@ public class TrickleTabFragment extends Fragment {
         }
     }
 
-    /**
-     * COMMENT ME AFTER YOU UNDERSTAND IT
-     */
-    class LoadRelationsDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
+    //Relation Drops Async
+    class LoadRelationDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
 
         List<ParseObject> parseRelationDrops = new ArrayList<ParseObject>();
         boolean isRefresh = false;
+        int page = 0;
 
-        public LoadRelationsDropsTask(boolean isRefresh) {
+        public LoadRelationDropsTask(boolean isRefresh) {
             this.isRefresh = isRefresh;
         }
 
+        public LoadRelationDropsTask(boolean isRefresh, int page){
+            this.isRefresh = isRefresh;
+            this.page = page;
+        }
 
+
+        //Get all Drops the currentUser is related to from Parse
         @Override
         protected ArrayList<DropItem> doInBackground(Void... params) {
-            ParseUser user = ParseUser.getCurrentUser();
-            ParseRelation relation = user.getRelation("hasRelationTo");
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            ParseRelation relation = currentUser.getRelation("hasRelationTo");
+
+            int skipNumber = 0;
+            if (page != 0) {
+                int pageMultiplier = page - 1;
+                skipNumber = pageMultiplier * 10;
+            }
 
             final ParseQuery hasRelationQuery = relation.getQuery();
-            hasRelationQuery.setLimit(10);
+            hasRelationQuery.setSkip(skipNumber);
             try {
                 parseRelationDrops = hasRelationQuery.find();
             } catch (ParseException e) {
@@ -243,7 +256,7 @@ public class TrickleTabFragment extends Fragment {
             return hasRelationList;
         }
 
-
+        //Async to filter the Drops, removing the Drops that the currentUser has created or completed
         public void asyncFilterDrops(ArrayList<DropItem> mHasRelationList, ArrayList<DropItem> mAllDropsList){
 
             Iterator<DropItem> allDropsIterator = mAllDropsList.iterator();
@@ -261,15 +274,19 @@ public class TrickleTabFragment extends Fragment {
             trickleTabInteractionList = allDropsList;
         }
 
+        //After Relation query finishes
         @Override
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
-            updateRecyclerView(allDropsList);
 
-            mWaveSwipeRefreshLayout.setRefreshing(false);
-
+            if(page != 0) {
+                mTrickleAdapter.notifyDataSetChanged();
+            } else {
+                updateRecyclerView(allDropsList);
+                //Set refreshing to false to stop refresh animation
+                mWaveSwipeRefreshLayout.setRefreshing(false);
+            }
         }
     }
-
 
     public void loadSavedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -338,7 +355,7 @@ public class TrickleTabFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-
+    //Default update RecyclerView method used when activity is created. Only shows 10 items until scrolled
     private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
         Log.d("KEVIN", "TRICKLE LIST SIZE: " + filteredDropList.size());
 
@@ -355,17 +372,10 @@ public class TrickleTabFragment extends Fragment {
         ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
         mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
+    }
 
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
+    //OnScroll RecyclerView method. Will add the next 10 items upon scroll and maintain current view
+    public void updateRecyclerViewOnScroll() {
+        mTrickleAdapter.notifyDataSetChanged();
     }
 }

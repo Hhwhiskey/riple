@@ -26,6 +26,7 @@ public abstract class EndlessRecyclerViewOnScrollListener extends RecyclerView.O
     public void reset() {
         mLoading = false;
         mPreviousTotal = 0;
+        current_page = 1;
     }
 
     @Override

@@ -261,11 +261,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //Get currentUser createdRelation instance
                     ParseRelation<ParseObject> relationCreatedDrops = currentUser.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
+                    currentUser.saveInBackground();
                     //Get currentuser hasRelationTo instance
                     ParseRelation<ParseObject> relationHasRelationTo = currentUser.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
-                    //Save the currentUser eventually
-                    currentUser.saveEventually(new SaveCallback() {
+                    currentUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {

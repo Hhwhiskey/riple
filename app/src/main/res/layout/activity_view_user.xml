@@ -57,6 +57,27 @@
                 app:layout_collapseParallaxMultiplier=".7"
                 android:src="@drawable/ic_user_default"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="2500 Riples"
+                android:id="@+id/view_user_ripleCount"
+                android:layout_gravity="right|top"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="24dp"
+                android:paddingTop="48dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="&quot;Volunteer&quot;"
+                android:id="@+id/view_user_rank"
+                android:layout_gravity="right|top"
+                android:paddingRight="24dp"
+                android:paddingTop="24dp"/>
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/other_user_tool_bar"
                 android:layout_width="match_parent"

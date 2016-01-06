@@ -54,9 +54,9 @@ public class RipleTabFragment extends Fragment {
 
     private ImageView profilePictureView;
     private TextView nameView;
-    private RecyclerView ripleRecyclerView;
+    private RecyclerView mRipleRecyclerView;
     private List<DropItem> mRipleList;
-    private DropAdapter ripleAdapter;
+    private DropAdapter mRipleAdapter;
     private RecyclerView.ItemAnimator animator;
     private TextView profileRankView;
     private TextView profileRipleCountView;
@@ -94,20 +94,9 @@ public class RipleTabFragment extends Fragment {
         //loadSavedPreferences();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
-        ripleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
-        ripleRecyclerView.setLayoutManager(layoutManager);
-        ripleRecyclerView.setItemAnimator(new SlideInLeftAnimator());
-
-
-        // Set onScroll Listener
-        ripleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int current_page) {
-                Log.d(TAG, "onLoadMore current_page: " + current_page);
-                loadRipleItemsOnScroll(current_page);
-                //pass current position in recyclerView so you can use it later
-            }
-        });
+        mRipleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
+        mRipleRecyclerView.setLayoutManager(layoutManager);
+        mRipleRecyclerView.setItemAnimator(new SlideInLeftAnimator());
 
         ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
 
@@ -146,30 +135,46 @@ public class RipleTabFragment extends Fragment {
                 viewCurrentUserProfileExtra();
             }
         });
-
         profileRipleCountView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 viewCurrentUserProfileExtra();
             }
         });
 
-        //Pull refresh drops
+        // Set onScroll Listener
+        mRipleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                Log.d(TAG, "onLoadMore current_page: " + current_page);
+                loadRipleItemsOnScroll(current_page);
+            }
+        });
+
+        //Pull to refresh riple list
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.riple_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
                 // Do work to refresh the list here.
                 loadRipleItemsFromParse();
-//                loadRipleItemsFromLocal();
-//                updateUserInfo();
-                mEndlessListener.reset();
                 new refreshQuery().execute();
             }
         });
 
-
-
         return view;
     }
+
+    private EndlessRecyclerViewOnScrollListener myLittleListener(LinearLayoutManager layoutManager) {
+
+        return new EndlessRecyclerViewOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                Log.d(TAG, "onLoadMore current_page: " + current_page);
+                loadRipleItemsOnScroll(current_page);
+            }
+        };
+
+    }
+
 
     private class refreshQuery extends AsyncTask<Void, Void, String[]> {
         @Override
@@ -180,22 +185,8 @@ public class RipleTabFragment extends Fragment {
         @Override protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
             mWaveSwipeRefreshLayout.setRefreshing(false);
-//            mEndlessListener.reset();
-
-//            final int resetPageNumer = 1;
-//
-//            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-//            ripleRecyclerView.addOnScrollListener(new EndlessRecyclerViewOnScrollListener(layoutManager) {
-//                @Override
-//                public void onLoadMore(int current_page) {
-//
-//                    current_page = resetPageNumer;
-//
-//                    Log.d(TAG, "onLoadMore current_page: " + current_page);
-//                    loadRipleItemsOnScroll(current_page);
-//                }
-//            });
-
+            mEndlessListener.reset();
+//            loadRipleItemsOnScroll(1);
             super.onPostExecute(result);
         }
     }
@@ -415,7 +406,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(mOnScrollListFromFromParse);
+                                        updateRecyclerViewOnScroll();
                                     }
                                 }
                             });
@@ -454,99 +445,7 @@ public class RipleTabFragment extends Fragment {
                         }
 
                         mOnScrollListFromFromParse.add(dropItem);
-//                        ParseObject.pinAllInBackground("pinnedQuery", listParse);
-                    }
-                }
-            }
-        });
-    }
-
-    public void loadRipleItemsFromLocal() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
-        mRipleListLocal = new ArrayList<>();
-
-        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
-        ParseRelation completedRelation = currentUser.getRelation("completedDrops");
-
-        ParseQuery createdQuery = createdRelation.getQuery();
-        ParseQuery completedQuery = completedRelation.getQuery();
-
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(createdQuery);
-        queries.add(completedQuery);
-
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-        mainQuery.include("authorPointer");
-        mainQuery.orderByDescending("createdAt");
-        mainQuery.fromLocalDatastore();
-//        mainQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
-        mainQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> listLocal, ParseException e) {
-
-                if (e != null) {
-                    Log.i("KEVIN", "error error");
-
-                    mOnScrollListFromFromParse.clear();
-
-                } else {
-                    for (int i = 0; i < mOnScrollListFromFromParse.size(); i++) {
-
-
-                        final DropItem dropItem = new DropItem();
-
-                        //Drop Author Data//////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) listLocal.get(i).get("authorPointer");
-
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerViewOnScroll(mOnScrollListFromFromParse);
-                                    }
-                                }
-                            });
-                        }
-
-                        //dropItemAll.setAuthorName(authorName);
-                        dropItem.setAuthorName((String) authorData.get("displayName"));
-                        //Author id
-                        dropItem.setAuthorId(authorData.getObjectId());
-                        //Author Rank
-                        dropItem.setAuthorRank(authorData.getString("userRank"));
-
-                        //Drop Data////////////////////////////////////////////////////////////////
-                        //DropObjectId
-                        dropItem.setObjectId(listLocal.get(i).getObjectId());
-                        //CreatedAt
-                        dropItem.setCreatedAt(listLocal.get(i).getCreatedAt());
-                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-                        //Drop description
-                        dropItem.setDescription(listLocal.get(i).getString("description"));
-
-                        //Riple Count
-                        int ripleCount = (listLocal.get(i).getInt("ripleCount"));
-                        if (ripleCount == 1) {
-                            dropItem.setRipleCount(String.valueOf(listLocal.get(i).getInt("ripleCount") + " Riple"));
-                        } else {
-                            dropItem.setRipleCount(String.valueOf(listLocal.get(i).getInt("ripleCount") + " Riples"));
-                        }
-
-                        //Comment Count
-                        int commentCount = (listLocal.get(i).getInt("commentCount"));
-                        if (commentCount == 1) {
-                            dropItem.setCommentCount(String.valueOf(listLocal.get(i).getInt("commentCount") + " Comment"));
-                        }else {
-                            dropItem.setCommentCount(String.valueOf(listLocal.get(i).getInt("commentCount") + " Comments"));
-                        }
-
-                        mOnScrollListFromFromParse.add(dropItem);
+                        mRipleAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -559,41 +458,23 @@ public class RipleTabFragment extends Fragment {
         Log.d("Riple", "list size = " + mRipleList.size());
 
         if (mRipleList.isEmpty()) {
-            ripleRecyclerView.setVisibility(View.GONE);
+            mRipleRecyclerView.setVisibility(View.GONE);
             ripleEmptyView.setVisibility(View.VISIBLE);
         }
         else {
-            ripleRecyclerView.setVisibility(View.VISIBLE);
+            mRipleRecyclerView.setVisibility(View.VISIBLE);
             ripleEmptyView.setVisibility(View.GONE);
         }
 
-        ripleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(ripleAdapter);
-        ripleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+        mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mRipleAdapter);
+        mRipleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
         scaleAdapter.setDuration(500);
-        //set focus to the item it was on before... you'll have to pass the previous position to this method
 
     }
     //OnScroll updateRecyclerView method
-    public void updateRecyclerViewOnScroll(List<DropItem> mRipleList) {
+    public void updateRecyclerViewOnScroll() {
 
-        Log.d("RipleList", "list size = " + mRipleList.size());
-
-        if (mRipleList.isEmpty()) {
-            ripleRecyclerView.setVisibility(View.GONE);
-            ripleEmptyView.setVisibility(View.VISIBLE);
-        }
-        else {
-            ripleRecyclerView.setVisibility(View.VISIBLE);
-            ripleEmptyView.setVisibility(View.GONE);
-        }
-
-//        ripleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
-
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(ripleAdapter);
-        ripleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        scaleAdapter.setDuration(500);
-        //set focus to the item it was on before... you'll have to pass the previous position to this method
     }
 
     private void updateUserInfo() {
