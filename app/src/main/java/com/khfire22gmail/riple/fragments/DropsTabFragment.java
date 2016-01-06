@@ -36,7 +36,6 @@ import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 /**
@@ -44,7 +43,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
  */
 public class DropsTabFragment extends Fragment {
 
-    private RecyclerView mRecyclerView;
+    private RecyclerView mDropRecyclerView;
     private Button button;
     private List<DropItem> mDropList;
     private List<DropItem> dropList;
@@ -60,10 +59,10 @@ public class DropsTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
-        mRecyclerView.getItemAnimator().setRemoveDuration(500);
+        mDropRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
+        mDropRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mDropRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
+        mDropRecyclerView.getItemAnimator().setRemoveDuration(500);
         dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
 
         //Swipe Refresh
@@ -219,18 +218,25 @@ public class DropsTabFragment extends Fragment {
         Log.d("kevinDropList", "Drop LIST SIZE: " + dropList.size());
 
         if (dropList.isEmpty()) {
-            mRecyclerView.setVisibility(View.GONE);
+            mDropRecyclerView.setVisibility(View.GONE);
             dropEmptyView.setVisibility(View.VISIBLE);
         }
         else {
-            mRecyclerView.setVisibility(View.VISIBLE);
+            mDropRecyclerView.setVisibility(View.VISIBLE);
             dropEmptyView.setVisibility(View.GONE);
         }
 
+        // Alpha animation
         mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
-        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        scaleAdapter.setDuration(500);
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mDropAdapter);
+        mDropRecyclerView.setAdapter(alphaAdapter);
+        alphaAdapter.setDuration(1000);
+
+        // Alpha and scale animation
+//        mDropAdapter = new DropAdapter(getActivity(), dropList, "drop");
+//        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mDropAdapter);
+//        mDropRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+//        scaleAdapter.setDuration(500);
     }
 
     @Override

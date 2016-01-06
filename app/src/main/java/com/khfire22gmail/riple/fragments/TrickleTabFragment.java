@@ -41,7 +41,6 @@ import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 /**
@@ -60,7 +59,7 @@ public class TrickleTabFragment extends Fragment {
     private String currentUserObject;
     private String currentUserName;
     private RecyclerView.ItemAnimator animator;
-    private RecyclerView mRecyclerView;
+    private RecyclerView mTrickleRecyclerView;
     public static DropAdapter mTrickleAdapter;
     final ArrayList <DropItem> hasRelationList = new ArrayList<>();
     public static final ArrayList <ParseObject> trickleObjectsList = new ArrayList<>();
@@ -75,19 +74,19 @@ public class TrickleTabFragment extends Fragment {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
-        mRecyclerView.getItemAnimator().setRemoveDuration(500);
+        mTrickleRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
+        mTrickleRecyclerView.setLayoutManager(layoutManager);
+        mTrickleRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
+        mTrickleRecyclerView.getItemAnimator().setRemoveDuration(500);
 
         trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
-        mRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int current_page) {
-                new AllDropsTask(new LoadRelationDropsTask(false, current_page)).execute();
-            }
-        });
+//        mTrickleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
+//            @Override
+//            public void onLoadMore(int current_page) {
+//                new AllDropsTask(new LoadRelationDropsTask(false, current_page)).execute();
+//            }
+//        });
 
         //Swipe Refresh
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.trickle_swipe);
@@ -139,7 +138,7 @@ public class TrickleTabFragment extends Fragment {
 
             dropQuery.orderByDescending("createdAt");
             dropQuery.include("authorPointer");
-            dropQuery.setLimit(25);
+//            dropQuery.setLimit(25);
             try {
                 listFromParse = dropQuery.find();
             } catch (ParseException e) {
@@ -281,7 +280,7 @@ public class TrickleTabFragment extends Fragment {
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
 
             mWaveSwipeRefreshLayout.setRefreshing(false);
-            mEndlessListener.reset();
+//            mEndlessListener.reset();
 
             if(page != 0) {
                 mTrickleAdapter.notifyDataSetChanged();
@@ -363,18 +362,25 @@ public class TrickleTabFragment extends Fragment {
         Log.d("KEVIN", "TRICKLE LIST SIZE: " + filteredDropList.size());
 
         if (filteredDropList.isEmpty()) {
-            mRecyclerView.setVisibility(View.GONE);
+            mTrickleRecyclerView.setVisibility(View.GONE);
             trickleEmptyView.setVisibility(View.VISIBLE);
         }
         else {
-            mRecyclerView.setVisibility(View.VISIBLE);
+            mTrickleRecyclerView.setVisibility(View.VISIBLE);
             trickleEmptyView.setVisibility(View.GONE);
         }
 
-        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
-        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        scaleAdapter.setDuration(500);
+        //Alpha animation
+        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "riple");
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mTrickleAdapter);
+        mTrickleRecyclerView.setAdapter(alphaAdapter);
+        alphaAdapter.setDuration(1000);
+
+        //Alpha and scale animation
+//        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
+//        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
+//        mTrickleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+//        scaleAdapter.setDuration(500);
     }
 
     //OnScroll RecyclerView method. Will add the next 10 items upon scroll and maintain current view

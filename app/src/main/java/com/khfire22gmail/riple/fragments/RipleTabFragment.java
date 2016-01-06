@@ -1,6 +1,5 @@
 package com.khfire22gmail.riple.fragments;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -44,7 +43,6 @@ import java.util.UUID;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 
@@ -81,7 +79,6 @@ public class RipleTabFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         updateUserInfo();
     }
-
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
@@ -156,7 +153,7 @@ public class RipleTabFragment extends Fragment {
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.riple_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
-                // Do work to refresh the list here.
+                // Run the standard Riple Query for most recent items
                 loadRipleItemsFromParse();
                 new refreshQuery().execute();
             }
@@ -259,7 +256,7 @@ public class RipleTabFragment extends Fragment {
 
     public void loadRipleItemsFromParse() {
 
-//        final ArrayList<DropItem> ripleListFromParse = new ArrayList<>();
+        int queryLimit = 10;
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -276,7 +273,7 @@ public class RipleTabFragment extends Fragment {
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
         mainQuery.include("authorPointer");
         mainQuery.orderByDescending("createdAt");
-        mainQuery.setLimit(10);
+        mainQuery.setLimit(queryLimit);
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> listParse, ParseException e) {
@@ -350,34 +347,19 @@ public class RipleTabFragment extends Fragment {
         });
     }
 
+    // Query to run after the onScrollListener activiates
+    public void loadRipleItemsOnScroll(int pageNumber) {
 
-
-    public void myLittleListener(int page) {
-
-    }
-
-    public void myLittleListener(int page, Context mContext) {
-
-    }
-
-
-
-
-    public void loadRipleItemsOnScroll(int page) {
-
-        // If the number isn't 0
-        // The page number minus 1 times 10
-
-        // Do not replace data in adapter but
-        // add to the dataset
-
-        // it should only replace it if we clear the
-        // list or reset the adapter
-
+        // The default page number is zero, so the IF statement content won't run
         int skipNumber = 0;
-        if (page != 0) {
-            int pageMultiplier = page - 1;
-            skipNumber = pageMultiplier * 10;
+        // The amount of items the query is limted to
+        int queryLimit = 10;
+        // If a page is passed in, the IF statement will be true and the logic will run
+        if (pageNumber != 0) {
+            // pageNumber - 1 gives us the the currentPage of data
+            int pageMultiplier = pageNumber - 1;
+            // Multiplying pageMultiplier * the query limit will tell the query how many items to skip
+            skipNumber = pageMultiplier * queryLimit;
         }
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -395,7 +377,7 @@ public class RipleTabFragment extends Fragment {
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
         mainQuery.include("authorPointer");
         mainQuery.orderByDescending("createdAt");
-        mainQuery.setLimit(10);
+        mainQuery.setLimit(queryLimit);
         mainQuery.setSkip(skipNumber);
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -421,7 +403,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerViewOnScroll();
+//                                        updateRecyclerViewOnScroll();
                                     }
                                 }
                             });
@@ -481,15 +463,17 @@ public class RipleTabFragment extends Fragment {
             ripleEmptyView.setVisibility(View.GONE);
         }
 
+        // Alpha animation
         mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mRipleAdapter);
-        mRipleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        scaleAdapter.setDuration(500);
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mRipleAdapter);
+        mRipleRecyclerView.setAdapter(alphaAdapter);
+        alphaAdapter.setDuration(1000);
 
-    }
-    //OnScroll updateRecyclerView method
-    public void updateRecyclerViewOnScroll() {
-
+//        // Alpha and scale animation
+//        mRipleAdapter = new DropAdapter(getActivity(), mRipleList, "riple");
+//        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mRipleAdapter);
+//        mRipleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+//        scaleAdapter.setDuration(500);
     }
 
     private void updateUserInfo() {

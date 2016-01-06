@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 
 public class ViewUserActivity extends AppCompatActivity {
@@ -309,11 +307,18 @@ public class ViewUserActivity extends AppCompatActivity {
             viewUserEmptyView.setVisibility(View.GONE);
         }
 
+        // Alpha animation
         mViewUserAdapter = new DropAdapter(this, clickedUserList, "riple");
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);
-        scaleAdapter.setDuration(250);
-        mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        mViewUserRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mViewUserAdapter);
+        mViewUserRecyclerView.setAdapter(alphaAdapter);
+        alphaAdapter.setDuration(1000);
+
+        // Alpha and scale animation
+//        mViewUserAdapter = new DropAdapter(this, clickedUserList, "riple");
+//        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mViewUserAdapter);
+//        scaleAdapter.setDuration(250);
+//        mViewUserRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+//        mViewUserRecyclerView.setItemAnimator(new SlideInLeftAnimator());
     }
 
     @Override
