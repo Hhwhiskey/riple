@@ -76,7 +76,7 @@ public class TrickleTabFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.trickle_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
         mRecyclerView.getItemAnimator().setRemoveDuration(500);
 
@@ -102,16 +102,21 @@ public class TrickleTabFragment extends Fragment {
         AllDropsTask allDropsTask = new AllDropsTask(new LoadRelationDropsTask(true));
         allDropsTask.execute();
 
-        return view;
+
+       return view;
     }
+
+    /*Get all of the currentUser hasRelation
+
+     */
 
     //All Drops Async
     public class AllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
 
         List<ParseObject> listFromParse;
 
-        LoadRelationDropsTask nextTask;
 
+        LoadRelationDropsTask nextTask;
 
         public AllDropsTask(LoadRelationDropsTask nextTask) {
             this.nextTask = nextTask;
@@ -134,7 +139,7 @@ public class TrickleTabFragment extends Fragment {
 
             dropQuery.orderByDescending("createdAt");
             dropQuery.include("authorPointer");
-            dropQuery.setLimit(10);
+            dropQuery.setLimit(25);
             try {
                 listFromParse = dropQuery.find();
             } catch (ParseException e) {
@@ -172,7 +177,6 @@ public class TrickleTabFragment extends Fragment {
                 //Author Rank
                 dropItemAll.setAuthorRank(authorData.getString("userRank"));
 
-
                 //Drop Data///////////////////////////////////////////////////////////////
                 //DropObjectId
                 dropItemAll.setObjectId(listFromParse.get(i).getObjectId());
@@ -193,12 +197,10 @@ public class TrickleTabFragment extends Fragment {
 
         }
 
-
-
-
         @Override
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
             nextTask.execute();
+
         }
     }
 
@@ -225,14 +227,14 @@ public class TrickleTabFragment extends Fragment {
             ParseUser currentUser = ParseUser.getCurrentUser();
             ParseRelation relation = currentUser.getRelation("hasRelationTo");
 
-            int skipNumber = 0;
-            if (page != 0) {
-                int pageMultiplier = page - 1;
-                skipNumber = pageMultiplier * 10;
-            }
+//            int skipNumber = 0;
+//            if (page != 0) {
+//                int pageMultiplier = page - 1;
+//                skipNumber = pageMultiplier * 10;
+//            }
 
             final ParseQuery hasRelationQuery = relation.getQuery();
-            hasRelationQuery.setSkip(skipNumber);
+//            hasRelationQuery.setSkip(skipNumber);
             try {
                 parseRelationDrops = hasRelationQuery.find();
             } catch (ParseException e) {
@@ -278,12 +280,13 @@ public class TrickleTabFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
 
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+            mEndlessListener.reset();
+
             if(page != 0) {
                 mTrickleAdapter.notifyDataSetChanged();
             } else {
                 updateRecyclerView(allDropsList);
-                //Set refreshing to false to stop refresh animation
-                mWaveSwipeRefreshLayout.setRefreshing(false);
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.khfire22gmail.riple.fragments;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -108,6 +109,7 @@ public class RipleTabFragment extends Fragment {
 
         //Update riple list and profile card
         loadRipleItemsFromParse();
+
 //        updateUserInfo();
 
         savePreferences("ripleTipBoolean", true);
@@ -347,6 +349,19 @@ public class RipleTabFragment extends Fragment {
             }
         });
     }
+
+
+
+    public void myLittleListener(int page) {
+
+    }
+
+    public void myLittleListener(int page, Context mContext) {
+
+    }
+
+
+
 
     public void loadRipleItemsOnScroll(int page) {
 
