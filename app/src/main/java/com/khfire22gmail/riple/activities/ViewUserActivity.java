@@ -282,7 +282,7 @@ public class ViewUserActivity extends AppCompatActivity {
 
 
                         viewUserList.add(dropItem);
-                        ParseObject.pinAllInBackground(list);
+//                        ParseObject.pinAllInBackground(list);
                     }
 
 //                    Log.i("KEVIN", "PARSE LIST SIZE: " + clickedUsersList.size());

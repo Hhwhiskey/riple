@@ -43,6 +43,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.Date;
 import java.util.List;
@@ -323,7 +324,13 @@ public class ViewDropActivity extends AppCompatActivity {
                             ParseRelation reportRelation = reportedUser.getRelation("reportedDrops");
                             reportRelation.add(dropObject);
                             reportedUser.increment("reportCount");
-                            reportedUser.saveEventually();
+                            reportedUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    Toast.makeText(ViewDropActivity.this, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
+
+                                }
+                            });
                         }
                     });
                 }
@@ -368,11 +375,12 @@ public class ViewDropActivity extends AppCompatActivity {
 //      shareIntent.setType("*/*");
 //      shareIntent.putExtra(Intent.EXTRA_STREAM, String.valueOf(imageUri));
 //      shareIntent.setType("image/*");
-        mContext.startActivity(Intent.createChooser(shareIntent, "Share this Drop with friends"));
+        startActivity(Intent.createChooser(shareIntent, "Share this Drop with friends"));
 
 
     }
 
+    // If the viewed Drop is not on your to-do list, show this menu
     public void showTrickleMenu() {
 
         CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Report"};
@@ -404,7 +412,6 @@ public class ViewDropActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             reportDropAuthor();
-                            Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
                         }
                     });
                     builderVerify.show();
@@ -414,7 +421,7 @@ public class ViewDropActivity extends AppCompatActivity {
         builder.show();
     }
 
-
+    //If the viewed Drop is on your to-do list, show this menu
     public void showDropMenu() {
 
         CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Remove From Todo", "Report"};
@@ -438,7 +445,7 @@ public class ViewDropActivity extends AppCompatActivity {
                     getDropObject(mDropObjectId);
 
                 } else if (selected == 4) {
-                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
                     builderVerify.setTitle("Report Drop Author");
                     builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
                     builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -451,8 +458,6 @@ public class ViewDropActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             reportDropAuthor();
-                            Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
-
                         }
                     });
                     builderVerify.show();

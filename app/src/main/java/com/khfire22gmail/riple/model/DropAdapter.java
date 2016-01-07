@@ -25,7 +25,6 @@ import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.CompletedActivity;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewDropActivity;
@@ -40,6 +39,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.Collections;
 import java.util.Date;
@@ -50,7 +50,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
 
     Context mContext;
-    public final String mTabName;
+    public String mTabName;
     private LayoutInflater inflater;
     public List<DropItem> data = Collections.emptyList();
     public static final String riple = "riple";
@@ -66,11 +66,17 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private boolean stop;
     private Context applicationContext;
 
+    public DropAdapter() {
+//        this.data =
+    }
+
     public DropAdapter(Context context, List<DropItem> data, String tabName) {
-        mContext = context;
-        inflater = LayoutInflater.from(context);
+
+        this.mContext = context;
         this.data = data;
-        mTabName = tabName;
+        this.mTabName = tabName;
+
+        inflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -302,6 +308,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("mPosition", mPosition);
 
         mContext.startActivity(intent);
+
     }
 
     // onClick action for viewing other user
@@ -319,37 +326,37 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         mContext.startActivity(intent);
     }
 
-    private void viewCompletedBy(int position) {
-
-        String mDropObjectId = (data.get(position).getObjectId());
-        String mAuthorId = (data.get(position).getAuthorId());
-        String mAuthorName = (data.get(position).getAuthorName());
-        String mAuthorRank = (data.get(position).getAuthorRank());
-        String mDropDescription = (data.get(position).getDescription());
-        String mRipleCount = (data.get(position).getRipleCount());
-        String mCommentCount = (data.get(position).getCommentCount());
-        Date mCreatedAt = (data.get(position).getCreatedAt());
-
-        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
-        Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
-        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + mAuthorName);
-        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
-        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
-        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
-        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
-
-        Intent intent = new Intent(mContext, CompletedActivity.class);
-        intent.putExtra("dropObjectId", mDropObjectId);
-        intent.putExtra("authorId", mAuthorId);
-        intent.putExtra("commenterName", mAuthorName);
-        intent.putExtra("authorRank", mAuthorRank);
-        intent.putExtra("dropDescription", mDropDescription);
-        intent.putExtra("ripleCount", mRipleCount);
-        intent.putExtra("commentCount", mCommentCount);
-        intent.putExtra("createdAt", mCreatedAt);
-
-        mContext.startActivity(intent);
-    }
+//    private void viewCompletedBy(int position) {
+//
+//        String mDropObjectId = (data.get(position).getObjectId());
+//        String mAuthorId = (data.get(position).getAuthorId());
+//        String mAuthorName = (data.get(position).getAuthorName());
+//        String mAuthorRank = (data.get(position).getAuthorRank());
+//        String mDropDescription = (data.get(position).getDescription());
+//        String mRipleCount = (data.get(position).getRipleCount());
+//        String mCommentCount = (data.get(position).getCommentCount());
+//        Date mCreatedAt = (data.get(position).getCreatedAt());
+//
+//        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
+//        Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
+//        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + mAuthorName);
+//        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
+//        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
+//        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
+//        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
+//
+//        Intent intent = new Intent(mContext, CompletedActivity.class);
+//        intent.putExtra("dropObjectId", mDropObjectId);
+//        intent.putExtra("authorId", mAuthorId);
+//        intent.putExtra("commenterName", mAuthorName);
+//        intent.putExtra("authorRank", mAuthorRank);
+//        intent.putExtra("dropDescription", mDropDescription);
+//        intent.putExtra("ripleCount", mRipleCount);
+//        intent.putExtra("commentCount", mCommentCount);
+//        intent.putExtra("createdAt", mCreatedAt);
+//
+//        mContext.startActivity(intent);
+//    }
 
 
     private void messageTheAuthor(int position) {
@@ -399,7 +406,14 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                             ParseRelation reportRelation = reportedUser.getRelation("reportedDrops");
                             reportRelation.add(dropObject);
                             reportedUser.increment("reportCount");
-                            reportedUser.saveEventually();
+                            reportedUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    Toast.makeText(mContext, "The author has been reported. " +
+                                            "Thank you for keeping Riple safe!",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
                     });
                 }
@@ -610,7 +624,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 reportDropAuthor(getAdapterPosition());
-                                Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
                             }
                         });
                         builderVerify.show();
@@ -657,8 +670,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 reportDropAuthor(getAdapterPosition());
-                                Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
-
                             }
                         });
                         builderVerify.show();

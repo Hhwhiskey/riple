@@ -22,6 +22,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.Collections;
 import java.util.List;
@@ -123,7 +124,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                             ParseRelation reportRelation = reportedUser.getRelation("reportedComments");
                             reportRelation.add(commentObject);
                             reportedUser.increment("reportCount");
-                            reportedUser.saveEventually();
+                            reportedUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
+
+                                }
+                            });
                         }
                     });
                 }
@@ -218,9 +225,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                         builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                reportCommentAuthor(getAdapterPosition());
-                                Toast.makeText(mContext, "The author has been reported. Thank you for keeping Riple safe!", Toast.LENGTH_LONG).show();
-                            }
+                                reportCommentAuthor(getAdapterPosition());}
                         });
                         builderVerify.show();
                     }

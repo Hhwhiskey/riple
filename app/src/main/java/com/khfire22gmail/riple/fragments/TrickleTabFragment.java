@@ -371,7 +371,7 @@ public class TrickleTabFragment extends Fragment {
         }
 
         //Alpha animation
-        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "riple");
+        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
         AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mTrickleAdapter);
         mTrickleRecyclerView.setAdapter(alphaAdapter);
         alphaAdapter.setDuration(1000);

@@ -51,6 +51,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                 boolean banBoolean = user.getBoolean("isBan");
                 if (!banBoolean) {
                     startActivity(intent);
+                    finish();
                 }
             }
         }
@@ -83,6 +84,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                             if (emailVerified) {
                                 if (!banBoolean) {
                                     startActivity(intent);
+                                    finish();
                                 } else {
                                    showBanDialog();
                                 }
@@ -143,7 +145,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                                             emailVerified = user.getBoolean("emailVerified");
                                             if (emailVerified) {
                                                 startActivity(intent);
-
+                                                finish();
                                            } else {
                                                 Toast.makeText(ParseLoginActivity.this, "An email has been sent. Please verify your email" +
                                                                 " address before you begin using Riple!",

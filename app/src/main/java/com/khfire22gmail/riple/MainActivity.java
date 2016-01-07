@@ -28,6 +28,7 @@ import com.khfire22gmail.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
+import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -261,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //Get currentUser createdRelation instance
                     ParseRelation<ParseObject> relationCreatedDrops = currentUser.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
-                    currentUser.saveInBackground();
+//                    currentUser.saveInBackground();
                     //Get currentuser hasRelationTo instance
                     ParseRelation<ParseObject> relationHasRelationTo = currentUser.getRelation("hasRelationTo");
                     relationHasRelationTo.add(drop);
@@ -271,12 +272,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (e == null) {
                                 // Notify the user that their Drop has been posted and show it in the RipleTabFragment
                                 Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
+
+//                                Intent intent = getIntent();
+//                                finish();
+//                                startActivity(intent);
 
 //                                RipleTabFragment ripleTab = new RipleTabFragment();
-//                                ripleTab.updateRecyclerView(ripleTab.loadRipleItemsFromParse());
+                                DropAdapter dropAdapter = new DropAdapter();
+                                dropAdapter.notifyDataSetChanged();
+
+
+
+
 
                                 // Check the currentUser Report count
                                 ParseQuery query = ParseQuery.getQuery("UserReportCount");
@@ -427,6 +434,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.apply();
     }*/
 
+
+    @Override
+    public void onBackPressed() {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Exit");
+        builder.setMessage("Are you sure you would like to exit Riple now?");
+        builder.setNegativeButton("Stay Here", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//               moveTaskToBack(true);
+                finish();
+//                moveTaskToBack(true);
+//                android.os.Process.killProcess(android.os.Process.myPid());
+//                System.exit(1);
+            }
+        });
+        builder.show();
+    }
 
     @Override
     public void onClick(View v) {

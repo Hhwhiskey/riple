@@ -80,6 +80,7 @@ public class TitleActivity extends AppCompatActivity {
             boolean banBoolean = currentUser.getBoolean("isBan");
             if (!banBoolean) {
                 startActivity(intent);
+                finish();
                 startService(serviceIntent);
             } else {
                 showBanDialog();
@@ -178,6 +179,7 @@ public class TitleActivity extends AppCompatActivity {
     public void parseLogin() {
         Intent intent = new Intent(TitleActivity.this, ParseLoginActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void fbLogin() {
@@ -312,6 +314,7 @@ public class TitleActivity extends AppCompatActivity {
     private void launchMainActivity() {
         Intent intent = new Intent(TitleActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
 
