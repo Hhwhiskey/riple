@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -24,10 +24,12 @@
         android:layout_height="match_parent"
         android:foregroundGravity="center"
         android:gravity="bottom|center_horizontal"
-        android:paddingBottom="300dp"
+        android:paddingBottom="250dp"
         android:text="This is where conversations with your friends will show up. Start making friends!"
         android:textSize="18sp"
         android:textStyle="italic"
         android:visibility="visible"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
         />
-</LinearLayout>
+</FrameLayout>

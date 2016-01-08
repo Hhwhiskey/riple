@@ -162,19 +162,6 @@ public class RipleTabFragment extends Fragment {
         return view;
     }
 
-    private EndlessRecyclerViewOnScrollListener myLittleListener(LinearLayoutManager layoutManager) {
-
-        return new EndlessRecyclerViewOnScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int current_page) {
-                Log.d(TAG, "onLoadMore current_page: " + current_page);
-                loadRipleItemsOnScroll(current_page);
-            }
-        };
-
-    }
-
-
     private class refreshQuery extends AsyncTask<Void, Void, String[]> {
         @Override
         protected String[] doInBackground(Void... params) {
@@ -185,7 +172,7 @@ public class RipleTabFragment extends Fragment {
             // Call setRefreshing(false) when the list has been refreshed.
             mWaveSwipeRefreshLayout.setRefreshing(false);
             mEndlessListener.reset();
-//            loadRipleItemsOnScroll(1);
+
             super.onPostExecute(result);
         }
     }

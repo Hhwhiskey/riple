@@ -28,5 +28,7 @@
         android:textSize="18sp"
         android:textStyle="italic"
         android:visibility="visible"
-        android:layout_marginBottom="300dp"/>
+        android:layout_marginBottom="300dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"/>
 </FrameLayout>

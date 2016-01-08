@@ -49,8 +49,9 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class TrickleTabFragment extends Fragment {
 
-    public static final String TAG = TrickleTabFragment.class.getSimpleName();
+    private static final String TAG = "TrickleTabFragment";
 
+//    public static final String TAG = TrickleTabFragment.class.getSimpleName();
     private ListView mListview;
     private PopupWindow popupWindow;
     private LayoutInflater layoutInflater;
@@ -69,7 +70,7 @@ public class TrickleTabFragment extends Fragment {
     private EndlessRecyclerViewOnScrollListener mEndlessListener;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -81,28 +82,31 @@ public class TrickleTabFragment extends Fragment {
 
         trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
-//        mTrickleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
-//            @Override
-//            public void onLoadMore(int current_page) {
-//                new AllDropsTask(new LoadRelationDropsTask(false, current_page)).execute();
-//            }
-//        });
+        //Default query call
+        LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask();
+        loadAllDropsTask.execute();
 
-        //Swipe Refresh
+        //Scroll Query
+        mTrickleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask(current_page);
+                loadAllDropsTask.execute();
+
+            }
+        });
+
+        //Pull Query
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.trickle_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
                 // Load all drops and refresh
-                new AllDropsTask(new LoadRelationDropsTask(false)).execute();
+                LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask(true);
+                loadAllDropsTask.execute();
             }
         });
 
-        //Start Async chain query by setting LoadRelationDropsTask boolean to true
-        AllDropsTask allDropsTask = new AllDropsTask(new LoadRelationDropsTask(true));
-        allDropsTask.execute();
-
-
-       return view;
+        return view;
     }
 
     /*Get all of the currentUser hasRelation
@@ -110,42 +114,53 @@ public class TrickleTabFragment extends Fragment {
      */
 
     //All Drops Async
-    public class AllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
+    public class LoadAllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
 
         List<ParseObject> listFromParse;
+        boolean refresh = false;
+        int page = 0;
 
-
-        LoadRelationDropsTask nextTask;
-
-        public AllDropsTask(LoadRelationDropsTask nextTask) {
-            this.nextTask = nextTask;
+        //Default constructor for onCreate query
+        public LoadAllDropsTask(){
         }
 
-        /**
-         * onPreExecute
-         * This is invoked on the UI Thread so do any last minute updates to
-         * the UI that you want here
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        //Page constuctor for onScroll query
+        public LoadAllDropsTask(int page){
+            Log.d(TAG, "currentPage = " + page);
+            this.page = page;
         }
+
+        //Refresh constructor for pull to refresh query
+        public LoadAllDropsTask(boolean refresh) {
+            this.refresh = refresh;
+        }
+
+
 
         //Get all Drops from Parse in Async
         @Override
         protected ArrayList<DropItem> doInBackground(Void... params) {
             final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
 
+            int queryLimit = 10;
+            int skipNumber = 0;
+
+            if (page != 0) {
+                int pageMultiplier = page - 1;
+                skipNumber = pageMultiplier * 10;
+            }else {
+                allDropsList.clear();
+            }
+
             dropQuery.orderByDescending("createdAt");
             dropQuery.include("authorPointer");
-//            dropQuery.setLimit(25);
+            dropQuery.setLimit(queryLimit);
+            dropQuery.setSkip(skipNumber);
             try {
                 listFromParse = dropQuery.find();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-            allDropsList.clear();
 
             for (int i = 0; i < listFromParse.size(); i++) {
 
@@ -189,36 +204,57 @@ public class TrickleTabFragment extends Fragment {
                 dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
 
                 allDropsList.add(dropItemAll);
-                Log.d("KevinData", "ArrayListContains" + allDropsList.size());
+//                Log.d(TAG, "AllDropsList = " + allDropsList.size());
+
             }
 
             return allDropsList;
-
         }
 
         @Override
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
-            nextTask.execute();
 
+            //Run the onScroll query
+            if (page != 0) {
+                LoadRelationDropsTask nextTask = new LoadRelationDropsTask(page);
+                nextTask.execute();
+            }
+
+            //Run the pull to refresh query
+            if (refresh) {
+                LoadRelationDropsTask nextTask = new LoadRelationDropsTask(true);
+                nextTask.execute();
+            }
+
+            //Otherwise call the default constructor for the standard query
+            if (page == 0 && !refresh) {
+                LoadRelationDropsTask nextTask = new LoadRelationDropsTask();
+                nextTask.execute();
+            }
         }
     }
 
     //Relation Drops Async
     class LoadRelationDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
 
-        List<ParseObject> parseRelationDrops = new ArrayList<ParseObject>();
-        boolean isRefresh = false;
+        List<ParseObject> parseRelationDrops = new ArrayList<>();
+        boolean refresh = false;
         int page = 0;
 
-        public LoadRelationDropsTask(boolean isRefresh) {
-            this.isRefresh = isRefresh;
+        //Default constuctor for onCreate and pull to refresh
+        LoadRelationDropsTask() {
         }
 
-        public LoadRelationDropsTask(boolean isRefresh, int page){
-            this.isRefresh = isRefresh;
+        //Constructor for onScrollQuery
+        public LoadRelationDropsTask(int page) {
             this.page = page;
         }
 
+        //Constructor for pull to refresh query
+        public LoadRelationDropsTask(boolean refresh) {
+            this.refresh = refresh;
+
+        }
 
         //Get all Drops the currentUser is related to from Parse
         @Override
@@ -226,14 +262,7 @@ public class TrickleTabFragment extends Fragment {
             ParseUser currentUser = ParseUser.getCurrentUser();
             ParseRelation relation = currentUser.getRelation("hasRelationTo");
 
-//            int skipNumber = 0;
-//            if (page != 0) {
-//                int pageMultiplier = page - 1;
-//                skipNumber = pageMultiplier * 10;
-//            }
-
             final ParseQuery hasRelationQuery = relation.getQuery();
-//            hasRelationQuery.setSkip(skipNumber);
             try {
                 parseRelationDrops = hasRelationQuery.find();
             } catch (ParseException e) {
@@ -246,15 +275,15 @@ public class TrickleTabFragment extends Fragment {
 
                 for (int i = 0; i < parseRelationDrops.size(); i++) {
                     DropItem dropItemRelation = new DropItem();
-
                     dropItemRelation.setObjectId(parseRelationDrops.get(i).getObjectId());
-
                     hasRelationList.add(dropItemRelation);
                 }
 
                 asyncFilterDrops(hasRelationList, allDropsList);
+//                Log.d(TAG, "HasRelationList = " + hasRelationList.size());
             }
             return hasRelationList;
+
         }
 
         //Async to filter the Drops, removing the Drops that the currentUser has created or completed
@@ -273,22 +302,57 @@ public class TrickleTabFragment extends Fragment {
             }
 
             trickleTabInteractionList = allDropsList;
+            Log.d(TAG, "Filtered list = " + trickleTabInteractionList.size());
         }
 
         //After Relation query finishes
         @Override
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
 
-            mWaveSwipeRefreshLayout.setRefreshing(false);
-//            mEndlessListener.reset();
+            //If pull to refresh caused this chain, end the refresh and reset the listener
+            if (refresh) {
+                mWaveSwipeRefreshLayout.setRefreshing(false);
+                mEndlessListener.reset(1, 0, true);
+                Log.d(TAG, "Page after reset = " + page);
+            }
 
+            //If scroll caused this chain, notify data changed to show the new data
             if(page != 0) {
                 mTrickleAdapter.notifyDataSetChanged();
+
+            //Otherwise update the recyclerView
             } else {
                 updateRecyclerView(allDropsList);
             }
         }
     }
+
+    //Default update RecyclerView method used when activity is created. Only shows 10 items until scrolled
+    private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
+        Log.d(TAG, "Displayed list = " + filteredDropList.size());
+
+        if (filteredDropList.isEmpty()) {
+            mTrickleRecyclerView.setVisibility(View.GONE);
+            trickleEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mTrickleRecyclerView.setVisibility(View.VISIBLE);
+            trickleEmptyView.setVisibility(View.GONE);
+        }
+
+        //Alpha animation
+        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mTrickleAdapter);
+        mTrickleRecyclerView.setAdapter(alphaAdapter);
+        alphaAdapter.setDuration(1000);
+
+        //Alpha and scale animation
+//        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
+//        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
+//        mTrickleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
+//        scaleAdapter.setDuration(500);
+    }
+
 
     public void loadSavedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -355,36 +419,5 @@ public class TrickleTabFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //Default update RecyclerView method used when activity is created. Only shows 10 items until scrolled
-    private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
-        Log.d("KEVIN", "TRICKLE LIST SIZE: " + filteredDropList.size());
-
-        if (filteredDropList.isEmpty()) {
-            mTrickleRecyclerView.setVisibility(View.GONE);
-            trickleEmptyView.setVisibility(View.VISIBLE);
-        }
-        else {
-            mTrickleRecyclerView.setVisibility(View.VISIBLE);
-            trickleEmptyView.setVisibility(View.GONE);
-        }
-
-        //Alpha animation
-        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
-        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mTrickleAdapter);
-        mTrickleRecyclerView.setAdapter(alphaAdapter);
-        alphaAdapter.setDuration(1000);
-
-        //Alpha and scale animation
-//        mTrickleAdapter = new DropAdapter(getActivity(), filteredDropList, "trickle");
-//        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(mTrickleAdapter);
-//        mTrickleRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-//        scaleAdapter.setDuration(500);
-    }
-
-    //OnScroll RecyclerView method. Will add the next 10 items upon scroll and maintain current view
-    public void updateRecyclerViewOnScroll() {
-        mTrickleAdapter.notifyDataSetChanged();
     }
 }
