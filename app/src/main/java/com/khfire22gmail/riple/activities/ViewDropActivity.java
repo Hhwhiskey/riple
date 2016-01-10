@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -147,6 +148,8 @@ public class ViewDropActivity extends AppCompatActivity {
         toolBar.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                Vibrator vb = (Vibrator) ViewDropActivity.this.getSystemService(ViewDropActivity.VIBRATOR_SERVICE);
+                vb.vibrate(5);
                 if (mTabName.equals(drop)) {
                     showDropMenu();
                 } else {
@@ -207,9 +210,10 @@ public class ViewDropActivity extends AppCompatActivity {
                         @Override
                         public void done(byte[] data, ParseException e) {
                             if (e == null) {
+
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 1000, 1000, true);
-                                authorProfilePictureView.setImageBitmap(bmp);
+                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                authorProfilePictureView.setImageBitmap(resized);
                             }
                         }
                     });

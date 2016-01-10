@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.khfire22gmail.riple.fragments.FriendsTabFragment;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
+import com.khfire22gmail.riple.fragments.FriendsTabFragment;
 import com.khfire22gmail.riple.fragments.RipleTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
 
@@ -26,7 +26,6 @@ public class MainViewPagerAdapter extends FragmentStatePagerAdapter{
         super(fm);
         this.Titles = mTitles;
         this.NumbOfTabs = mNumbOfTabsumb;
-
     }
 
     //This method return the fragment for the every position in the View Pager

@@ -51,7 +51,7 @@ public class TrickleTabFragment extends Fragment {
 
     private static final String TAG = "TrickleTabFragment";
 
-//    public static final String TAG = TrickleTabFragment.class.getSimpleName();
+    //    public static final String TAG = TrickleTabFragment.class.getSimpleName();
     private ListView mListview;
     private PopupWindow popupWindow;
     private LayoutInflater layoutInflater;
@@ -86,6 +86,7 @@ public class TrickleTabFragment extends Fragment {
         LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask();
         loadAllDropsTask.execute();
 
+
         //Scroll Query
         mTrickleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
             @Override
@@ -110,7 +111,6 @@ public class TrickleTabFragment extends Fragment {
     }
 
     /*Get all of the currentUser hasRelation
-
      */
 
     //All Drops Async
@@ -142,19 +142,26 @@ public class TrickleTabFragment extends Fragment {
         protected ArrayList<DropItem> doInBackground(Void... params) {
             final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
 
-            int queryLimit = 10;
+            // Limit of Drops to get from Parse and the
+            int queryLimit = 25;
+            // Amount of Drops to skip, activated with the onScroll constructor
             int skipNumber = 0;
-
+            // If called with onScroll constructor
+            // do some logic to determine the
+            // amount of Drops to skip
             if (page != 0) {
                 int pageMultiplier = page - 1;
-                skipNumber = pageMultiplier * 10;
+                skipNumber = pageMultiplier * queryLimit;
+            // Otherwise, clear the list, because this is a default(refresh) query
             }else {
                 allDropsList.clear();
             }
 
             dropQuery.orderByDescending("createdAt");
             dropQuery.include("authorPointer");
+            // Set the query limit
             dropQuery.setLimit(queryLimit);
+            // Set the skip amount with logic above
             dropQuery.setSkip(skipNumber);
             try {
                 listFromParse = dropQuery.find();
@@ -177,8 +184,11 @@ public class TrickleTabFragment extends Fragment {
                         public void done(byte[] data, ParseException e) {
                             if (e == null) {
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                dropItemAll.setParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                dropItemAll.setParseProfilePicture(resized);
+//                                if (bmp != null) {
+//                                    bmp.recycle();
+//                                }
                             }
                         }
                     });
@@ -203,11 +213,11 @@ public class TrickleTabFragment extends Fragment {
                 //Comment Count
                 dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
 
-                allDropsList.add(dropItemAll);
-//                Log.d(TAG, "AllDropsList = " + allDropsList.size());
 
+                allDropsList.add(dropItemAll);
             }
 
+            Log.d(TAG, "allDropsList = " + allDropsList.size());
             return allDropsList;
         }
 
@@ -271,6 +281,8 @@ public class TrickleTabFragment extends Fragment {
 
             hasRelationList.clear();
 
+            //If relation Drops from Parse is not empty, set their objetIds and add them to the
+            //hasRelationList
             if (!parseRelationDrops.isEmpty()) {
 
                 for (int i = 0; i < parseRelationDrops.size(); i++) {
@@ -280,8 +292,9 @@ public class TrickleTabFragment extends Fragment {
                 }
 
                 asyncFilterDrops(hasRelationList, allDropsList);
-//                Log.d(TAG, "HasRelationList = " + hasRelationList.size());
+
             }
+            Log.d(TAG, "HasRelationList = " + hasRelationList.size());
             return hasRelationList;
 
         }
@@ -302,7 +315,7 @@ public class TrickleTabFragment extends Fragment {
             }
 
             trickleTabInteractionList = allDropsList;
-            Log.d(TAG, "Filtered list = " + trickleTabInteractionList.size());
+//            Log.d(TAG, "DisplayedList = " + trickleTabInteractionList.size());
         }
 
         //After Relation query finishes
@@ -318,18 +331,21 @@ public class TrickleTabFragment extends Fragment {
 
             //If scroll caused this chain, notify data changed to show the new data
             if(page != 0) {
+                Log.d(TAG, "onScrollSize = " + allDropsList.size());
                 mTrickleAdapter.notifyDataSetChanged();
 
-            //Otherwise update the recyclerView
+                //Otherwise update the recyclerView
             } else {
+                Log.d(TAG, "Refresh size = " + allDropsList.size());
                 updateRecyclerView(allDropsList);
+
             }
         }
     }
 
     //Default update RecyclerView method used when activity is created. Only shows 10 items until scrolled
     private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
-        Log.d(TAG, "Displayed list = " + filteredDropList.size());
+
 
         if (filteredDropList.isEmpty()) {
             mTrickleRecyclerView.setVisibility(View.GONE);

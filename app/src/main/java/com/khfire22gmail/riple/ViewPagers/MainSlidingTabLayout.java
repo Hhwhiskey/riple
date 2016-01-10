@@ -54,6 +54,8 @@ import com.khfire22gmail.riple.R;
  * providing the layout ID of your custom layout.
  */
 public class MainSlidingTabLayout extends HorizontalScrollView {
+
+
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
      * {@link #setCustomTabColorizer(TabColorizer)}.
@@ -266,7 +268,7 @@ public class MainSlidingTabLayout extends HorizontalScrollView {
         }
     }
 
-    private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
+    public class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
         private int mScrollState;
 
         @Override

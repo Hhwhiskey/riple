@@ -188,8 +188,8 @@ public class ViewUserActivity extends AppCompatActivity {
                         public void done(byte[] data, ParseException e) {
                             if (e == null) {
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 1000, 1000, true);
-                                profilePictureView.setImageBitmap(bmp);
+                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 1000, 1000, true);
+                                profilePictureView.setImageBitmap(resized);
                             }
                         }
                     });
@@ -252,8 +252,8 @@ public class ViewUserActivity extends AppCompatActivity {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(resized);
                                         updateRecyclerView(viewUserList);
                                     }
                                 }

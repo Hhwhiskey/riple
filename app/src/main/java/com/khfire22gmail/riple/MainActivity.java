@@ -151,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tabs.setViewPager(mPager);
     }
 
+
+
     public void createDropDialog() {
 
         final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);

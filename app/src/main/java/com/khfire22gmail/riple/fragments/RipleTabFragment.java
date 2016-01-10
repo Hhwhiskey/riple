@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
@@ -39,7 +37,6 @@ import com.parse.ParseUser;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
@@ -73,6 +70,7 @@ public class RipleTabFragment extends Fragment {
     private List<ParseObject> mParseList;
     private EndlessRecyclerViewOnScrollListener mEndlessListener;
     private static String TAG = RipleTabFragment.class.getSimpleName();
+    private boolean visible;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -159,6 +157,12 @@ public class RipleTabFragment extends Fragment {
             }
         });
 
+        visible = getUserVisibleHint();
+
+        if (visible) {
+            ripleTip();
+        }
+
         return view;
     }
 
@@ -176,6 +180,8 @@ public class RipleTabFragment extends Fragment {
             super.onPostExecute(result);
         }
     }
+
+
 
     public void loadSavedPreferences() {
         android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -388,8 +394,8 @@ public class RipleTabFragment extends Fragment {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(resized);
 //                                        updateRecyclerViewOnScroll();
                                     }
                                 }
@@ -470,22 +476,36 @@ public class RipleTabFragment extends Fragment {
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
         }
 
-        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
-        if (parseProfilePicture != null) {
-            Glide.with(this)
-                    .load(parseProfilePicture.getUrl())
-                    .crossFade()
-                    .fallback(R.drawable.ic_user_default)
-                    .error(R.drawable.ic_user_default)
-                    .signature(new StringSignature(UUID.randomUUID().toString()))
-                    .into(profilePictureView);
-        } else {
-            if (facebookId != null) {
-                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
-                new DownloadImageTask(profilePictureView)
-                        .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
+        parseProfilePicture.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] data, ParseException e) {
+                if (e == null) {
+                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+
+                    profilePictureView.setImageBitmap(resized);
+                }
             }
-        }
+        });
+
+
+
+//        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
+//        if (parseProfilePicture != null) {
+//            Glide.with(this)
+//                    .load(parseProfilePicture.getUrl())
+//                    .crossFade()
+//                    .fallback(R.drawable.ic_user_default)
+//                    .error(R.drawable.ic_user_default)
+//                    .signature(new StringSignature(UUID.randomUUID().toString()))
+//                    .into(profilePictureView);
+//        } else {
+//            if (facebookId != null) {
+//                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
+//                new DownloadImageTask(profilePictureView)
+//                        .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
+//            }
+//        }
 
          String userName =currentUser.getString("displayName");
 
@@ -535,6 +555,9 @@ public class RipleTabFragment extends Fragment {
         if (ripleCount > 1299) {
             ripleRank = ("\"Saint\"");//8
         }
+
+        //Ellen, Oprah, Zuck, Gates, MLK Jr
+
         if (ripleCount > 2499) {
             ripleRank = ("\"Gandhi\"");//9
         }

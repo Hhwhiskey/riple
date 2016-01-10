@@ -22,11 +22,19 @@ public abstract class EndlessRecyclerViewOnScrollListener extends RecyclerView.O
         this.mLinearLayoutManager = linearLayoutManager;
     }
 
+    public void reset() {
+        mLoading = false;
+        mPreviousTotal = 0;
+        currentPage = 0;
+    }
+
     public void reset(int page, int previousTotal, boolean loading) {
         this.currentPage = page;
         this.mPreviousTotal = previousTotal;
         this.mLoading = loading;
     }
+
+
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

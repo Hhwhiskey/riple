@@ -89,7 +89,6 @@ public class CropActivity extends AppCompatActivity {
                 saveDialog.setIndeterminate(true);
                 saveDialog.setCanceledOnTouchOutside(false);
                 saveDialog.show();
-
             }
         });
     }
@@ -107,6 +106,7 @@ public class CropActivity extends AppCompatActivity {
                             saveDialog.dismiss();
                             Intent intent = new Intent(CropActivity.this, MainActivity.class);
                             startActivity(intent);
+
                         }
                     });
                 }
