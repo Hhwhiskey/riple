@@ -15,7 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
+import com.khfire22gmail.riple.utils.Constants;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -53,50 +56,48 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     private void viewOtherUser(int position) {
 
-        String mClickedUserId = (data.get(position).getCommenterId());
-        String mClickedUserName = (data.get(position).getCommenterName());
+        String clickedUserId = (data.get(position).getCommenterId());
+        String clickedUserName = (data.get(position).getCommenterName());
+        String clickedUserRank = (data.get(position).getCommenterRank());
+        String clickedUserRipleCount = (data.get(position).getCommenterRipleCount());
 
-        Log.d("sCommentViewUser", "Clicked User's userObjectId = " + mClickedUserId);
-        Log.d("sCommentViewUser", "Clicked User's clickedUserName = " + mClickedUserName);
+        Log.d("sCommentViewUser", "Clicked User's userObjectId = " + clickedUserId);
+        Log.d("sCommentViewUser", "Clicked User's clickedUserName = " + clickedUserName);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-        intent.putExtra("clickedUserId", mClickedUserId);
-        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_ID, clickedUserId);
+        intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
+        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+
         mContext.startActivity(intent);
+    }
+
+    private void messageTheAuthor(int position) {
+
+        String author = data.get(position).getCommenterId();
+
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("objectId", author);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> user, ParseException e) {
+                if (e == null) {
+                    Intent messageIntent = new Intent(mContext, MessagingActivity.class);
+                    messageIntent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
+                    mContext.startActivity(messageIntent);
+                } else {
+                    Toast.makeText(mContext,
+                            "Error finding that user",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 
     @Override
     public void onBindViewHolder(CommentViewHolder viewHolder, final int position) {
         viewHolder.update(position);
-
-        /*viewHolder.commenterParseProfilePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                viewOtherUser(position);
-            }
-        });
-
-        viewHolder.commenterName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewOtherUser(position);
-            }
-        });
-
-        viewHolder.commentText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewOtherUser(position);
-            }
-        });
-
-        viewHolder.createdAt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewOtherUser(position);
-            }
-        });*/
     }
 
     public void reportCommentAuthor(final int position) {
@@ -205,7 +206,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         public void showCommentMenu() {
 
-            CharSequence todoDrop[] = new CharSequence[]{"Report"};
+            CharSequence todoDrop[] = new CharSequence[]{"Message the Commenter", "Report"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
             builder.setTitle("Comment Menu");
@@ -213,6 +214,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                 @Override
                 public void onClick(DialogInterface dialog, int selected) {
                     if (selected == 0) {
+                        messageTheAuthor(getAdapterPosition());
+                    } if (selected == 1) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Comment Author");
                         builderVerify.setMessage("Does this user or comment contain spam or inappropriate/offensive material?");

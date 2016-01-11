@@ -31,6 +31,7 @@ import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
+import com.khfire22gmail.riple.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -65,6 +66,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private boolean storeImage;
     private boolean stop;
     private Context applicationContext;
+    private static final String TAG = "DropAdapter";
 
     public DropAdapter() {
 //        this.data =
@@ -277,87 +279,61 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     }
 
     public void viewDrop(int position) {
-        String mDropObjectId = (data.get(position).getObjectId());
-        String mAuthorId = (data.get(position).getAuthorId());
-        String mAuthorName = (data.get(position).getAuthorName());
-        String mAuthorRank = (data.get(position).getAuthorRank());
-        String mDropDescription = (data.get(position).getDescription());
-        String mRipleCount = (data.get(position).getRipleCount());
-        String mCommentCount = (data.get(position).getCommentCount());
-        String mPosition = String.valueOf((data.get(position)));
-        Date mCreatedAt = (data.get(position).getCreatedAt());
+        String dropObjectId = (data.get(position).getObjectId());
+        String authorId = (data.get(position).getAuthorId());
+        String authorName = (data.get(position).getAuthorName());
+        String authorRank = (data.get(position).getAuthorRank());
+        String authorRipleCount = (data.get(position).getAuthorRipleCount());
+        String dropDescription = (data.get(position).getDescription());
+        String ripleCount = (data.get(position).getRipleCount());
+        String commentCount = (data.get(position).getCommentCount());
+//        String mPosition = String.valueOf((data.get(position)));
+        Date createdAt = (data.get(position).getCreatedAt());
 
-        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
-        Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
-        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + mAuthorName);
-        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
-        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
-        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
-        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
+        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + dropObjectId);
+        Log.d("sViewDropAcitivty", "Send drop's authorId = " + authorId);
+        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + authorName);
+        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + dropDescription);
+        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + ripleCount);
+        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + commentCount);
+        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + createdAt);
 
         Intent intent = new Intent(mContext, ViewDropActivity.class);
-        intent.putExtra("dropObjectId", mDropObjectId);
-        intent.putExtra("authorId", mAuthorId);
-        intent.putExtra("authorRank", mAuthorRank);
-        intent.putExtra("commenterName", mAuthorName);
-        intent.putExtra("dropDescription", mDropDescription);
-        intent.putExtra("ripleCount", mRipleCount);
-        intent.putExtra("commentCount", mCommentCount);
-        intent.putExtra("createdAt", mCreatedAt);
+        intent.putExtra("dropObjectId", dropObjectId);
+        intent.putExtra("authorId", authorId);
+        intent.putExtra("authorRank", authorRank);
+        intent.putExtra("authorRipleCount", authorRipleCount);
+        intent.putExtra("commenterName", authorName);
+        intent.putExtra("dropDescription", dropDescription);
+        intent.putExtra("ripleCount", ripleCount);
+        intent.putExtra("commentCount", commentCount);
+        intent.putExtra("createdAt", createdAt);
         intent.putExtra("mTabName", mTabName);
-        intent.putExtra("mPosition", mPosition);
+//        intent.putExtra("mPosition", mPosition);
 
         mContext.startActivity(intent);
-
     }
 
     // onClick action for viewing other user
     private void viewOtherUser(int position) {
 
-        String mClickedUserId = (data.get(position).getAuthorId());
-        String mClickedUserName = (data.get(position).getAuthorName());
+        String clickedUserId = (data.get(position).getAuthorId());
+        String clickedUserName = (data.get(position).getAuthorName());
+        String clickedUserRank = (data.get(position).getAuthorRank());
+        String clickedUserRipleCount = (data.get(position).getAuthorRipleCount());
 
-        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
-        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+        Log.d(TAG, "Clicked User's Id = " + clickedUserId);
+        Log.d(TAG, "Clicked User's Name = " + clickedUserName);
+        Log.d(TAG, "Clicked User's RipleCount = " + clickedUserRipleCount);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-        intent.putExtra("clickedUserId", mClickedUserId);
-        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_ID, clickedUserId);
+        intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
+        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+
         mContext.startActivity(intent);
     }
-
-//    private void viewCompletedBy(int position) {
-//
-//        String mDropObjectId = (data.get(position).getObjectId());
-//        String mAuthorId = (data.get(position).getAuthorId());
-//        String mAuthorName = (data.get(position).getAuthorName());
-//        String mAuthorRank = (data.get(position).getAuthorRank());
-//        String mDropDescription = (data.get(position).getDescription());
-//        String mRipleCount = (data.get(position).getRipleCount());
-//        String mCommentCount = (data.get(position).getCommentCount());
-//        Date mCreatedAt = (data.get(position).getCreatedAt());
-//
-//        Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + mDropObjectId);
-//        Log.d("sViewDropAcitivty", "Send drop's authorId = " + mAuthorId);
-//        Log.d("sViewDropAcitivty", "Send drop's commenterName = " + mAuthorName);
-//        Log.d("sViewDropAcitivty", "Send drop's dropDescription = " + mDropDescription);
-//        Log.d("sViewDropAcitivty", "Send drop's ripleCount = " + mRipleCount);
-//        Log.d("sViewDropAcitivty", "Send drop's commentCount = " + mCommentCount);
-//        Log.d("sViewDropAcitivty", "Send drop's createdAt = " + mCreatedAt);
-//
-//        Intent intent = new Intent(mContext, CompletedActivity.class);
-//        intent.putExtra("dropObjectId", mDropObjectId);
-//        intent.putExtra("authorId", mAuthorId);
-//        intent.putExtra("commenterName", mAuthorName);
-//        intent.putExtra("authorRank", mAuthorRank);
-//        intent.putExtra("dropDescription", mDropDescription);
-//        intent.putExtra("ripleCount", mRipleCount);
-//        intent.putExtra("commentCount", mCommentCount);
-//        intent.putExtra("createdAt", mCreatedAt);
-//
-//        mContext.startActivity(intent);
-//    }
-
 
     private void messageTheAuthor(int position) {
 

@@ -11,15 +11,15 @@ public class CompletedByItem {
     public String dropObjectId;
     public String displayName;
     public Bitmap parseProfilePicture;
-    public int userRipleCount;
+    public String userRipleCount;
     public String userRank;
 
 
-    public int getUserRipleCount() {
+    public String getUserRipleCount() {
         return userRipleCount;
     }
 
-    public void setUserRipleCount(int userRipleCount) {
+    public void setUserRipleCount(String userRipleCount) {
         this.userRipleCount = userRipleCount;
     }
 

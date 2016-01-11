@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
+import com.khfire22gmail.riple.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -98,15 +99,20 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     private void viewOtherUser(int position) {
 
-        String mClickedUserId = (data.get(position).getUserObjectId());
-        String mClickedUserName = (data.get(position).getDisplayName());
+        String clickedUserId = (data.get(position).getUserObjectId());
+        String clickedUserName = (data.get(position).getDisplayName());
+        String clickedUserRank = (data.get(position).getUserRank());
+        String clickedUserRipleCount = (data.get(position).getUserRipleCount());
 
-        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
-        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+        Log.d("sDropViewUser", "Clicked User's Id = " + clickedUserId);
+        Log.d("sDropViewUser", "Clicked User's Name = " + clickedUserName);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-        intent.putExtra("clickedUserId", mClickedUserId);
-        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_ID, clickedUserId);
+        intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
+        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+
         mContext.startActivity(intent);
     }
 
@@ -155,6 +161,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             otherProfilePicture.setOnClickListener(this);
+            otherProfilePicture.setOnLongClickListener(this);
         }
         //Update item based on position
         public void update(int position){

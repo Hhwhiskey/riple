@@ -124,8 +124,8 @@ public class CompletedFragment extends Fragment {
                                         public void done(byte[] data, ParseException e) {
                                             if (e == null) {
                                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                                completedByItem.setParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                                completedByItem.setParseProfilePicture(resized);
                                                 updateRecyclerView(completedByList);
                                             }
                                         }
@@ -135,7 +135,7 @@ public class CompletedFragment extends Fragment {
                                 completedByItem.setUserObjectId(list.get(i).getObjectId());
                                 completedByItem.setDisplayName((String) list.get(i).get("displayName"));
                                 completedByItem.setUserRank(list.get(i).getString("userRank"));
-                                completedByItem.setUserRipleCount(list.get(i).getInt("userRipleCount"));
+                                completedByItem.setUserRipleCount(String.valueOf(list.get(i).getInt("userRipleCount")));
 
 
                                 completedByList.add(completedByItem);

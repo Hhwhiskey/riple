@@ -18,12 +18,22 @@ public class DropItem {
     public String authorId;
     public String authorName;
     public String authorRank;
+    public String authorRipleCount;
     public String description;
     public String comment;
     public String ripleCount;
     public String commentCount;
     public ParseObject drop;
     public Bitmap parseProfilePicture;
+
+
+    public String getAuthorRipleCount() {
+        return authorRipleCount;
+    }
+
+    public void setAuthorRipleCount(String authorRipleCount) {
+        this.authorRipleCount = authorRipleCount;
+    }
 
     public String getAuthorRank() {
         return authorRank;

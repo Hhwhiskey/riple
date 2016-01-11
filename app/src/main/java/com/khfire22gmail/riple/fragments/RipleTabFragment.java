@@ -23,6 +23,7 @@ import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -237,11 +238,15 @@ public class RipleTabFragment extends Fragment {
     private void viewCurrentUserProfileExtra() {
 
         String currentUserId = currentUser.getObjectId();
-        String currentUserName = currentUser.getString("displayName");
+        String currentUserDisplayName = currentUser.getString("displayName");
+        String currentUserRank = currentUser.getString("userRank");
+        String currentUserRipleCount = String.valueOf(currentUser.getInt("userRipleCount"));
 
         Intent intent = new Intent(getActivity(), ViewUserActivity.class);
-        intent.putExtra("clickedUserId", currentUserId);
-        intent.putExtra("clickedUserName",currentUserName);
+        intent.putExtra(Constants.CLICKED_USER_ID, currentUserId);
+        intent.putExtra(Constants.CLICKED_USER_NAME, currentUserDisplayName);
+        intent.putExtra(Constants.CLICKED_USER_RANK, currentUserRank);
+        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, currentUserRipleCount);
         getActivity().startActivity(intent);
     }
 
@@ -292,8 +297,8 @@ public class RipleTabFragment extends Fragment {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        dropItem.setParseProfilePicture(resized);
                                         updateRecyclerView(mOnScrollListFromFromParse);
                                     }
                                 }
@@ -306,6 +311,8 @@ public class RipleTabFragment extends Fragment {
                         dropItem.setAuthorId(authorData.getObjectId());
                         //Author Rank
                         dropItem.setAuthorRank(authorData.getString("userRank"));
+                        //Author Riple Count
+                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId
@@ -481,7 +488,7 @@ public class RipleTabFragment extends Fragment {
             public void done(byte[] data, ParseException e) {
                 if (e == null) {
                     Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
 
                     profilePictureView.setImageBitmap(resized);
                 }
@@ -530,40 +537,73 @@ public class RipleTabFragment extends Fragment {
 
     public void updateRipleCount(ParseObject userObject) {
 
-        String ripleRank = "\"Drop\"";
+        String ripleRank = "\"Drop\"";//1
 
         int ripleCount = userObject.getInt("ripleCount");
 
-        if (ripleCount > 19) {
+        if (ripleCount > 4) {
             ripleRank = ("\"Volunteer\"");//2
         }
-        if (ripleCount > 39) {
-            ripleRank = ("\"Do-Gooder\"");//3
+        if (ripleCount > 9) {
+            ripleRank = ("\"Contributor\"");//3
+
+        }if (ripleCount > 19) {
+            ripleRank = ("\"Do-Gooder\"");//4
+
+        }if (ripleCount > 39) {
+            ripleRank = ("\"Kind\"");//5
         }
         if (ripleCount > 79) {
-            ripleRank = ("\"Contributor\"");//4
+            ripleRank = ("\"Generous\"");//6
         }
         if (ripleCount > 159) {
-            ripleRank = ("\"Patron\"");//5
+            ripleRank = ("\"Patron\"");//7
         }
         if (ripleCount > 319) {
-            ripleRank = ("\"Beneficent\"");//6
+            ripleRank = ("\"Benevolent\"");//8
         }
         if (ripleCount > 639) {
-            ripleRank = ("\"Humanitarian\"");//7
+            ripleRank = ("\"Humanitarian\"");//9
         }
-        if (ripleCount > 1299) {
-            ripleRank = ("\"Saint\"");//8
+        if (ripleCount > 1279) {
+            ripleRank = ("\"Altruist\"");//10
         }
-
-        //Ellen, Oprah, Zuck, Gates, MLK Jr
-
-        if (ripleCount > 2499) {
-            ripleRank = ("\"Gandhi\"");//9
+        if (ripleCount > 2559) {
+            ripleRank = ("\"Saint\"");//11
         }
         if (ripleCount > 4999) {
-            ripleRank = ("\"Mother Teresa\"");//10
+            ripleRank = ("\"Riple Master\"");//12
         }
+
+        if (ripleCount > 9999) {
+            ripleRank = ("\"2nd Riple Master\"");//13
+        }
+        if (ripleCount > 14999) {
+            ripleRank = ("\"3rd Riple Master\"");//14
+        }
+        if (ripleCount > 19999) {
+            ripleRank = ("\"4th Riple Master\"");//15
+        }
+        if (ripleCount > 24999) {
+            ripleRank = ("\"5th Riple Master\"");//16
+        }
+        if (ripleCount > 29999) {
+            ripleRank = ("\"6th Riple Master\"");//17
+        }
+        if (ripleCount > 34999) {
+            ripleRank = ("\"7th Riple Master\"");//18
+        }
+        if (ripleCount > 39999) {
+            ripleRank = ("\"8th Riple Master\"");//19
+        }
+        if (ripleCount > 44999) {
+            ripleRank = ("\"9th Riple Master\"");//20
+        }
+        if (ripleCount > 49999) {
+            ripleRank = ("\"10th Riple Master\"");//21
+        }
+
+
 
         // Save the currentUser ripleCount and rank to the user table
         currentUser.put("userRipleCount", ripleCount);

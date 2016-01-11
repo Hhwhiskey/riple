@@ -200,6 +200,8 @@ public class TrickleTabFragment extends Fragment {
                 dropItemAll.setAuthorId(authorData.getObjectId());
                 //Author Rank
                 dropItemAll.setAuthorRank(authorData.getString("userRank"));
+                //Author Riple Count
+                dropItemAll.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
 
                 //Drop Data///////////////////////////////////////////////////////////////
                 //DropObjectId

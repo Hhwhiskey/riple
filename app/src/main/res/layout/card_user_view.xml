@@ -54,8 +54,8 @@
                 android:textStyle="bold"
                 android:layout_toLeftOf="@+id/other_riple_count"
                 android:layout_toStartOf="@+id/other_riple_count"
-                android:paddingLeft="8dp"
-                android:paddingTop="8dp"/>
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="8dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -88,8 +88,8 @@
                 android:layout_below="@+id/other_display_name"
                 android:layout_alignRight="@+id/other_display_name"
                 android:layout_alignEnd="@+id/other_display_name"
-                android:paddingLeft="8dp"
-                android:paddingBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                />
 
 
         </RelativeLayout>

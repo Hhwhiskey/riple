@@ -15,7 +15,26 @@ public class Constants {
     public static final String USER2 = "user2";
     public static final String USER_ID = "userId";
     public static final String CHANNELS = "channels";
-    public static final String USER_REPORT_COUNT = "UserReportCount";
+
+    //Intent Extra for User
+    public static final String CLICKED_USER_ID = "clickedUserId";
+    public static final String CLICKED_USER_NAME = "clickedUserName";
+    public static final String CLICKED_USER_RANK = "clickedUserRank";
+    public static final String CLICKED_USER_RIPLE_COUNT = "clickedUserRipleCount";
+
+    //Intent Extra for Drop
+    public static final String CLICKED_AUTHOR_NAME = "authorName";
+    public static final String CLICKED_DROP_ID = "dropObjectId";
+    public static final String CLICKED_DROP_DESCRIPTION = "dropDescription";
+    public static final String CLICKED_DROP_RIPLE_COUNT = "ripleCount";
+    public static final String CLICKED_DROP_COMMENT_COUNT = "commentCount";
+    public static final String CLICKED_DROP_CREATED_AT = "createdAt";
+    public static final String CLICKED_DROP_TAB_NAME = "mTabName";
+    public static final String CLICKED_DROP_POSITION = "mPosition";
+
+
+
+
 
 
     //Push Constants

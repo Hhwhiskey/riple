@@ -35,6 +35,7 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.ViewPagers.DropPagerAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.khfire22gmail.riple.model.CompletedByAdapter;
+import com.khfire22gmail.riple.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -57,7 +58,6 @@ public class ViewDropActivity extends AppCompatActivity {
     private List<CommentItem> mCommentList;
     private CompletedByAdapter mCommenterAdapter;
     private RecyclerView.Adapter mCommentAdapter;
-    private String mDescription;
     private String currentDrop;
     private String mAuthorId;
     private String mAuthorName;
@@ -91,6 +91,7 @@ public class ViewDropActivity extends AppCompatActivity {
     private String displayName;
     Context mContext;
     private ParseUser currentUser;
+    private String mAuthorRipleCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,8 +115,9 @@ public class ViewDropActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
         mAuthorId = intent.getStringExtra("authorId");
-        mAuthorRank = intent.getStringExtra("authorRank");
         mAuthorName = intent.getStringExtra("commenterName");
+        mAuthorRank = intent.getStringExtra("authorRank");
+        mAuthorRipleCount = intent.getStringExtra("authorRipleCount");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
@@ -127,7 +129,7 @@ public class ViewDropActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mAuthorId = " + mAuthorId);
         Log.d("rDropExtra", "mAuthorName = " + mAuthorName);
         Log.d("rDropExtra", "mAuthorFacebookId = " + mFacebookId);
-        Log.d("rDropExtra", "mDropDescription = " + mDescription);
+        Log.d("rDropExtra", "mDropDescription = " + mDropDescription);
         Log.d("rDropExtra", "mRipleCount = " + mRipleCount);
         Log.d("rDropExtra", "mCommentCount = " + mCommentCount);
         Log.d("rDropExtra", "mCreatedAt = " + mCreatedAt);
@@ -240,15 +242,19 @@ public class ViewDropActivity extends AppCompatActivity {
     // Allow user to view the Drop's Author's profile
     private void viewOtherUser(String mAuthorId, String mAuthorName) {
 
-        String mClickedUserId = mAuthorId;
-        String mClickedUserName = mAuthorName;
+//        String mClickedUserId = mAuthorId;
+//        String mClickedUserName = mAuthorName;
+//        String clickedUserRank = mAuthorRank;
+//        String clickedUserRipleCount = mAuthor
 
-        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
-        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+//        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
+//        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
 
         Intent intent = new Intent(this, ViewUserActivity.class);
-        intent.putExtra("clickedUserId", mClickedUserId);
-        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_ID, mAuthorId);
+        intent.putExtra(Constants.CLICKED_USER_NAME, mAuthorName);
+        intent.putExtra(Constants.CLICKED_USER_RANK, mAuthorRank);
+        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, mAuthorRipleCount);
         this.startActivity(intent);
     }
 
@@ -366,7 +372,7 @@ public class ViewDropActivity extends AppCompatActivity {
     public void shareWithOther() {
         String displayName = currentUser.getString("displayName");
         String shareAuthor = mAuthorName;
-        String shareDescription = mDescription;
+        String shareDescription = mDropDescription;
 //        Bitmap sharedImage = data.get(position).getCommenterParseProfilePicture();
 
         //Share to Other

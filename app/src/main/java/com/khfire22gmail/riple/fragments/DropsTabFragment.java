@@ -179,6 +179,8 @@ public class DropsTabFragment extends Fragment {
                         dropItem.setAuthorId(authorData.getObjectId());
                         //Author Rank
                         dropItem.setAuthorRank(authorData.getString("userRank"));
+                        //Author Riple Count
+                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId

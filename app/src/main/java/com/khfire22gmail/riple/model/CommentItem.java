@@ -17,9 +17,17 @@ public class CommentItem {
     public String commenterId;
     public String commenterName;
     public String commenterRank;
+    public String commenterRipleCount;
     public Bitmap commenterParseProfilePicture;
 
 
+    public String getCommenterRipleCount() {
+        return commenterRipleCount;
+    }
+
+    public void setCommenterRipleCount(String commenterRipleCount) {
+        this.commenterRipleCount = commenterRipleCount;
+    }
 
     public String getCommentObjectId() {
         return commentObjectId;

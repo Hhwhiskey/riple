@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
+import com.khfire22gmail.riple.utils.Constants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -58,15 +59,19 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     private void viewFriendProfile(int position) {
 
-        String mClickedUserId = (data.get(position).getFriendObjectId());
-        String mClickedUserName = (data.get(position).getFriendName());
+        String clickedUserId = (data.get(position).getFriendObjectId());
+        String clickedUserName = (data.get(position).getFriendName());
+        String clickedUserRank = (data.get(position).getRipleRank());
+        String clickedUserRipleCount = (data.get(position).getRipleCount());
 
-        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
-        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
+        Log.d("sDropViewUser", "Clicked User's Id = " + clickedUserId);
+        Log.d("sDropViewUser", "Clicked User's Name = " + clickedUserName);
 
         Intent intent = new Intent(mContext, ViewUserActivity.class);
-        intent.putExtra("clickedUserId", mClickedUserId);
-        intent.putExtra("clickedUserName", mClickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_ID, clickedUserId);
+        intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
+        intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
+        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
         mContext.startActivity(intent);
     }
 

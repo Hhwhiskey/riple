@@ -332,6 +332,9 @@ public class CommentFragment extends Fragment {
                         //Commenter Rank
                         commentItem.setCommenterRank((String) commenterData.get("userRank"));
 
+                        //Author Riple Count
+                        commentItem.setCommenterRipleCount(String.valueOf(commenterData.getInt("userRipleCount")));
+
                         //Comment Data/////////////////////////////////////////////////////////////
                         // Comment Id
                         commentItem.setCommentObjectId(list.get(i).getObjectId());

@@ -55,9 +55,10 @@ public class ViewUserActivity extends AppCompatActivity {
     private ParseFile parseProfilePicture;
     private ImageView profilePictureView;
     private TextView viewUserEmptyView;
-
-    // Added this to track current User's drop stuff
-    private ArrayList<DropItem> mCurrentUserDrops = null;
+    private String mClickedUserRank;
+    private int mClickedUserRipleCount;
+    private TextView authorRipleRank;
+    private TextView authorRipleCount;
 
 
     @Override
@@ -67,8 +68,19 @@ public class ViewUserActivity extends AppCompatActivity {
 
         ViewCompat.setTransitionName(findViewById(R.id.appbar_view_user), EXTRA_IMAGE);
 
+        // Instantiate name, rank, riple count and empty TVs and the RV
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
+
+        profilePictureView = (ImageView) findViewById(R.id.view_user_profile_picture);
+        authorRipleRank = (TextView) findViewById(R.id.view_user_rank);
+        authorRipleCount = (TextView) findViewById(R.id.view_user_ripleCount);
+
+        mViewUserRecyclerView = (RecyclerView) findViewById(R.id.view_user_recycler_view);
+        mViewUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        viewUserEmptyView = (TextView) findViewById(R.id.view_user_empty_view);
+        ////////////////////////////////////////////////////////////////////////////
 
         loadSavedPreferences();
 //        viewUserTip();
@@ -77,24 +89,33 @@ public class ViewUserActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mClickedUserId = intent.getStringExtra("clickedUserId");
         mClickedUserName = intent.getStringExtra("clickedUserName");
+        mClickedUserRank = intent.getStringExtra("clickedUserRank");
+        mClickedUserRipleCount = Integer.parseInt(intent.getStringExtra("clickedUserRipleCount"));
         Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
         Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
+        Log.d("rViewUser", "mClickedUserRipleCount = " + mClickedUserRipleCount);
+        Log.d("rViewUser", "mClickedUserRank = " + mClickedUserRank);
 
+        //Populate the viewed users data////////////////////////////////////
+
+        //Get viewedUsers parseProfilePicture and set it to imageView
         getViewedUserProfilePicture(mClickedUserId);
 
-        loadRipleItemsFromParse();
-
-        // Set collapsable toolbar picture and text
-        profilePictureView = (ImageView)findViewById(R.id.view_user_profile_picture);
-
+        //Set the name, rank and riple count of the viewed user
         collapsingToolbar.setTitle(mClickedUserName);
+        authorRipleRank.setText(mClickedUserRank);
 
-        mViewUserRecyclerView = (RecyclerView) findViewById(R.id.view_user_recycler_view);
-        mViewUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //If riple count = 1 use "Riple" otherwise, use "Riples"
+        if (mClickedUserRipleCount == 1) {
+            authorRipleCount.setText(mClickedUserRipleCount + " Riple");
+        } else {
+            authorRipleCount.setText(mClickedUserRipleCount + " Riples");
+        }
+        ////////////////////////////////////////////////////////////////////
 
-        viewUserEmptyView = (TextView) findViewById(R.id.view_user_empty_view);
+        loadUserActivityFromParse();
 
+        //Set hero image OCL
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +123,7 @@ public class ViewUserActivity extends AppCompatActivity {
             }
         });
 
+       //Set FAB onClick for messaging the user
         FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
         messageFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -188,7 +210,7 @@ public class ViewUserActivity extends AppCompatActivity {
                         public void done(byte[] data, ParseException e) {
                             if (e == null) {
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 1000, 1000, true);
+                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 500, 500, true);
                                 profilePictureView.setImageBitmap(resized);
                             }
                         }
@@ -199,8 +221,7 @@ public class ViewUserActivity extends AppCompatActivity {
     }
 
 
-
-    public void loadRipleItemsFromParse() {
+    public void loadUserActivityFromParse() {
 
         final ArrayList<DropItem> viewUserList = new ArrayList<>();
 
@@ -266,6 +287,8 @@ public class ViewUserActivity extends AppCompatActivity {
                         dropItem.setAuthorId(authorData.getObjectId());
                         //Author Rank
                         dropItem.setAuthorRank(authorData.getString("userRank"));
+                        //Author RipleCount
+                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
 
                         //Drop Data////////////////////////////////////////////////////////////////
                         //DropObjectId
@@ -301,8 +324,7 @@ public class ViewUserActivity extends AppCompatActivity {
         if (clickedUserList.isEmpty()) {
             mViewUserRecyclerView.setVisibility(View.GONE);
             viewUserEmptyView.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mViewUserRecyclerView.setVisibility(View.VISIBLE);
             viewUserEmptyView.setVisibility(View.GONE);
         }
