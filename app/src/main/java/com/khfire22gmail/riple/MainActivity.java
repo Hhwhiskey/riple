@@ -339,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                                     ParseUser.logOut();
                                                                     Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
                                                                     startActivity(intentLogout);
+                                                                    finish();
                                                                 }
                                                             }, 3000);
                                                         }

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -56,9 +57,11 @@ public class ViewUserActivity extends AppCompatActivity {
     private ImageView profilePictureView;
     private TextView viewUserEmptyView;
     private String mClickedUserRank;
-    private int mClickedUserRipleCount;
+    private String mClickedUserRipleCount;
     private TextView authorRipleRank;
     private TextView authorRipleCount;
+    private String stringTestVariable;
+    private ArrayList<DropItem> mViewUserDropList;
 
 
     @Override
@@ -66,9 +69,11 @@ public class ViewUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_user);
 
+        mViewUserDropList = new ArrayList<DropItem>();
+
         ViewCompat.setTransitionName(findViewById(R.id.appbar_view_user), EXTRA_IMAGE);
 
-        // Instantiate name, rank, riple count and empty TVs and the RV
+        // Instantiate name, rank, riple count and empty TVs, RV and layout manager
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.view_user_collapsing_tool_bar);
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 
@@ -76,8 +81,10 @@ public class ViewUserActivity extends AppCompatActivity {
         authorRipleRank = (TextView) findViewById(R.id.view_user_rank);
         authorRipleCount = (TextView) findViewById(R.id.view_user_ripleCount);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
         mViewUserRecyclerView = (RecyclerView) findViewById(R.id.view_user_recycler_view);
-        mViewUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mViewUserRecyclerView.setLayoutManager(layoutManager);
         mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
         viewUserEmptyView = (TextView) findViewById(R.id.view_user_empty_view);
         ////////////////////////////////////////////////////////////////////////////
@@ -90,7 +97,7 @@ public class ViewUserActivity extends AppCompatActivity {
         mClickedUserId = intent.getStringExtra("clickedUserId");
         mClickedUserName = intent.getStringExtra("clickedUserName");
         mClickedUserRank = intent.getStringExtra("clickedUserRank");
-        mClickedUserRipleCount = Integer.parseInt(intent.getStringExtra("clickedUserRipleCount"));
+        mClickedUserRipleCount = intent.getStringExtra("clickedUserRipleCount");
         Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
         Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
         Log.d("rViewUser", "mClickedUserRipleCount = " + mClickedUserRipleCount);
@@ -105,15 +112,18 @@ public class ViewUserActivity extends AppCompatActivity {
         collapsingToolbar.setTitle(mClickedUserName);
         authorRipleRank.setText(mClickedUserRank);
 
-        //If riple count = 1 use "Riple" otherwise, use "Riples"
-        if (mClickedUserRipleCount == 1) {
+        stringTestVariable = String.valueOf(1);
+
+        //If ripleCount == stringTestVariable(1)
+        if (mClickedUserRipleCount.equals(stringTestVariable)) {
             authorRipleCount.setText(mClickedUserRipleCount + " Riple");
         } else {
             authorRipleCount.setText(mClickedUserRipleCount + " Riples");
         }
         ////////////////////////////////////////////////////////////////////
 
-        loadUserActivityFromParse();
+        LoadUserActivityFromParse onCreateQuery = new LoadUserActivityFromParse();
+        onCreateQuery.runLoadUserActivityFromParse();
 
         //Set hero image OCL
         profilePictureView.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +140,14 @@ public class ViewUserActivity extends AppCompatActivity {
                 Intent intent = new Intent(ViewUserActivity.this, MessagingActivity.class);
                 intent.putExtra("RECIPIENT_ID", mClickedUserId);
                 startActivity(intent);
+            }
+        });
+
+        mViewUserRecyclerView.addOnScrollListener(new EndlessRecyclerViewOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                LoadUserActivityFromParse onCreateQuery = new LoadUserActivityFromParse(current_page);
+                onCreateQuery.runLoadUserActivityFromParse();
             }
         });
     }
@@ -220,102 +238,129 @@ public class ViewUserActivity extends AppCompatActivity {
         });
     }
 
+    public class LoadUserActivityFromParse {
 
-    public void loadUserActivityFromParse() {
+        //The passed in refresh boolean, defaults to false
+//        public boolean refresh = false;
+        //The passed in pageNumber, defaults to 0
+        public int pageNumber = 0;
+        //The limit of Drop Objects to get from Parse
+        public int queryLimit = 10;
+        //The amount of Drop Objects to skip from Parse
+        public int skipNumber = 0;
 
-        final ArrayList<DropItem> viewUserList = new ArrayList<>();
-
-        ParseUser clickedUser = null;
-        ParseQuery viewedUserQuery = ParseQuery.getQuery("_User");
-        viewedUserQuery.whereEqualTo("objectId", mClickedUserId);
-
-        try {
-            if (viewedUserQuery.find().size() != 0) {
-                clickedUser = (ParseUser) viewedUserQuery.find().get(0);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        //Default constructor for onCreate query
+        public LoadUserActivityFromParse() {
         }
 
-        assert clickedUser != null;
-        ParseRelation createdRelation = clickedUser.getRelation("createdDrops");
-        ParseRelation completedRelation = clickedUser.getRelation("completedDrops");
+//        //Refresh constructor for pull to refresh query
+//        public LoadUserActivityFromParse(boolean refresh) {
+//            this.refresh = refresh;
+//        }
 
-        ParseQuery createdQuery = createdRelation.getQuery();
-        ParseQuery completedQuery = completedRelation.getQuery();
+        //Page constuctor for onScroll query
+        public LoadUserActivityFromParse(int pageNumber) {
+            this.pageNumber = pageNumber;
+        }
 
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(createdQuery);
-        queries.add(completedQuery);
+        public void runLoadUserActivityFromParse() {
 
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-        mainQuery.include("authorPointer");
-        mainQuery.orderByDescending("createdAt");
-        mainQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
+            if (pageNumber != 0) {
+                int pageMultiplier = pageNumber - 1;
+                skipNumber = pageMultiplier * queryLimit;
+                // Otherwise, clear the list, because this is a default(refresh) query
+            }else {
+                mViewUserDropList.clear();
+            }
 
-                if (e != null) {
-                    Log.i("KEVIN", "error error");
+            ParseQuery viewedUserQuery = ParseQuery.getQuery("_User");
+            viewedUserQuery.whereEqualTo("objectId", mClickedUserId);
+            viewedUserQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                @Override
+                public void done(ParseUser viewedUser, ParseException e) {
 
-                } else {
-                    for (int i = 0; i < list.size(); i++) {
+                    ParseRelation createdRelation = viewedUser.getRelation("createdDrops");
+                    ParseRelation completedRelation = viewedUser.getRelation("completedDrops");
 
-                        final DropItem dropItem = new DropItem();
+                    ParseQuery createdQuery = createdRelation.getQuery();
+                    ParseQuery completedQuery = completedRelation.getQuery();
 
-                        //Drop Author Data//////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
+                    List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+                    queries.add(createdQuery);
+                    queries.add(completedQuery);
 
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(resized);
-                                        updateRecyclerView(viewUserList);
+                    ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+                    mainQuery.include("authorPointer");
+                    mainQuery.orderByDescending("createdAt");
+                    mainQuery.setSkip(skipNumber);
+                    mainQuery.setLimit(queryLimit);
+                    mainQuery.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> list, ParseException e) {
+
+                            if (e != null) {
+                                Log.i("KEVIN", "error error");
+
+                            } else {
+                                for (int i = 0; i < list.size(); i++) {
+
+                                    final DropItem dropItem = new DropItem();
+
+                                    //Drop Author Data//////////////////////////////////////////////////////////
+                                    ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
+
+                                    ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                                    if (parseProfilePicture != null) {
+                                        parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                            @Override
+                                            public void done(byte[] data, ParseException e) {
+                                                if (e == null) {
+                                                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                                    dropItem.setParseProfilePicture(resized);
+
+                                                    if (pageNumber != 0) {
+                                                        mViewUserAdapter.notifyDataSetChanged();
+                                                    } else {
+                                                        updateRecyclerView(mViewUserDropList);
+                                                    }
+                                                }
+                                            }
+                                        });
                                     }
+
+                                    //dropItemAll.setAuthorName(authorName);
+                                    dropItem.setAuthorName((String) authorData.get("displayName"));
+                                    //Author id
+                                    dropItem.setAuthorId(authorData.getObjectId());
+                                    //Author Rank
+                                    dropItem.setAuthorRank(authorData.getString("userRank"));
+                                    //Author RipleCount
+                                    dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+
+                                    //Drop Data////////////////////////////////////////////////////////////////
+                                    //DropObjectId
+                                    dropItem.setObjectId(list.get(i).getObjectId());
+                                    //CreatedAt
+                                    dropItem.setCreatedAt(list.get(i).getCreatedAt());
+                                    //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+                                    //Drop description
+                                    dropItem.setDescription(list.get(i).getString("description"));
+                                    //Riple Count
+                                    dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                                    //Comment Count
+                                    dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+
+
+                                    mViewUserDropList.add(dropItem);
                                 }
-                            });
+                            }
                         }
-
-                        //dropItemAll.setAuthorName(authorName);
-                        dropItem.setAuthorName((String) authorData.get("displayName"));
-                        //Author id
-                        dropItem.setAuthorId(authorData.getObjectId());
-                        //Author Rank
-                        dropItem.setAuthorRank(authorData.getString("userRank"));
-                        //Author RipleCount
-                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
-
-                        //Drop Data////////////////////////////////////////////////////////////////
-                        //DropObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
-                        //CreatedAt
-                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
-                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-                        //Drop description
-                        dropItem.setDescription(list.get(i).getString("description"));
-                        //Riple Count
-                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-                        //Comment Count
-                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-
-                        viewUserList.add(dropItem);
-//                        ParseObject.pinAllInBackground(list);
-                    }
-
-//                    Log.i("KEVIN", "PARSE LIST SIZE: " + clickedUsersList.size());
-                    // Don't update this until we have the list of the current user's stuff as well
-                    // Then, we'll have the relations that we need to display the proper card.
-
+                    });
                 }
 
-            }
-        });
+            });
+        }
     }
 
     private void updateRecyclerView(ArrayList<DropItem> clickedUserList) {

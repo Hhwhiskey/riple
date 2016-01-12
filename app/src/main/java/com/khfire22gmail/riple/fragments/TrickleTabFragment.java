@@ -116,18 +116,20 @@ public class TrickleTabFragment extends Fragment {
     //All Drops Async
     public class LoadAllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
         List<ParseObject> listFromParse;
         boolean refresh = false;
-        int page = 0;
+        int pageNumber = 0;
 
         //Default constructor for onCreate query
         public LoadAllDropsTask(){
         }
 
         //Page constuctor for onScroll query
-        public LoadAllDropsTask(int page){
-            Log.d(TAG, "currentPage = " + page);
-            this.page = page;
+        public LoadAllDropsTask(int pageNumber){
+            Log.d(TAG, "currentPage = " + pageNumber);
+            this.pageNumber = pageNumber;
         }
 
         //Refresh constructor for pull to refresh query
@@ -136,21 +138,19 @@ public class TrickleTabFragment extends Fragment {
         }
 
 
-
         //Get all Drops from Parse in Async
         @Override
         protected ArrayList<DropItem> doInBackground(Void... params) {
             final ParseQuery<ParseObject> dropQuery = ParseQuery.getQuery("Drop");
 
             // Limit of Drops to get from Parse and the
-            int queryLimit = 25;
+            int queryLimit = 10;
             // Amount of Drops to skip, activated with the onScroll constructor
             int skipNumber = 0;
-            // If called with onScroll constructor
-            // do some logic to determine the
-            // amount of Drops to skip
-            if (page != 0) {
-                int pageMultiplier = page - 1;
+            // If called with onScroll constructor do some logic
+            // to determine the amount of Drops to skip
+            if (pageNumber != 0) {
+                int pageMultiplier = pageNumber - 1;
                 skipNumber = pageMultiplier * queryLimit;
             // Otherwise, clear the list, because this is a default(refresh) query
             }else {
@@ -159,6 +159,7 @@ public class TrickleTabFragment extends Fragment {
 
             dropQuery.orderByDescending("createdAt");
             dropQuery.include("authorPointer");
+            dropQuery.whereNotEqualTo("authorPointer", currentUser);
             // Set the query limit
             dropQuery.setLimit(queryLimit);
             // Set the skip amount with logic above
@@ -227,8 +228,8 @@ public class TrickleTabFragment extends Fragment {
         protected void onPostExecute(ArrayList<DropItem> dropItems) {
 
             //Run the onScroll query
-            if (page != 0) {
-                LoadRelationDropsTask nextTask = new LoadRelationDropsTask(page);
+            if (pageNumber != 0) {
+                LoadRelationDropsTask nextTask = new LoadRelationDropsTask(pageNumber);
                 nextTask.execute();
             }
 
@@ -239,7 +240,7 @@ public class TrickleTabFragment extends Fragment {
             }
 
             //Otherwise call the default constructor for the standard query
-            if (page == 0 && !refresh) {
+            if (pageNumber == 0 && !refresh) {
                 LoadRelationDropsTask nextTask = new LoadRelationDropsTask();
                 nextTask.execute();
             }
@@ -347,7 +348,6 @@ public class TrickleTabFragment extends Fragment {
 
     //Default update RecyclerView method used when activity is created. Only shows 10 items until scrolled
     private void updateRecyclerView(ArrayList<DropItem> filteredDropList) {
-
 
         if (filteredDropList.isEmpty()) {
             mTrickleRecyclerView.setVisibility(View.GONE);

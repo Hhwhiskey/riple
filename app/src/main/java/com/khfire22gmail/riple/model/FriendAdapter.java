@@ -3,7 +3,6 @@ package com.khfire22gmail.riple.model;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +17,7 @@ import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.utils.Constants;
+import com.khfire22gmail.riple.utils.Vibrate;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -132,8 +132,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
         @Override
         public boolean onLongClick(View v) {
-            Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
-            vb.vibrate(5);
+            Vibrate vibrate = new Vibrate();
+            vibrate.vibrate(mContext);
             openFriendMenu();
             return false;
         }

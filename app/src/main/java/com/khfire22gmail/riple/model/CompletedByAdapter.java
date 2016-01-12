@@ -6,6 +6,7 @@ package com.khfire22gmail.riple.model;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -181,6 +182,8 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
         @Override
         public boolean onLongClick(View v) {
+            Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
+            vb.vibrate(10);
             openFriendMenu();
             return false;
         }

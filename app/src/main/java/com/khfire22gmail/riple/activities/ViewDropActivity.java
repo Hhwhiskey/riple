@@ -19,10 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,11 +73,6 @@ public class ViewDropActivity extends AppCompatActivity {
     private String mAuthorFacebookId;
     private String mDropDescription;
     private ImageView authorProfilePictureView;
-    private ImageView commenterProfilePictureView;
-    private String commentText;
-    private AutoCompleteTextView newCommentView;
-    private Switch viewedDropTodoSwitch;
-    private CheckBox viewedDropCompleteCheckBox;
     private ParseFile parseProfilePicture;
     private String mAuthorRank;
     private TextView rankView;
@@ -117,7 +109,7 @@ public class ViewDropActivity extends AppCompatActivity {
         mAuthorId = intent.getStringExtra("authorId");
         mAuthorName = intent.getStringExtra("commenterName");
         mAuthorRank = intent.getStringExtra("authorRank");
-        mAuthorRipleCount = intent.getStringExtra("authorRipleCount");
+        mAuthorRipleCount = intent.getStringExtra("clickedUserRipleCount");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
@@ -128,6 +120,7 @@ public class ViewDropActivity extends AppCompatActivity {
         Log.d("rDropExtra", "mDropObjectId = " + mDropObjectId);
         Log.d("rDropExtra", "mAuthorId = " + mAuthorId);
         Log.d("rDropExtra", "mAuthorName = " + mAuthorName);
+        Log.d("rDropExtra", "mAuthorRipleCount = " + mAuthorRipleCount);
         Log.d("rDropExtra", "mAuthorFacebookId = " + mFacebookId);
         Log.d("rDropExtra", "mDropDescription = " + mDropDescription);
         Log.d("rDropExtra", "mRipleCount = " + mRipleCount);

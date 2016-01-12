@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -43,47 +44,58 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
  */
 public class DropsTabFragment extends Fragment {
 
+    private static final String TAG = "DropsTabFragment";
     private RecyclerView mDropRecyclerView;
     private Button button;
-    private List<DropItem> mDropList;
-    private List<DropItem> dropList;
+    private ArrayList<DropItem> mDropListFromParse;
     private DropAdapter mDropAdapter;
-    public static ArrayList<ParseObject> dropObjectsList = new ArrayList<>();
     public static ArrayList<DropItem> dropTabInteractionList;
     private boolean dropTips;
     private TextView dropEmptyView;
     private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
+    private EndlessRecyclerViewOnScrollListener mEndlessOnScrollListener;
+    private LinearLayoutManager layoutManager;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
 
+        mDropListFromParse = new ArrayList<>();
+
+        layoutManager = new LinearLayoutManager(getActivity());
+
         mDropRecyclerView = (RecyclerView) view.findViewById(R.id.drop_recycler_view);
-        mDropRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mDropRecyclerView.setLayoutManager(layoutManager);
         mDropRecyclerView.setItemAnimator(new SlideInLeftAnimator(new AnticipateInterpolator(2f)));
         mDropRecyclerView.getItemAnimator().setRemoveDuration(500);
         dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
+
+        LoadDropItemsFromParse dropOnCreateQuery = new LoadDropItemsFromParse();
+        dropOnCreateQuery.runLoadDropItemsFromParse();
+
+        mDropRecyclerView.addOnScrollListener(mEndlessOnScrollListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                LoadDropItemsFromParse dropOnScrollQuery = new LoadDropItemsFromParse(current_page);
+                dropOnScrollQuery.runLoadDropItemsFromParse();
+
+            }
+        });
 
         //Swipe Refresh
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.drop_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
                 // Do work to refresh the list here.
-                loadDropItemsFromParse();
-                new Task().execute();
+                LoadDropItemsFromParse dropRefreshQuery = new LoadDropItemsFromParse(true);
+                dropRefreshQuery.runLoadDropItemsFromParse();
+                new dropRefreshTask().execute();
             }
         });
 
 
-
-
-
-
         //        loadSavedPreferences();
-
-        loadDropItemsFromParse();
-
         return view;
     }
 
@@ -127,93 +139,132 @@ public class DropsTabFragment extends Fragment {
         builder.show();
     }
 
-    public void loadDropItemsFromParse() {
+    public class LoadDropItemsFromParse {
 
-        final ArrayList<DropItem> dropList = new ArrayList<>();
+        //The passed in refresh boolean, defaults to false
+        public boolean refresh = false;
+        //The passed in pageNumber, defaults to 0
+        public int pageNumber = 0;
+        //The limit of Drop Objects to get from Parse
+        public int queryLimit = 10;
+        //The amount of Drop Objects to skip from Parse
+        public int skipNumber = 0;
 
-        ParseUser user = ParseUser.getCurrentUser();
+        //Default constructor for onCreate query
+        public LoadDropItemsFromParse() {
+        }
 
-        ParseRelation relation = user.getRelation("todoDrops");
+        //Refresh constructor for pull to refresh query
+        public LoadDropItemsFromParse(boolean refresh) {
+            this.refresh = refresh;
+        }
 
-        ParseQuery query = relation.getQuery();
+        //Page constuctor for onScroll query
+        public LoadDropItemsFromParse(int pageNumber) {
+            this.pageNumber = pageNumber;
+        }
 
-        query.include("authorPointer");
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
+        public void runLoadDropItemsFromParse() {
 
-                if (e != null) {
-                    Log.i("KEVIN", "error error");
-
-                } else {
-
-                    for (int i = 0; i < list.size(); i++) {
-
-                        //Collects Drop Objects
-//                        dropObjectsList.add(list.get(i));
-
-                        final DropItem dropItem = new DropItem();
-
-                        //Drop Author Data//////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
-
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(bmp);
-                                        updateRecyclerView(dropList);
-                                    }
-                                }
-                            });
-                        }
-
-                        //dropItemAll.setAuthorName(authorName);
-                        dropItem.setAuthorName((String) authorData.get("displayName"));
-                        //Author id
-                        dropItem.setAuthorId(authorData.getObjectId());
-                        //Author Rank
-                        dropItem.setAuthorRank(authorData.getString("userRank"));
-                        //Author Riple Count
-                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
-
-                        //Drop Data////////////////////////////////////////////////////////////////
-                        //DropObjectId
-                        dropItem.setObjectId(list.get(i).getObjectId());
-                        //Drop description
-                        dropItem.setDescription(list.get(i).getString("description"));
-                        //CreatedAt
-                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
-
-                        //Riple Count
-                        int ripleCount = (list.get(i).getInt("ripleCount"));
-                        if (ripleCount == 1) {
-                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riple"));
-                        } else {
-                            dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-                        }
-
-                        //Comment Count
-                        int commentCount = (list.get(i).getInt("commentCount"));
-                        if (commentCount == 1) {
-                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comment"));
-                        }else {
-                            dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-                        }
-
-                        dropList.add(dropItem);
-                    }
-                }
-                dropTabInteractionList = dropList;
-
-
+            if (pageNumber != 0) {
+                int pageMultiplier = pageNumber - 1;
+                skipNumber = pageMultiplier * queryLimit;
+                // Otherwise, clear the list, because this is a default(refresh) query
+            } else {
+                mDropListFromParse.clear();
             }
-        });
+
+            ParseUser user = ParseUser.getCurrentUser();
+
+            ParseRelation relation = user.getRelation("todoDrops");
+
+            ParseQuery query = relation.getQuery();
+
+            query.setLimit(queryLimit);
+            query.setSkip(skipNumber);
+            query.include("authorPointer");
+            query.orderByDescending("createdAt");
+            query.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> list, ParseException e) {
+
+                    if (e != null) {
+                        Log.i("KEVIN", "error error");
+
+                    } else {
+
+                        for (int i = 0; i < list.size(); i++) {
+
+                            //Collects Drop Objects
+                            //                        dropObjectsList.add(list.get(i));
+
+                            final DropItem dropItem = new DropItem();
+
+                            //Drop Author Data//////////////////////////////////////////////////////////
+                            ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
+
+                            ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                            if (parseProfilePicture != null) {
+                                parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                    @Override
+                                    public void done(byte[] data, ParseException e) {
+                                        if (e == null) {
+                                            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                            dropItem.setParseProfilePicture(resized);
+                                            if (pageNumber != 0) {
+                                                mDropAdapter.notifyDataSetChanged();
+                                            } else {
+                                                updateRecyclerView(mDropListFromParse);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
+                            //dropItemAll.setAuthorName(authorName);
+                            dropItem.setAuthorName((String) authorData.get("displayName"));
+                            //Author id
+                            dropItem.setAuthorId(authorData.getObjectId());
+                            //Author Rank
+                            dropItem.setAuthorRank(authorData.getString("userRank"));
+                            //Author Riple Count
+                            dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+
+                            //Drop Data////////////////////////////////////////////////////////////////
+                            //DropObjectId
+                            dropItem.setObjectId(list.get(i).getObjectId());
+                            //Drop description
+                            dropItem.setDescription(list.get(i).getString("description"));
+                            //CreatedAt
+                            dropItem.setCreatedAt(list.get(i).getCreatedAt());
+
+                            //Riple Count
+                            int ripleCount = (list.get(i).getInt("ripleCount"));
+                            if (ripleCount == 1) {
+                                dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riple"));
+                            } else {
+                                dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                            }
+
+                            //Comment Count
+                            int commentCount = (list.get(i).getInt("commentCount"));
+                            if (commentCount == 1) {
+                                dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comment"));
+                            } else {
+                                dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+                            }
+
+
+                            mDropListFromParse.add(dropItem);
+                        }
+                    }
+
+                    Log.d(TAG, "DropList = " + mDropListFromParse.size());
+                    dropTabInteractionList = mDropListFromParse;
+                }
+            });
+        }
     }
 
     private void updateRecyclerView(ArrayList<DropItem> dropList) {
@@ -246,7 +297,7 @@ public class DropsTabFragment extends Fragment {
         super.onResume();
     }
 
-    private class Task extends AsyncTask<Void, Void, String[]> {
+    private class dropRefreshTask extends AsyncTask<Void, Void, String[]> {
         @Override
         protected String[] doInBackground(Void... params) {
             return new String[0];
@@ -255,6 +306,7 @@ public class DropsTabFragment extends Fragment {
         @Override protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
             mWaveSwipeRefreshLayout.setRefreshing(false);
+            mEndlessOnScrollListener.reset(1, 0, true);
             super.onPostExecute(result);
         }
     }

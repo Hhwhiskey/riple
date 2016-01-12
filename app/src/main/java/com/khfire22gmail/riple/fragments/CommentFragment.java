@@ -314,8 +314,8 @@ public class CommentFragment extends Fragment {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        commentItem.setCommenterParseProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                        commentItem.setCommenterParseProfilePicture(resized);
                                         updateRecyclerView(commentList);
                                     }
                                 }
@@ -332,7 +332,7 @@ public class CommentFragment extends Fragment {
                         //Commenter Rank
                         commentItem.setCommenterRank((String) commenterData.get("userRank"));
 
-                        //Author Riple Count
+                        //Commenter Riple Count
                         commentItem.setCommenterRipleCount(String.valueOf(commenterData.getInt("userRipleCount")));
 
                         //Comment Data/////////////////////////////////////////////////////////////

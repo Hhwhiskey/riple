@@ -49,6 +49,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
  */
 public class RipleTabFragment extends Fragment {
 
+    private static final String TAG = "RipleTabFragment";
     private ImageView profilePictureView;
     private TextView nameView;
     private RecyclerView mRipleRecyclerView;
@@ -65,13 +66,13 @@ public class RipleTabFragment extends Fragment {
     private ParseUser currentUser;
     public String userName;
     public String facebookId;
-    private ArrayList <DropItem> mOnScrollListFromFromParse;
+    private ArrayList<DropItem> mOnScrollListFromFromParse;
     private ArrayList<DropItem> mRipleListLocal;
     private List<ParseObject> listFromParse;
     private List<ParseObject> mParseList;
     private EndlessRecyclerViewOnScrollListener mEndlessListener;
-    private static String TAG = RipleTabFragment.class.getSimpleName();
     private boolean visible;
+    private LinearLayoutManager layoutManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -84,15 +85,14 @@ public class RipleTabFragment extends Fragment {
 
         mOnScrollListFromFromParse = new ArrayList<>();
 
-        currentUser =  ParseUser.getCurrentUser();
+        currentUser = ParseUser.getCurrentUser();
 //        userName  = currentUser.getString("displayName");
         facebookId = currentUser.getString("facebookId");
 
         //loadSavedPreferences();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         mRipleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
-        mRipleRecyclerView.setLayoutManager(layoutManager);
+        mRipleRecyclerView.setLayoutManager(layoutManager = new LinearLayoutManager(getActivity()));
         mRipleRecyclerView.setItemAnimator(new SlideInLeftAnimator());
 
         ripleEmptyView = (TextView) view.findViewById(R.id.riple_tab_empty_view);
@@ -103,8 +103,9 @@ public class RipleTabFragment extends Fragment {
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
 
-        //Update riple list and profile card
-        loadRipleItemsFromParse();
+        //Default onCreate Query call
+        LoadRipleItemsFromParse onCreateQuery = new LoadRipleItemsFromParse();
+        onCreateQuery.runLoadRipleItemsFromParse();
 
 //        updateUserInfo();
 
@@ -117,7 +118,7 @@ public class RipleTabFragment extends Fragment {
                     Intent settingIntent = new Intent(getActivity(), SettingsActivity.class);
                     startActivity(settingIntent);
                 } else {
-                viewCurrentUserProfileExtra();
+                    viewCurrentUserProfileExtra();
                 }
             }
         });
@@ -144,44 +145,51 @@ public class RipleTabFragment extends Fragment {
             @Override
             public void onLoadMore(int current_page) {
                 Log.d(TAG, "onLoadMore current_page: " + current_page);
-                loadRipleItemsOnScroll(current_page);
+                //OnScroll Query call
+                LoadRipleItemsFromParse onScrollQuery = new LoadRipleItemsFromParse(current_page);
+                onScrollQuery.runLoadRipleItemsFromParse();
+
             }
         });
 
         //Pull to refresh riple list
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.riple_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
-            @Override public void onRefresh() {
+            @Override
+            public void onRefresh() {
                 // Run the standard Riple Query for most recent items
-                loadRipleItemsFromParse();
-                new refreshQuery().execute();
+                //onRefresh Query call
+                LoadRipleItemsFromParse onRefreshQuery = new LoadRipleItemsFromParse(true);
+                onRefreshQuery.runLoadRipleItemsFromParse();
+                new ripleRefreshTask().execute();
+
             }
         });
 
-        visible = getUserVisibleHint();
-
-        if (visible) {
-            ripleTip();
-        }
+//        visible = getUserVisibleHint();
+//
+//        if (visible) {
+//            ripleTip();
+//        }
 
         return view;
     }
 
-    private class refreshQuery extends AsyncTask<Void, Void, String[]> {
+    private class ripleRefreshTask extends AsyncTask<Void, Void, String[]> {
         @Override
         protected String[] doInBackground(Void... params) {
             return new String[0];
         }
 
-        @Override protected void onPostExecute(String[] result) {
+        @Override
+        protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
             mWaveSwipeRefreshLayout.setRefreshing(false);
-            mEndlessListener.reset();
+            mEndlessListener.reset(1, 0, true);
 
             super.onPostExecute(result);
         }
     }
-
 
 
     public void loadSavedPreferences() {
@@ -249,7 +257,6 @@ public class RipleTabFragment extends Fragment {
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, currentUserRipleCount);
         getActivity().startActivity(intent);
     }
-
 
 
     public void loadRipleItemsFromParse() {
@@ -335,7 +342,7 @@ public class RipleTabFragment extends Fragment {
                         int commentCount = (listParse.get(i).getInt("commentCount"));
                         if (commentCount == 1) {
                             dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
-                        }else {
+                        } else {
                             dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
                         }
 
@@ -347,107 +354,142 @@ public class RipleTabFragment extends Fragment {
         });
     }
 
-    // Query to run after the onScrollListener activiates
-    public void loadRipleItemsOnScroll(int pageNumber) {
 
-        // The default page number is zero, so the IF statement content won't run
-        int skipNumber = 0;
-        // The amount of items the query is limted to
-        int queryLimit = 10;
-        // If a page is passed in, the IF statement will be true and the logic will run
-        if (pageNumber != 0) {
-            // pageNumber - 1 gives us the the currentPage of data
-            int pageMultiplier = pageNumber - 1;
-            // Multiplying pageMultiplier * the query limit will tell the query how many items to skip
-            skipNumber = pageMultiplier * queryLimit;
+
+    //Riple Query method with 3 constructors for different parameters
+    public class LoadRipleItemsFromParse {
+
+        //The passed in refresh boolean, defaults to false
+        public boolean refresh = false;
+        //The passed in pageNumber, defaults to 0
+        public int pageNumber = 0;
+        //The limit of Drop Objects to get from Parse
+        public int queryLimit = 10;
+        //The amount of Drop Objects to skip from Parse
+        public int skipNumber = 0;
+
+        //Default constructor for onCreate query
+        public LoadRipleItemsFromParse() {
         }
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        //Refresh constructor for pull to refresh query
+        public LoadRipleItemsFromParse(boolean refresh) {
+            this.refresh = refresh;
+        }
 
-        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
-        ParseRelation completedRelation = currentUser.getRelation("completedDrops");
+        //Page constuctor for onScroll query
+        public LoadRipleItemsFromParse(int pageNumber) {
+            this.pageNumber = pageNumber;
+        }
 
-        ParseQuery createdQuery = createdRelation.getQuery();
-        ParseQuery completedQuery = completedRelation.getQuery();
+        // If a pageNumber is passed in, the IF statement will be true and the logic will run
+        public void runLoadRipleItemsFromParse() {
 
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(createdQuery);
-        queries.add(completedQuery);
+            if (pageNumber != 0) {
+                int pageMultiplier = pageNumber - 1;
+                skipNumber = pageMultiplier * queryLimit;
+                // Otherwise, clear the list, because this is a default(refresh) query
+            }else {
+                mOnScrollListFromFromParse.clear();
+            }
 
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-        mainQuery.include("authorPointer");
-        mainQuery.orderByDescending("createdAt");
-        mainQuery.setLimit(queryLimit);
-        mainQuery.setSkip(skipNumber);
-        mainQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> listParse, ParseException e) {
+            ParseUser currentUser = ParseUser.getCurrentUser();
 
-                if (e != null) {
-                    Log.i("KEVIN", "error error");
+            ParseRelation createdRelation = currentUser.getRelation("createdDrops");
+            ParseRelation completedRelation = currentUser.getRelation("completedDrops");
 
-                } else {
-                    for (int i = 0; i < listParse.size(); i++) {
+            ParseQuery createdQuery = createdRelation.getQuery();
+            ParseQuery completedQuery = completedRelation.getQuery();
 
-                        final DropItem dropItem = new DropItem();
+            List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+            queries.add(createdQuery);
+            queries.add(completedQuery);
 
-                        //Drop Author Data//////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
+            ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+            mainQuery.include("authorPointer");
+            mainQuery.orderByDescending("createdAt");
+            mainQuery.setLimit(queryLimit);
+            mainQuery.setSkip(skipNumber);
+            mainQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> listParse, ParseException e) {
 
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(resized);
-//                                        updateRecyclerViewOnScroll();
+                    if (e != null) {
+                        Log.i("KEVIN", "error error");
+
+                    } else {
+
+                        for (int i = 0; i < listParse.size(); i++) {
+
+                            final DropItem dropItem = new DropItem();
+
+                            //Drop Author Data//////////////////////////////////////////////////////////
+                            ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
+
+                            ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                            if (parseProfilePicture != null) {
+                                parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                    @Override
+                                    public void done(byte[] data, ParseException e) {
+                                        if (e == null) {
+                                            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                            dropItem.setParseProfilePicture(resized);
+
+                                            if (pageNumber != 0) {
+                                                mRipleAdapter.notifyDataSetChanged();
+                                            } else {
+                                                updateRecyclerView(mOnScrollListFromFromParse);
+                                            }
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
+
+                            //dropItemAll.setAuthorName(authorName);
+                            dropItem.setAuthorName((String) authorData.get("displayName"));
+                            //Author id
+                            dropItem.setAuthorId(authorData.getObjectId());
+                            //Author Rank
+                            dropItem.setAuthorRank(authorData.getString("userRank"));
+                            //Author RipleCount
+                            dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+
+                            //Drop Data////////////////////////////////////////////////////////////////
+                            //DropObjectId
+                            dropItem.setObjectId(listParse.get(i).getObjectId());
+                            //CreatedAt
+                            dropItem.setCreatedAt(listParse.get(i).getCreatedAt());
+                            //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+                            //Drop description
+                            dropItem.setDescription(listParse.get(i).getString("description"));
+
+                            //Riple Count
+                            int ripleCount = (listParse.get(i).getInt("ripleCount"));
+                            if (ripleCount == 1) {
+                                dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riple"));
+                            } else {
+                                dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riples"));
+                            }
+
+                            //Comment Count
+                            int commentCount = (listParse.get(i).getInt("commentCount"));
+                            if (commentCount == 1) {
+                                dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
+                            } else {
+                                dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
+                            }
+
+                            Log.d(TAG, "Riple List = " + mOnScrollListFromFromParse.size());
+                            mOnScrollListFromFromParse.add(dropItem);
+
                         }
-
-                        //dropItemAll.setAuthorName(authorName);
-                        dropItem.setAuthorName((String) authorData.get("displayName"));
-                        //Author id
-                        dropItem.setAuthorId(authorData.getObjectId());
-                        //Author Rank
-                        dropItem.setAuthorRank(authorData.getString("userRank"));
-
-                        //Drop Data////////////////////////////////////////////////////////////////
-                        //DropObjectId
-                        dropItem.setObjectId(listParse.get(i).getObjectId());
-                        //CreatedAt
-                        dropItem.setCreatedAt(listParse.get(i).getCreatedAt());
-                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-                        //Drop description
-                        dropItem.setDescription(listParse.get(i).getString("description"));
-
-                        //Riple Count
-                        int ripleCount = (listParse.get(i).getInt("ripleCount"));
-                        if (ripleCount == 1) {
-                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riple"));
-                        } else {
-                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riples"));
-                        }
-
-                        //Comment Count
-                        int commentCount = (listParse.get(i).getInt("commentCount"));
-                        if (commentCount == 1) {
-                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
-                        }else {
-                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
-                        }
-
-                        mOnScrollListFromFromParse.add(dropItem);
-                        mRipleAdapter.notifyDataSetChanged();
                     }
                 }
-            }
-        });
+            });
+        }
     }
+
 
     //Default updateRecyclerView method
     public void updateRecyclerView(List<DropItem> mRipleList) {
@@ -457,8 +499,7 @@ public class RipleTabFragment extends Fragment {
         if (mRipleList.isEmpty()) {
             mRipleRecyclerView.setVisibility(View.GONE);
             ripleEmptyView.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mRipleRecyclerView.setVisibility(View.VISIBLE);
             ripleEmptyView.setVisibility(View.GONE);
         }
@@ -496,7 +537,6 @@ public class RipleTabFragment extends Fragment {
         });
 
 
-
 //        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
 //        if (parseProfilePicture != null) {
 //            Glide.with(this)
@@ -514,7 +554,7 @@ public class RipleTabFragment extends Fragment {
 //            }
 //        }
 
-         String userName =currentUser.getString("displayName");
+        String userName = currentUser.getString("displayName");
 
         // Update UserName
         if (userName != null) {
@@ -547,10 +587,12 @@ public class RipleTabFragment extends Fragment {
         if (ripleCount > 9) {
             ripleRank = ("\"Contributor\"");//3
 
-        }if (ripleCount > 19) {
+        }
+        if (ripleCount > 19) {
             ripleRank = ("\"Do-Gooder\"");//4
 
-        }if (ripleCount > 39) {
+        }
+        if (ripleCount > 39) {
             ripleRank = ("\"Kind\"");//5
         }
         if (ripleCount > 79) {
@@ -604,7 +646,6 @@ public class RipleTabFragment extends Fragment {
         }
 
 
-
         // Save the currentUser ripleCount and rank to the user table
         currentUser.put("userRipleCount", ripleCount);
         currentUser.put("userRank", ripleRank);
@@ -640,8 +681,8 @@ public class RipleTabFragment extends Fragment {
             }
             return mIcon;
         }
-    }
 
+    }
 
 
     @Override

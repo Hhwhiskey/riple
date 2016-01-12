@@ -22,9 +22,9 @@
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
             android:alpha="123124"
-            android:background="@drawable/custom_bg">
+            android:background="@drawable/custom_bg"
+            android:paddingBottom="10dp">
 
             <ImageView
                 android:id="@+id/commenter_profile_picture"
@@ -96,7 +96,7 @@
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                />
 
             <TextView
                 android:layout_width="wrap_content"

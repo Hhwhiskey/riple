@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +31,7 @@ import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
 import com.khfire22gmail.riple.utils.Constants;
+import com.khfire22gmail.riple.utils.Vibrate;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -302,7 +302,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("dropObjectId", dropObjectId);
         intent.putExtra("authorId", authorId);
         intent.putExtra("authorRank", authorRank);
-        intent.putExtra("authorRipleCount", authorRipleCount);
+        intent.putExtra("clickedUserRipleCount", authorRipleCount);
         intent.putExtra("commenterName", authorName);
         intent.putExtra("dropDescription", dropDescription);
         intent.putExtra("ripleCount", ripleCount);
@@ -559,8 +559,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         @Override
         public boolean onLongClick(View view) {
-            Vibrator vb = (Vibrator) mContext.getSystemService(mContext.VIBRATOR_SERVICE);
-            vb.vibrate(5);
+            Vibrate vibrate = new Vibrate();
+            vibrate.vibrate(mContext);
             if (mTabName.equals(drop)) {
                 showDropMenu();
             } else {
