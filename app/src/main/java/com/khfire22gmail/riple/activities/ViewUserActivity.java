@@ -2,6 +2,7 @@ package com.khfire22gmail.riple.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -89,8 +90,6 @@ public class ViewUserActivity extends AppCompatActivity {
         viewUserEmptyView = (TextView) findViewById(R.id.view_user_empty_view);
         ////////////////////////////////////////////////////////////////////////////
 
-        loadSavedPreferences();
-//        viewUserTip();
 
         //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
@@ -150,43 +149,41 @@ public class ViewUserActivity extends AppCompatActivity {
                 onCreateQuery.runLoadUserActivityFromParse();
             }
         });
+
+        showUserTips();
     }
 
-    public void loadSavedPreferences() {
-        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean viewUserTipBoolean = sharedPreferences.getBoolean("viewUserTipBoolean", true);
-        if (viewUserTipBoolean) {
+    public void showUserTips() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean test = sharedPreferences.getBoolean("viewUserTips", true);
+
+        if (test) {
             viewUserTip();
         }
     }
 
-    public void savePreferences(String key, Boolean value) {
-        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+    public void saveTipPreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
-        editor.apply();
-    }
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
 
-    public void unCheckAllTipsCheckBox(String key, Boolean value) {
-        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
     }
 
     public void viewUserTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
 
-        builder.setTitle("View Profile");
-        builder.setMessage("This is where you view others Riple page. View all the Drops" +
-                " they have created and completed. Touch their picture to get more info - You " +
-                "can even check out their riple count and rank. Cool, huh?");
+        builder.setTitle("View Riple");
+        builder.setMessage("Here, you can view other users Riple activity. View all the Drops" +
+                " they have created and completed. Feel free to send them a message as well.");
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                savePreferences("viewUserTipBoolean", false);
-                unCheckAllTipsCheckBox("allTipsBoolean", false);
+                saveTipPreferences("viewUserTips", false);
             }
         });
 

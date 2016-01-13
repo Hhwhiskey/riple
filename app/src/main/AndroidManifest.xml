@@ -81,14 +81,11 @@
             android:name=".activities.ParseLoginActivity"
             android:label="@string/title_activity_parse_login_activity"
             android:screenOrientation="portrait">
-
         </activity>
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_edit_profile"
-            android:screenOrientation="portrait"
-            android:noHistory="true">
-
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activities.ViewUserInfoActivity"
@@ -103,8 +100,7 @@
 
         </activity>
         <activity android:name=".activities.CropActivity"
-                  android:screenOrientation="portrait"
-                  android:noHistory="true">
+                  android:screenOrientation="portrait">
         </activity>
 
         <!--<meta-data android:name="com.parse.push.notification_icon" android:resource="@mipmap/ic_launcher"/>-->

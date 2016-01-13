@@ -110,8 +110,66 @@ public class TrickleTabFragment extends Fragment {
         return view;
     }
 
-    /*Get all of the currentUser hasRelation
-     */
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser && loadSavedPreferences()) {
+                trickleTip();
+            }
+    }
+
+    public boolean loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean test = sharedPreferences.getBoolean("trickleTips", true);
+
+        if (!test) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    public void saveTipPreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
+//
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
+    }
+
+    public void trickleTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TrickleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
+
+        builder.setTitle("Trickle...");
+        builder.setMessage("This is the Trickle. A steady flow of Drops where every Riple begins. " +
+                "Find a Drop you want to complete and add it to your To-Do list. Once there " +
+                "you may complete it at your leisure. Please, do your part and report spam or " +
+                "inappropriate/offensive material here.");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveTipPreferences("trickleTips", false);
+
+            }
+        });
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
+    }
+
+
 
     //All Drops Async
     public class LoadAllDropsTask extends AsyncTask<Void, Void, ArrayList<DropItem>> {
@@ -211,10 +269,22 @@ public class TrickleTabFragment extends Fragment {
                 dropItemAll.setDescription(listFromParse.get(i).getString("description"));
                 //CreatedAt
                 dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
+
                 //Riple Count
-                dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
+                int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
+                if (ripleCount == 1) {
+                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riple"));
+                } else {
+                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
+                }
+
                 //Comment Count
-                dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
+                int commentCount = (listFromParse.get(i).getInt("commentCount"));
+                if (commentCount == 1) {
+                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comment"));
+                } else {
+                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
+                }
 
 
                 allDropsList.add(dropItemAll);
@@ -372,46 +442,7 @@ public class TrickleTabFragment extends Fragment {
     }
 
 
-    public void loadSavedPreferences() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean trickleTipBoolean = sharedPreferences.getBoolean("trickleTipBoolean", true);
-        if (trickleTipBoolean) {
-            trickleTip();
-        }
-    }
 
-    public void savePreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
-    }
-
-    public void trickleTip() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(TrickleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
-
-        builder.setTitle("Trickle...");
-        builder.setMessage("This is the Trickle. A steady flow of Drops where every Riple begins. " +
-                "Add these Drops to your to-do list with the conveniently placed switch. " +
-                "Touch the author or the Drop to get a better look at them, respectively. Please do" +
-                " your part and report harassment, by touching the setting button seen on each Drop" +
-                ". If someone posts something offensive here then report it so it can be taken care of promptly");
-
-        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                savePreferences("trickleTipBoolean", false);
-
-            }
-        });
-
-        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.show();
-    }
 
     @Override
     public void onResume() {

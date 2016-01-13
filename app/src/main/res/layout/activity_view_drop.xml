@@ -56,7 +56,7 @@
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textColor="#000000"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/other_profile_picture"
@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:text="September 18, 2015 @ 3:32 p.m."
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:singleLine="true"
                 android:gravity="left"
                 android:layout_alignBottom="@+id/other_profile_picture"
@@ -95,7 +95,7 @@
                 android:text="Description"
                 android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
@@ -104,7 +104,7 @@
             <android.support.design.widget.TabLayout
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
+                android:layout_height="40dp"
                 app:tabMode="scrollable"
                 android:layout_gravity="bottom"
                 android:layout_below="@+id/description"
@@ -129,7 +129,7 @@
                 android:layout_height="wrap_content"
                 android:text="&quot;Mother Teresa&quot;"
                 android:id="@+id/author_rank"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:singleLine="false"
                 android:textStyle="italic"
                 android:layout_below="@+id/name"
@@ -138,7 +138,7 @@
                 android:layout_alignLeft="@+id/name"
                 android:layout_alignStart="@+id/name"
                 android:layout_toLeftOf="@+id/menu_button"
-                />
+                android:layout_marginTop="-4dp"/>
 
 
         </RelativeLayout>

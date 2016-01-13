@@ -61,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BroadcastReceiver receiver;
     Context mContext;
     SharedPreferences settings;
+    private boolean isBoxChecked;
+    private MenuItem checkBox;
+    private boolean checkTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,14 +154,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tabs.setViewPager(mPager);
     }
 
+    public void showUserTips() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean test = sharedPreferences.getBoolean("postDropTips", true);
+
+        if (test) {
+            viewUserTip();
+        }
+    }
+
+    public void saveTipPreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
+
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
+    }
+
+    public void viewUserTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+
+        builder.setTitle("Post a Drop");
+        builder.setMessage("Here, you can post a Drop for everyone to see. A Drop is an idea " +
+                "you have to make the world a better place. No matter how big or small your Drop " +
+                "is, you can create huge Riples. Post your Drop and then watch the Riples spread.");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveTipPreferences("postDropTips", false);
+            }
+        });
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
+    }
+
 
 
     public void createDropDialog() {
 
+
+
         final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
-        builder.setTitle("Post a new Drop");
+        builder.setTitle("Post a Drop");
 
         final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.drop_description);
 
@@ -179,8 +227,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "This is a fairly short Drop, try " +
-                            "adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Try adding some text before your" +
+                            "Drop is posted.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -192,7 +240,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         builder.show();
+
+        showUserTips();
     }
+
+
 
     /*public void createDropDialog() {
 
@@ -368,23 +420,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public void isBoxChecked(boolean status) {
+        this.isBoxChecked = status;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        SharedPreferences tipsSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isChecked = tipsSharedPreferences.getBoolean("allTipsBoolean", true);
-        MenuItem checkBox = menu.findItem(R.id.tips);
-        checkBox.setChecked(isChecked);
+        isBoxChecked = false;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        checkTest = sharedPreferences.getBoolean("allTipsBoolean", true);
+        checkBox = menu.findItem(R.id.tips);
+        checkBox.setChecked(checkTest);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (id == R.id.settingsButton) {
@@ -399,21 +454,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
 
+        //If checkbox is actuated
         if (id == R.id.tips) {
-            item.setChecked(!item.isChecked());
 
-            SharedPreferences.Editor editor = null;
+            if (checkTest) {
+                item.setChecked(item.isChecked());
+            } else {
+               item.setChecked(!item.isChecked());
+            }
+
+//            item.setChecked(!item.isChecked());
+
+            //If the box is checked
+            SharedPreferences.Editor editor;
             if (item.isChecked()) {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 editor = sharedPreferences.edit();
                 editor.putBoolean("allTipsBoolean", true);
-                editor.apply();
+                editor.putBoolean("ripleTips", true);
+                editor.putBoolean("dropTips", true);
+                editor.putBoolean("trickleTips", true);
+                editor.putBoolean("friendTips", true);
+                editor.putBoolean("postDropTips", true);
+                editor.putBoolean("viewUserTips", true);
+                editor.putBoolean("viewDropTips", true);
+                editor.commit();
+
                 Toast.makeText(MainActivity.this, "All tips will be displayed.", Toast.LENGTH_LONG).show();
+
+            //If the box is unchecked
             } else {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 editor = sharedPreferences.edit();
                 editor.putBoolean("allTipsBoolean", false);
-                editor.apply();
+                editor.putBoolean("ripleTips", false);
+                editor.putBoolean("dropTips", false);
+                editor.putBoolean("trickleTips", false);
+                editor.putBoolean("friendTips", false);
+                editor.putBoolean("postDropTips", false);
+                editor.putBoolean("viewUserTips", false);
+                editor.putBoolean("viewDropTips", false);
+                editor.commit();
+
                 Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
             }
             return true;
@@ -430,7 +512,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    /*public void savePreferences(String key, Boolean value){
+    /*public void saveTipPreferences(String key, Boolean value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);

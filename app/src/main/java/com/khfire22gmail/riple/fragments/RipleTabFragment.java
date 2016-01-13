@@ -2,6 +2,7 @@ package com.khfire22gmail.riple.fragments;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -89,7 +90,7 @@ public class RipleTabFragment extends Fragment {
 //        userName  = currentUser.getString("displayName");
         facebookId = currentUser.getString("facebookId");
 
-        //loadSavedPreferences();
+        //showUserTips();
 
         mRipleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRipleRecyclerView.setLayoutManager(layoutManager = new LinearLayoutManager(getActivity()));
@@ -108,8 +109,6 @@ public class RipleTabFragment extends Fragment {
         onCreateQuery.runLoadRipleItemsFromParse();
 
 //        updateUserInfo();
-
-        savePreferences("ripleTipBoolean", true);
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,6 +171,8 @@ public class RipleTabFragment extends Fragment {
 //            ripleTip();
 //        }
 
+//        setUserVisibleHint(true);
+
         return view;
     }
 
@@ -191,45 +192,51 @@ public class RipleTabFragment extends Fragment {
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
 
-    public void loadSavedPreferences() {
-        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean ripleTipBoolean = sharedPreferences.getBoolean("ripleTipBoolean", true);
-        if (ripleTipBoolean) {
+        if (isVisibleToUser && loadSavedPreferences()) {
             ripleTip();
         }
     }
 
-    public void savePreferences(String key, Boolean value) {
-        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
+    public boolean loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean test = sharedPreferences.getBoolean("ripleTips", true);
+
+        if (!test) {
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
-
-    public void unCheckAllTipsCheckBox(String key, Boolean value) {
-        android.content.SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+    public void saveTipPreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
-        editor.apply();
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
+
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
     }
 
     public void ripleTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(RipleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Riple...");
-        builder.setMessage("This is your Riple headquarters, all of your created and " +
-                "completed Drops will be listed here. Your Riple count will be tracked and you will" +
-                " be given a Riple Rank, accordingly. Make a bigger Riple to increase your rank." +
-                " Nobody likes a showoff, but it certainly does feel good to see the impact you " +
-                "have made, doesn't it?");
+        builder.setMessage("This is your Riple headquarters. All of your created and " +
+                "completed Drops will be listed here. You will be given a rank based on how many " +
+                "Riples you have created. Nobody likes a showoff, but it certainly does feel good " +
+                "to see the impact you have made.");
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                savePreferences("ripleTipBoolean", false);
-                unCheckAllTipsCheckBox("allTipsBoolean", false);
+                saveTipPreferences("ripleTips", false);
             }
         });
 

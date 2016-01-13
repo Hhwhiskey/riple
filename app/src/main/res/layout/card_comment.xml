@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:alpha="123124"
             android:background="@drawable/custom_bg"
-            android:paddingBottom="10dp">
+            >
 
             <ImageView
                 android:id="@+id/commenter_profile_picture"
@@ -51,7 +51,7 @@
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textColor="@color/PrimaryText"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/commenter_profile_picture"
@@ -67,7 +67,7 @@
                 android:gravity="top"
                 android:text="September 18, 2015 @ 3:32 p.m."
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:singleLine="true"
                 android:layout_alignBottom="@+id/commenter_profile_picture"
                 android:layout_alignParentRight="true"
@@ -86,24 +86,22 @@
                 android:enabled="true"
                 android:focusable="false"
                 android:maxLines="5"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Comment"
                 android:layout_below="@+id/commenter_profile_picture"
                 android:textColor="@color/PrimaryText"
-                android:textSize="14sp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
+                android:textSize="16sp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
-                />
+                android:layout_marginBottom="12dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="&quot;Mother Teresa&quot;"
                 android:id="@+id/commenter_rank"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:singleLine="false"
                 android:textStyle="italic"
                 android:textColor="#7d000000"
@@ -112,7 +110,7 @@
                 android:layout_toEndOf="@+id/commenter_profile_picture"
                 android:layout_below="@+id/commenter_name"
                 android:layout_marginLeft="8dp"
-                />
+                android:layout_marginTop="-4dp"/>
 
             <ImageView
                 android:layout_width="wrap_content"

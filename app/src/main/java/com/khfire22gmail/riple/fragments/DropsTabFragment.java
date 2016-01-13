@@ -94,39 +94,54 @@ public class DropsTabFragment extends Fragment {
             }
         });
 
-
-        //        loadSavedPreferences();
         return view;
     }
 
-    public void loadSavedPreferences() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean dropTipBoolean = sharedPreferences.getBoolean("dropTipBoolean", true);
-        if (dropTipBoolean) {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser && loadSavedPreferences()) {
             dropTip();
         }
     }
 
-    public void savePreferences(String key, Boolean value){
+    public boolean loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean test = sharedPreferences.getBoolean("dropTips", true);
+
+        if (!test) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    public void saveTipPreferences(String key, Boolean value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
-        editor.apply();
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
+
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
     }
 
     public void dropTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(DropsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Drops...");
-        builder.setMessage("This is your Drops list. Your very own to-do list of Drops. Once added to " +
+        builder.setMessage("This is your Drops list. Your very own To-Do list of Drops. Once added to " +
                 "this list, challenge yourself to complete them as you go about your" +
-                " day. Once complete, hit the checkbox, the author of the Drop will receive a" +
-                " Riple, and you will have helped make the world a better place; a win-win.");
+                " day. Once complete, the author of the Drop will receive a" +
+                " Riple, and you will have helped make the world a better place.");
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                savePreferences("dropTipBoolean", false);
+                saveTipPreferences("dropTips", false);
 
             }
         });

@@ -75,7 +75,7 @@ public class FriendsTabFragment extends Fragment {
         friendsEmptyView = (TextView) view.findViewById(R.id.friends_tab_empty_view);
 
         getConversationList();
-//        loadSavedPreferences();
+//        showUserTips();
 
         //Pull refresh conversation list
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.friend_swipe);
@@ -89,32 +89,50 @@ public class FriendsTabFragment extends Fragment {
         return view;
     }
 
-    public void loadSavedPreferences() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean friendTipBoolean = sharedPreferences.getBoolean("friendTipBoolean", true);
-        if (friendTipBoolean) {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser && loadSavedPreferences()) {
             friendTip();
         }
     }
 
-    public void savePreferences(String key, Boolean value){
+    public boolean loadSavedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean test = sharedPreferences.getBoolean("friendTips", true);
+
+        if (!test) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    public void saveTipPreferences(String key, Boolean value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
-        editor.apply();
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
+
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
     }
 
     public void friendTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(FriendsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Friends...");
-        builder.setMessage("This is your friends list. Everyone you have contacted will show up " +
-                "here so you can easily keep in touch. Simple enough, right?");
+        builder.setMessage("This is your friends list. Everyone you have contacted will automatically" +
+                " show up here so you can easily keep in touch. You may also long press your friends" +
+                " cards for additional actions.");
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                savePreferences("friendTipBoolean", false);
+                saveTipPreferences("friendTips", false);
 
             }
         });

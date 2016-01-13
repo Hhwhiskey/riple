@@ -26,7 +26,6 @@
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
             android:background="@drawable/custom_bg">
 
             <android.support.v7.widget.Toolbar
@@ -55,7 +54,7 @@
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textColor="#000000"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/other_profile_picture"
@@ -70,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:text="&quot;Mother Teresa&quot;"
                 android:id="@+id/author_rank"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:singleLine="false"
                 android:gravity="left|center_vertical|center_horizontal"
                 android:layout_alignLeft="@+id/name"
@@ -79,7 +78,8 @@
                 android:layout_below="@+id/name"
                 android:textColor="#7d000000"
                 android:layout_alignRight="@+id/name"
-                android:layout_alignEnd="@+id/name"/>
+                android:layout_alignEnd="@+id/name"
+                android:layout_marginTop="-4dp"/>
 
             <TextView
                 android:id="@+id/comment_created_at"
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:text="September 18, 2015 @ 3:32 p.m."
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:singleLine="true"
                 android:gravity="left"
                 android:layout_alignBottom="@+id/other_profile_picture"
@@ -105,15 +105,13 @@
                 android:enabled="true"
                 android:focusable="false"
                 android:maxLines="5"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Description"
                 android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
-                android:textSize="14sp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
+                android:textSize="16sp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:layout_alignParentLeft="true"/>
@@ -124,12 +122,11 @@
                 android:layout_height="wrap_content"
                 android:text="9999 riples"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:singleLine="true"
                 android:gravity="center|start"
                 android:layout_alignBottom="@+id/button_todo"
                 android:layout_below="@+id/description"
-                android:layout_marginTop="12dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/comment_created_at"
@@ -137,7 +134,8 @@
                 android:layout_toLeftOf="@+id/comment_created_at"
                 android:layout_alignParentEnd="true"
                 android:textStyle="italic"
-                android:layout_alignParentRight="true"/>
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"/>
 
             <TextView
                 android:id="@+id/comment_count"
@@ -145,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:text="120 comments"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:singleLine="true"
                 android:layout_alignBottom="@+id/button_todo"
                 android:layout_alignTop="@+id/riple_count"
@@ -156,7 +154,8 @@
                 android:layout_alignStart="@+id/comment_created_at"
                 android:layout_marginLeft="16dp"
                 android:layout_alignRight="@+id/comment_created_at"
-                android:layout_alignEnd="@+id/comment_created_at"/>
+                android:layout_alignEnd="@+id/comment_created_at"
+                />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -169,11 +168,11 @@
                 android:textColor="#ffffff"
                 android:background="@drawable/button_bg"
                 android:textStyle="bold"
-                android:layout_marginTop="4dp"
                 android:minHeight="32dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginRight="8dp"/>
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"/>
 
 
 

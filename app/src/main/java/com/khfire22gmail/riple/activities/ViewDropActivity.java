@@ -3,11 +3,13 @@ package com.khfire22gmail.riple.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -190,6 +192,50 @@ public class ViewDropActivity extends AppCompatActivity {
 
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
+
+        showUserTips();
+    }
+
+    public void showUserTips() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean test = sharedPreferences.getBoolean("viewDropTips", true);
+
+        if (test) {
+            viewUserTip();
+        }
+    }
+
+    public void saveTipPreferences(String key, Boolean value){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.putBoolean("allTipsBoolean", false);
+        editor.commit();
+
+//        MainActivity mainActivity = new MainActivity();
+//        mainActivity.isBoxChecked(false);
+    }
+
+    public void viewUserTip() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
+
+        builder.setTitle("View Drop");
+        builder.setMessage("This is where you can get a better look at a Drop and " +
+                "post comments. You can even swipe to the right to see who has completed this Drop.");
+
+        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveTipPreferences("viewDropTips", false);
+            }
+        });
+
+        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
     }
 
     private void getAuthorProfilePicture(String mAuthorId) {
