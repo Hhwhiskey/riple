@@ -59,6 +59,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         String clickedUserId = (data.get(position).getCommenterId());
         String clickedUserName = (data.get(position).getCommenterName());
         String clickedUserRank = (data.get(position).getCommenterRank());
+        String clickedUserInfo = (data.get(position).getCommenterInfo());
         String clickedUserRipleCount = (data.get(position).getCommenterRipleCount());
 
         Log.d("sCommentViewUser", "Clicked User's userObjectId = " + clickedUserId);
@@ -69,6 +70,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+        intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
 
         mContext.startActivity(intent);
     }

@@ -10,10 +10,18 @@ public class CompletedByItem {
     public String userObjectId;
     public String dropObjectId;
     public String displayName;
+    public String userInfo;
     public Bitmap parseProfilePicture;
     public String userRipleCount;
     public String userRank;
 
+    public String getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(String userInfo) {
+        this.userInfo = userInfo;
+    }
 
     public String getUserRipleCount() {
         return userRipleCount;

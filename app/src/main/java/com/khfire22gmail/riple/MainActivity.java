@@ -20,15 +20,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.khfire22gmail.riple.ViewPagers.MainSlidingTabLayout;
 import com.khfire22gmail.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
-import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -64,13 +66,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isBoxChecked;
     private MenuItem checkBox;
     private boolean checkTest;
+    private ParseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences settings = getSharedPreferences("MY_APP", MODE_PRIVATE);
+        currentUser = ParseUser.getCurrentUser();
+
+//        SharedPreferences settings = getSharedPreferences("MY_APP", MODE_PRIVATE);
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         startService(serviceIntent);
@@ -152,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(mPager);
+
+        //Log User with Crashlytics
+        logUser();
     }
 
     public void showUserTips() {
@@ -198,65 +206,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    //Open up a dialog box for the creation of a Drop
+//    public void createDropDialog() {
+//
+//        final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+//        builder.setTitle("Post a Drop");
+//
+//        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.drop_description);
+//
+//        builder.setView(view);
+//
+//        // Set up the buttons
+//        builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//
+//                dropDescription = input.getText().toString();
+//                int dropTextField = input.getText().length();
+//
+//                if (dropTextField > 0) {
+//                    try {
+//                        createDrop(dropDescription);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Try adding some text before your" +
+//                            "Drop is posted.", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//
+//        builder.show();
+//
+//        showUserTips();
+//    }
 
     public void createDropDialog() {
 
-
-
-        final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
-        builder.setTitle("Post a Drop");
-
-        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.drop_description);
-
-        builder.setView(view);
-
-        // Set up the buttons
-        builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                dropDescription = input.getText().toString();
-                int dropTextField = input.getText().length();
-
-                if (dropTextField > 0) {
-                    try {
-                        createDrop(dropDescription);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Try adding some text before your" +
-                            "Drop is posted.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-
-        showUserTips();
-    }
-
-
-
-    /*public void createDropDialog() {
+        showSoftKeyboard();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final String copiedString = sharedPreferences.getString("sharedDropString", "");
+        final String copiedString = sharedPreferences.getString("storedDropString", "");
 
         final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Post a new Drop");
 
-        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.drop_description);
+        final EditText input = (EditText) view.findViewById(R.id.drop_description);
+
+        input.setText(copiedString);
+
 
         builder.setView(view);
 
@@ -265,26 +274,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                input.setText(copiedString);
                 dropDescription = input.getText().toString();
                 int dropTextField = input.getText().length();
 
-
-
-                if (dropTextField > 25) {
+                if (dropTextField > 49) {
                     try {
                         createDrop(dropDescription);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "This is a fairly short Drop, try " +
-                    "adding a little more description to it before it's posted.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Hold on...This is a fairly short Drop. Try " +
+                    "having at least 50 characters before you post.", Toast.LENGTH_LONG).show();
 
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("sharedDropString", dropDescription);
-                    editor.apply();
+                    editor.putString("storedDropString", dropDescription);
+                    editor.commit();
                 }
             }
         });
@@ -292,19 +298,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+
+                //If the Drop is posted, clear the Text Field
+               removeDropStringFromSharedPreferences();
+            }
+        });
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                //If the Drop is posted, clear the Text Field
+               removeDropStringFromSharedPreferences();
+                hideSoftKeyboard();
+            }
+        });
+
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                hideSoftKeyboard();
             }
         });
 
         builder.show();
-    }*/
+    }
 
+    public void showSoftKeyboard() {
+        InputMethodManager imm = (InputMethodManager) (this).getSystemService((this).INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 
+    }
+
+    public void hideSoftKeyboard() {
+        if (this.getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(this.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    //If the Drop dialog is cleared or canceled, clear the stored string from S.P
+    public void removeDropStringFromSharedPreferences () {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("storedDropString", "");
+        editor.commit();
+    }
 
     // Take user input and post the Drop
     public void createDrop(String dropDescription) throws InterruptedException {
         //Create a Drop Object and get the currentUser
         final ParseObject drop = new ParseObject("Drop");
         final ParseUser currentUser = ParseUser.getCurrentUser();
+
+        //If the Drop is posted, clear the Text Field
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("storedDropString", "");
+        editor.commit();
 
         if (dropDescription != null) {
             //Add following fields to Drop data
@@ -331,13 +381,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                                finish();
 //                                startActivity(intent);
 
-//                                RipleTabFragment ripleTab = new RipleTabFragment();
-                                DropAdapter dropAdapter = new DropAdapter();
-                                dropAdapter.notifyDataSetChanged();
-
-
-
-
+//                                DropAdapter dropAdapter = new DropAdapter();
+//                                dropAdapter.notifyDataSetChanged();
 
                                 // Check the currentUser Report count
                                 ParseQuery query = ParseQuery.getQuery("UserReportCount");
@@ -457,13 +502,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //If checkbox is actuated
         if (id == R.id.tips) {
 
-            if (checkTest) {
-                item.setChecked(item.isChecked());
-            } else {
-               item.setChecked(!item.isChecked());
-            }
+//            if (checkTest) {
+//                item.setChecked(item.isChecked());
+//            } else {
+//               item.setChecked(!item.isChecked());
+//            }
 
-//            item.setChecked(!item.isChecked());
+            item.setChecked(!item.isChecked());
 
             //If the box is checked
             SharedPreferences.Editor editor;
@@ -506,23 +551,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ParseUser.logOut();
             Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
             startActivity(intentLogout);
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /*public void saveTipPreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
-    }*/
-
-
     @Override
     public void onBackPressed() {
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Exit");
@@ -550,21 +587,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
     }
+
+    private void logUser() {
+        // TODO: Use the current user's information
+        // You can call any combination of these three methods
+        Crashlytics.setUserName(currentUser.getUsername());
+    }
 }
 
 
 
 
 
-    /*private void logout() {
-        // Log the user out
-        ParseUser.logOut();
-        //todo Turn off Sinch functions upon logout of Riple
-        sinchClient.stopListeningOnActiveConnection();
-        sinchClient.terminate();
 
-        // Go to the login view
-        Intent intent = new Intent(getApplicationContext(), TitleActivity.class);
-        startActivity(intent);
-    }*/
 

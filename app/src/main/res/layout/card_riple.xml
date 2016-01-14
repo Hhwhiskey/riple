@@ -25,7 +25,7 @@
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="12dp"
+            android:paddingBottom="10dp"
             android:background="@drawable/custom_bg">
 
             <android.support.v7.widget.Toolbar
@@ -96,7 +96,10 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentLeft="true"/>
 
             <TextView
                 android:id="@+id/riple_count"

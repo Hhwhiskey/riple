@@ -86,6 +86,7 @@ public class ViewDropActivity extends AppCompatActivity {
     Context mContext;
     private ParseUser currentUser;
     private String mAuthorRipleCount;
+    private String mAuthorInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,7 @@ public class ViewDropActivity extends AppCompatActivity {
         mAuthorName = intent.getStringExtra("commenterName");
         mAuthorRank = intent.getStringExtra("authorRank");
         mAuthorRipleCount = intent.getStringExtra("clickedUserRipleCount");
+        mAuthorInfo = intent.getStringExtra("clickedUserInfo");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
@@ -263,37 +265,16 @@ public class ViewDropActivity extends AppCompatActivity {
         });
     }
 
-//    private void viewCompletedBy() {
-//
-//        Intent intent = new Intent(ViewDropActivity.this, CompletedActivity.class);
-//        intent.putExtra("dropObjectId", mDropObjectId);
-//        intent.putExtra("authorId", mAuthorId);
-//        intent.putExtra("commenterName", mAuthorName);
-//        intent.putExtra("authorRank", mAuthorRank);
-//        intent.putExtra("dropDescription", mDropDescription);
-//        intent.putExtra("ripleCount", mRipleCount);
-//        intent.putExtra("commentCount", mCommentCount);
-//        intent.putExtra("createdAt", mCreatedAt);
-//
-//        this.startActivity(intent);
-//    }
-
     // Allow user to view the Drop's Author's profile
     private void viewOtherUser(String mAuthorId, String mAuthorName) {
-
-//        String mClickedUserId = mAuthorId;
-//        String mClickedUserName = mAuthorName;
-//        String clickedUserRank = mAuthorRank;
-//        String clickedUserRipleCount = mAuthor
-
-//        Log.d("sDropViewUser", "Clicked User's Id = " + mClickedUserId);
-//        Log.d("sDropViewUser", "Clicked User's Name = " + mClickedUserName);
 
         Intent intent = new Intent(this, ViewUserActivity.class);
         intent.putExtra(Constants.CLICKED_USER_ID, mAuthorId);
         intent.putExtra(Constants.CLICKED_USER_NAME, mAuthorName);
         intent.putExtra(Constants.CLICKED_USER_RANK, mAuthorRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, mAuthorRipleCount);
+        intent.putExtra(Constants.CLICKED_USER_INFO, mAuthorInfo);
+
         this.startActivity(intent);
     }
 

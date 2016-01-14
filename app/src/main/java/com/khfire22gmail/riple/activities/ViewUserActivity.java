@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -63,6 +64,7 @@ public class ViewUserActivity extends AppCompatActivity {
     private TextView authorRipleCount;
     private String stringTestVariable;
     private ArrayList<DropItem> mViewUserDropList;
+    private String mClickedUserInfo;
 
 
     @Override
@@ -93,10 +95,11 @@ public class ViewUserActivity extends AppCompatActivity {
 
         //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
-        mClickedUserId = intent.getStringExtra("clickedUserId");
-        mClickedUserName = intent.getStringExtra("clickedUserName");
-        mClickedUserRank = intent.getStringExtra("clickedUserRank");
-        mClickedUserRipleCount = intent.getStringExtra("clickedUserRipleCount");
+        mClickedUserId = intent.getStringExtra(Constants.CLICKED_USER_ID);
+        mClickedUserName = intent.getStringExtra(Constants.CLICKED_USER_NAME);
+        mClickedUserRank = intent.getStringExtra(Constants.CLICKED_USER_RANK);
+        mClickedUserRipleCount = intent.getStringExtra(Constants.CLICKED_USER_RIPLE_COUNT);
+        mClickedUserInfo = intent.getStringExtra(Constants.CLICKED_USER_INFO);
         Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
         Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
         Log.d("rViewUser", "mClickedUserRipleCount = " + mClickedUserRipleCount);
@@ -128,7 +131,7 @@ public class ViewUserActivity extends AppCompatActivity {
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewUserInfo(mClickedUserName, mClickedUserId);
+                viewUserInfo(mClickedUserName, mClickedUserInfo);
             }
         });
 
@@ -195,12 +198,18 @@ public class ViewUserActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void viewUserInfo(String usersName, String aboutUser) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
+    //View users info
+    public void viewUserInfo(String userName, String userInfo ) {
 
-        builder.setTitle(usersName);
-        builder.setMessage("Hi I'm Kevin and I am the creator of Riple. I am glad you are using " +
-                "this exciting app alongside me. Lets make some big Riples!!!");
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
+        //Set title to users name
+        builder.setTitle(userName);
+        //If user has message show it, otherwise show default note
+        if (userInfo.equals("")) {
+            builder.setMessage("This user has not added any information yet.");
+        } else {
+            builder.setMessage(userInfo);
+        }
 
         builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
             @Override
@@ -334,6 +343,8 @@ public class ViewUserActivity extends AppCompatActivity {
                                     dropItem.setAuthorRank(authorData.getString("userRank"));
                                     //Author RipleCount
                                     dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+                                    //Author Info
+                                    dropItem.setAuthorInfo(authorData.getString("userInfo"));
 
                                     //Drop Data////////////////////////////////////////////////////////////////
                                     //DropObjectId

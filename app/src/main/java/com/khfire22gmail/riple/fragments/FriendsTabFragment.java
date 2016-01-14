@@ -207,7 +207,9 @@ public class FriendsTabFragment extends Fragment {
                         friendItem.setFriendObjectId(recipient.getObjectId());
                         friendItem.setFriendName(recipient.getString("displayName"));
                         friendItem.setRipleRank(recipient.getString("userRank"));
+                        friendItem.setFriendInfo(recipient.getString("userInfo"));
                         friendItem.setRipleCount(String.valueOf(recipient.getInt("userRipleCount")));
+
 
                         friendsList.add(friendItem);
                     }

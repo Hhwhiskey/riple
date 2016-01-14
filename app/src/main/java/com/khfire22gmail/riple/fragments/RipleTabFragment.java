@@ -176,6 +176,11 @@ public class RipleTabFragment extends Fragment {
         return view;
     }
 
+    public void forceCrash(View view) {
+        throw new RuntimeException("This is a crash");
+    }
+
+
     private class ripleRefreshTask extends AsyncTask<Void, Void, String[]> {
         @Override
         protected String[] doInBackground(Void... params) {
@@ -256,12 +261,14 @@ public class RipleTabFragment extends Fragment {
         String currentUserDisplayName = currentUser.getString("displayName");
         String currentUserRank = currentUser.getString("userRank");
         String currentUserRipleCount = String.valueOf(currentUser.getInt("userRipleCount"));
+        String currentUserInfo = currentUser.getString("userInfo");
 
         Intent intent = new Intent(getActivity(), ViewUserActivity.class);
         intent.putExtra(Constants.CLICKED_USER_ID, currentUserId);
         intent.putExtra(Constants.CLICKED_USER_NAME, currentUserDisplayName);
         intent.putExtra(Constants.CLICKED_USER_RANK, currentUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, currentUserRipleCount);
+        intent.putExtra(Constants.CLICKED_USER_INFO, currentUserInfo);
         getActivity().startActivity(intent);
     }
 
@@ -461,6 +468,8 @@ public class RipleTabFragment extends Fragment {
                             dropItem.setAuthorRank(authorData.getString("userRank"));
                             //Author RipleCount
                             dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+                            //Author Info
+                            dropItem.setAuthorInfo(authorData.getString("userInfo"));
 
                             //Drop Data////////////////////////////////////////////////////////////////
                             //DropObjectId

@@ -2,12 +2,14 @@ package com.khfire22gmail.riple.application;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.khfire22gmail.riple.R;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+import io.fabric.sdk.android.Fabric;
 
 
 /**
@@ -20,6 +22,7 @@ public class RipleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 

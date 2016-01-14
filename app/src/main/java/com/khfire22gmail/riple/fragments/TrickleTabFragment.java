@@ -149,7 +149,7 @@ public class TrickleTabFragment extends Fragment {
 
         builder.setTitle("Trickle...");
         builder.setMessage("This is the Trickle. A steady flow of Drops where every Riple begins. " +
-                "Find a Drop you want to complete and add it to your To-Do list. Once there " +
+                "Find a Drop you want to complete and add it to your To-Do list. Once there, " +
                 "you may complete it at your leisure. Please, do your part and report spam or " +
                 "inappropriate/offensive material here.");
 
@@ -261,6 +261,8 @@ public class TrickleTabFragment extends Fragment {
                 dropItemAll.setAuthorRank(authorData.getString("userRank"));
                 //Author Riple Count
                 dropItemAll.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+                //Author Info
+                dropItemAll.setAuthorInfo(authorData.getString("userInfo"));
 
                 //Drop Data///////////////////////////////////////////////////////////////
                 //DropObjectId

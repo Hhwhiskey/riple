@@ -135,6 +135,7 @@ public class CompletedFragment extends Fragment {
                                 completedByItem.setUserObjectId(list.get(i).getObjectId());
                                 completedByItem.setDisplayName((String) list.get(i).get("displayName"));
                                 completedByItem.setUserRank(list.get(i).getString("userRank"));
+                                completedByItem.setUserInfo(list.get(i).getString("userInfo"));
                                 completedByItem.setUserRipleCount(String.valueOf(list.get(i).getInt("userRipleCount")));
 
 

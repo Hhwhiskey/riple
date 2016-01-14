@@ -104,6 +104,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         String clickedUserName = (data.get(position).getDisplayName());
         String clickedUserRank = (data.get(position).getUserRank());
         String clickedUserRipleCount = (data.get(position).getUserRipleCount());
+        String clickedUserInfo = (data.get(position).getUserInfo());
 
         Log.d("sDropViewUser", "Clicked User's Id = " + clickedUserId);
         Log.d("sDropViewUser", "Clicked User's Name = " + clickedUserName);
@@ -113,6 +114,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+        intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
 
         mContext.startActivity(intent);
     }

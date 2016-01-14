@@ -11,8 +11,17 @@ public class FriendItem {
     public String friendName;
     public String ripleRank;
     public String ripleCount;
+    public String friendInfo;
     public String relationshipObjectId;
     public String friendObjectId;
+
+    public String getFriendInfo() {
+        return friendInfo;
+    }
+
+    public void setFriendInfo(String friendInfo) {
+        this.friendInfo = friendInfo;
+    }
 
     public String getFriendObjectId() {
         return friendObjectId;

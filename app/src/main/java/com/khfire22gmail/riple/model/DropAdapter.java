@@ -284,6 +284,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String authorName = (data.get(position).getAuthorName());
         String authorRank = (data.get(position).getAuthorRank());
         String authorRipleCount = (data.get(position).getAuthorRipleCount());
+        String clickedUserInfo = (data.get(position).getAuthorInfo());
         String dropDescription = (data.get(position).getDescription());
         String ripleCount = (data.get(position).getRipleCount());
         String commentCount = (data.get(position).getCommentCount());
@@ -303,6 +304,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("authorId", authorId);
         intent.putExtra("authorRank", authorRank);
         intent.putExtra("clickedUserRipleCount", authorRipleCount);
+        intent.putExtra("clickedUserInfo", clickedUserInfo);
         intent.putExtra("commenterName", authorName);
         intent.putExtra("dropDescription", dropDescription);
         intent.putExtra("ripleCount", ripleCount);
@@ -321,6 +323,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String clickedUserName = (data.get(position).getAuthorName());
         String clickedUserRank = (data.get(position).getAuthorRank());
         String clickedUserRipleCount = (data.get(position).getAuthorRipleCount());
+        String clickedUserInfo = (data.get(position).getAuthorInfo());
 
         Log.d(TAG, "Clicked User's Id = " + clickedUserId);
         Log.d(TAG, "Clicked User's Name = " + clickedUserName);
@@ -331,6 +334,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+        intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
+
 
         mContext.startActivity(intent);
     }

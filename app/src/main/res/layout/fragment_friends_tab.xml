@@ -24,7 +24,7 @@
         android:layout_height="match_parent"
         android:foregroundGravity="center"
         android:gravity="bottom|center_horizontal"
-        android:paddingBottom="250dp"
+        android:paddingBottom="325dp"
         android:text="This is where conversations with your friends will show up. Start making friends!"
         android:textSize="18sp"
         android:textStyle="italic"

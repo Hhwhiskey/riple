@@ -21,6 +21,8 @@ public class Constants {
     public static final String CLICKED_USER_NAME = "clickedUserName";
     public static final String CLICKED_USER_RANK = "clickedUserRank";
     public static final String CLICKED_USER_RIPLE_COUNT = "clickedUserRipleCount";
+    public static final String CLICKED_USER_INFO = "clickedUserInfo";
+
 
     //Intent Extra for Drop
     public static final String CLICKED_AUTHOR_NAME = "authorName";

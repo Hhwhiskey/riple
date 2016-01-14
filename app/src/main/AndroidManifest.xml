@@ -105,5 +105,8 @@
 
         <!--<meta-data android:name="com.parse.push.notification_icon" android:resource="@mipmap/ic_launcher"/>-->
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="8e8ad55e1558fcbceb21e4b0e96b059606e55b2f" />
     </application>
 </manifest>

@@ -26,7 +26,8 @@
             android:id="@+id/top_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_bg">
+            android:background="@drawable/custom_bg"
+            android:paddingBottom="8dp">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/trickle_card_tool_bar"
@@ -172,7 +173,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"/>
+                />
 
 
 

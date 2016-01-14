@@ -19,6 +19,7 @@ public class DropItem {
     public String authorName;
     public String authorRank;
     public String authorRipleCount;
+    public String authorInfo;
     public String description;
     public String comment;
     public String ripleCount;
@@ -26,6 +27,16 @@ public class DropItem {
     public ParseObject drop;
     public Bitmap parseProfilePicture;
 
+
+
+
+    public String getAuthorInfo() {
+        return authorInfo;
+    }
+
+    public void setAuthorInfo(String authorInfo) {
+        this.authorInfo = authorInfo;
+    }
 
     public String getAuthorRipleCount() {
         return authorRipleCount;

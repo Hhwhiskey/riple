@@ -1,26 +1,29 @@
+<ScrollView android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            >
+
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 tools:context=".activities.SettingsActivity"
-                android:id="@+id/profile">
+                android:id="@+id/profile"
+                android:paddingBottom="32dp"
+                android:paddingTop="32dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Edit your User Name..."
+        android:text="Edit Your Display Name..."
         android:id="@+id/edit_display_name_tv"
         android:textSize="20sp"
-        android:textStyle="bold|italic"
+        android:textStyle="bold"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:layout_below="@+id/display_name_tv"/>
 
     <TextView
@@ -31,7 +34,6 @@
         android:id="@+id/textView4"
         android:textSize="20sp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
         android:textStyle="bold"/>
 
     <TextView
@@ -42,10 +44,11 @@
         android:textSize="30dp"
         android:layout_below="@+id/edit_profile_picture"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:textStyle="italic"/>
 
 
 
@@ -54,24 +57,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Notifications"
+            android:text="Notifications Coming Soon!"
             android:id="@+id/textView8"
             android:textSize="20sp"
             android:layout_below="@+id/edit_info_tv"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"/>
+            android:layout_marginTop="32dp"
+            />
 
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:rowCount="2"
-            android:columnCount="2"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/textView8"
-            android:orientation="horizontal">
+        <!--<GridLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:rowCount="2"-->
+            <!--android:columnCount="2"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_below="@+id/textView8"-->
+            <!--android:orientation="horizontal">-->
 
 
-            <CheckBox
+            <!--<CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Messages"
@@ -134,8 +138,8 @@
                 android:layout_row="1"
                 android:layout_column="1"
                 android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"/>
-        </GridLayout>
+                android:layout_marginRight="50dp"/>-->
+        <!--</GridLayout>-->
 
 
 
@@ -146,20 +150,35 @@
         android:id="@+id/edit_profile_picture"
         android:layout_below="@+id/textView4"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="24dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Edit your Info..."
+        android:text="Edit Your Info..."
         android:id="@+id/edit_info_tv"
         android:textSize="20sp"
-        android:textStyle="bold|italic"
+        android:textStyle="bold"
         android:gravity="center_horizontal"
+        android:layout_below="@+id/user_info_tv"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Info"
+        android:id="@+id/user_info_tv"
         android:layout_below="@+id/edit_display_name_tv"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        android:gravity="center"/>
 
 
 </RelativeLayout>
+</ScrollView>

@@ -3,4 +3,12 @@
     <style name="AppTheme.">
         <item name="android:colorControlHighlight">@color/colorHighlight</item>
     </style>
+
+    <style name="counterText">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="counterOverride">
+        <item name="android:textColor">#ff0000</item>
+    </style>
 </resources>

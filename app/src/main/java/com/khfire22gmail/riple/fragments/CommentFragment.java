@@ -49,6 +49,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class CommentFragment extends Fragment {
 
+    public static final String ARG_PAGE = "COMMENT_PAGE";
     private String mDropObjectId;
     private String mAuthorId;
     private String mAuthorRank;
@@ -70,10 +71,9 @@ public class CommentFragment extends Fragment {
     private String commentText;
     private TextView newCommentView;
     private ParseFile commenterProfilePicture;
-
-    public static final String ARG_PAGE = "COMMENT_PAGE";
     private int mPage;
     private ParseUser currentUser;
+    private String mAuthorInfo;
 
     public static CommentFragment newInstance(int page) {
         Bundle args = new Bundle();
@@ -118,6 +118,7 @@ public class CommentFragment extends Fragment {
         mAuthorName = intent.getStringExtra("commenterName");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
+        mAuthorInfo = intent.getStringExtra("commenterInfo");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
@@ -334,6 +335,9 @@ public class CommentFragment extends Fragment {
 
                         //Commenter Riple Count
                         commentItem.setCommenterRipleCount(String.valueOf(commenterData.getInt("userRipleCount")));
+
+                        //Commenter Info
+                        commentItem.setCommenterInfo((String)commenterData.get("userInfo"));
 
                         //Comment Data/////////////////////////////////////////////////////////////
                         // Comment Id

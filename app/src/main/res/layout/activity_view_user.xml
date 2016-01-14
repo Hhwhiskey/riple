@@ -32,7 +32,9 @@
         android:textStyle="italic"
         android:foregroundGravity="center"
         android:paddingBottom="100dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"/>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_view_user"
