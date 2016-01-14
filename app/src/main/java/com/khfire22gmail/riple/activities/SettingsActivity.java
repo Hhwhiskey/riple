@@ -25,9 +25,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -37,7 +36,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -90,27 +88,43 @@ public class SettingsActivity extends AppCompatActivity {
 
         }
 
+        //If currentUser has a picture, decode it at 300x300 and display it in TV
+        if (parseProfilePicture != null) {
+            parseProfilePicture.getDataInBackground(new GetDataCallback() {
+
+                @Override
+                public void done(byte[] data, ParseException e) {
+                    if (e == null) {
+                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 300, 300, true);
+                        editProfilePictureView.setImageBitmap(resized);
+                    }
+                }
+            });
+        } else {
+            //Otherwise, if use has a facebook picture, get that instead.
+            if (facebookId != null) {
+                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
+                new DownloadImageTask((ImageView) findViewById(R.id.edit_profile_picture))
+                        .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
+            }
+        }
+
         //Set curentUser name and info to textviews
         displayNameView.setText(parseDisplayName);
         userInfoView.setText(userInfoString);
 
         //Get the currentUser displayImage if it's available, and set it to editProfilePictureView
-        if(parseProfilePicture != null) {
-            Glide.with(this)
-                    .load(parseProfilePicture.getUrl())
-                    .crossFade()
-                    .fallback(R.drawable.ic_user_default)
-                    .error(R.drawable.ic_user_default)
-                    .signature(new StringSignature(UUID.randomUUID().toString()))
-                    .into(editProfilePictureView);
-        //If the user has a valid facebookId, use their facebook picture by default
-        } else {
-            if (facebookId != null){
-                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
-                new DownloadImageTask((ImageView) findViewById(R.id.edit_profile_picture))
-                        .execute("https://graph.facebook.com/" + facebookId+ "/picture?type=large");
-            }
-        }
+//        if (parseProfilePicture != null) {
+//            Glide.with(this)
+//                    .load(parseProfilePicture.getUrl())
+//                    .crossFade()
+//                    .fallback(R.drawable.ic_user_default)
+//                    .error(R.drawable.ic_user_default)
+//                    .signature(new StringSignature(UUID.randomUUID().toString()))
+//                    .into(editProfilePictureView);
+//            //If the user has a valid facebookId, use their facebook picture by default
+
         //OCL for new image selection
         ImageView image = (ImageView) findViewById(R.id.edit_profile_picture);
         image.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +203,6 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
 
-
         //OCL for user info edit
         TextView editUserInfo = (TextView) findViewById(R.id.edit_info_tv);
         editUserInfo.setOnClickListener(new View.OnClickListener() {
@@ -253,13 +266,20 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 });
 
+                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+
+                    }
+                });
+
                 builder.show();
             }
         });
     }
 
     //Updates the users display name after edit
-    public void updateDisplayNameTextView (String updatedName) {
+    public void updateDisplayNameTextView(String updatedName) {
         TextView displayNameView = (TextView) findViewById(R.id.display_name_tv);
         displayNameView.setText(updatedName);
     }
@@ -291,6 +311,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
             return mIcon;
         }
+
         //Once picture is downloaded, assign it to bmImage and convert it into a byteArray
         //then save it to Parse
         protected void onPostExecute(Bitmap result) {
@@ -380,13 +401,13 @@ public class SettingsActivity extends AppCompatActivity {
         if (width > height) {
             float ratio = (float) width / maxWidth;
             width = maxWidth;
-            height = (int)(height / ratio);
-        //Otherwise give portrait ratio
+            height = (int) (height / ratio);
+            //Otherwise give portrait ratio
         } else if (height > width) {
             float ratio = (float) height / maxHeight;
             height = maxHeight;
-            width = (int)(width / ratio);
-        //If sides are equivalent, give square ratio
+            width = (int) (width / ratio);
+            //If sides are equivalent, give square ratio
         } else {
             height = maxHeight;
             width = maxWidth;

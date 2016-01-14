@@ -3,6 +3,8 @@ package com.khfire22gmail.riple.activities;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -56,18 +59,18 @@ public class TitleActivity extends AppCompatActivity {
         //Splash Video
 
 
-//        VideoView drops = (VideoView)findViewById(R.id.title_video);
-//        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
-//        drops.setVideoURI(Uri.parse(path));
-//        drops.start();
-//
-//        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                mp.setLooping(true);
-//            }
-//        });
+        VideoView drops = (VideoView)findViewById(R.id.title_video);
+        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
+        drops.setVideoURI(Uri.parse(path));
+        drops.start();
+
+        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
 
         // Bypass login screen if user is currently logged in
         intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -253,7 +256,7 @@ public class TitleActivity extends AppCompatActivity {
                                 final ParseUser currentUser = ParseUser.getCurrentUser();
 
                                 currentUser.put("facebookId", jsonObject.getString("id"));
-                                currentUser.put("username", jsonObject.getString("name"));
+                                currentUser.put("username", jsonObject.getString("id"));
                                 currentUser.put("displayName", jsonObject.getString("name"));
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override

@@ -324,15 +324,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void showSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) (this).getSystemService((this).INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 
     }
 
     public void hideSoftKeyboard() {
         if (this.getCurrentFocus() != null) {
-            InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(this.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+            InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
         }
     }
 
@@ -392,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     public void done(final ParseObject parseObject, ParseException e) {
                                         int reportCount = parseObject.getInt("reportCount");
 
-                                        if (reportCount > 0) {
+                                        if (reportCount > 50) {
                                             //Get the banned users Drops for flush
                                             ParseQuery deleteUserQuery = ParseQuery.getQuery("Drop");
                                             deleteUserQuery.whereEqualTo("authorPointer", currentUser);
@@ -573,11 +573,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//               moveTaskToBack(true);
+
                 finish();
-//                moveTaskToBack(true);
-//                android.os.Process.killProcess(android.os.Process.myPid());
-//                System.exit(1);
             }
         });
         builder.show();

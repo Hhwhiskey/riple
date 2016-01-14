@@ -35,7 +35,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,10 +89,8 @@ public class RipleTabFragment extends Fragment {
         mOnScrollListFromFromParse = new ArrayList<>();
 
         currentUser = ParseUser.getCurrentUser();
-//        userName  = currentUser.getString("displayName");
+        userName  = currentUser.getString("displayName");
         facebookId = currentUser.getString("facebookId");
-
-        //showUserTips();
 
         mRipleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
         mRipleRecyclerView.setLayoutManager(layoutManager = new LinearLayoutManager(getActivity()));
@@ -104,11 +104,13 @@ public class RipleTabFragment extends Fragment {
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
 
+       //Call to get and set current user data on profile card
+        updateUserInfo();
+
+
         //Default onCreate Query call
         LoadRipleItemsFromParse onCreateQuery = new LoadRipleItemsFromParse();
         onCreateQuery.runLoadRipleItemsFromParse();
-
-//        updateUserInfo();
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,21 +167,13 @@ public class RipleTabFragment extends Fragment {
             }
         });
 
-//        visible = getUserVisibleHint();
-//
-//        if (visible) {
-//            ripleTip();
-//        }
-
-//        setUserVisibleHint(true);
-
         return view;
     }
 
-    public void forceCrash(View view) {
-        throw new RuntimeException("This is a crash");
-    }
-
+    //Code to force crash for Fabric
+//    public void forceCrash(View view) {
+//        throw new RuntimeException("This is a crash");
+//    }
 
     private class ripleRefreshTask extends AsyncTask<Void, Void, String[]> {
         @Override
@@ -533,6 +527,7 @@ public class RipleTabFragment extends Fragment {
 //        scaleAdapter.setDuration(500);
     }
 
+    //Updates all of their current user data in their profile card. Picture, name, rank and riple count
     private void updateUserInfo() {
 
         if ((currentUser != null) && currentUser.isAuthenticated()) {
@@ -540,55 +535,64 @@ public class RipleTabFragment extends Fragment {
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
         }
 
-        parseProfilePicture.getDataInBackground(new GetDataCallback() {
-            @Override
-            public void done(byte[] data, ParseException e) {
-                if (e == null) {
-                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
-
-                    profilePictureView.setImageBitmap(resized);
+        //If user has a parse picture, get/set it
+        if (parseProfilePicture != null) {
+            parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] data, ParseException e) {
+                    if (e == null) {
+                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
+                        profilePictureView.setImageBitmap(resized);
+                    }
                 }
-            }
-        });
-
-
-//        //get parse profile picture if exists, if not, store Facebook picture on Parse and show
-//        if (parseProfilePicture != null) {
-//            Glide.with(this)
-//                    .load(parseProfilePicture.getUrl())
-//                    .crossFade()
-//                    .fallback(R.drawable.ic_user_default)
-//                    .error(R.drawable.ic_user_default)
-//                    .signature(new StringSignature(UUID.randomUUID().toString()))
-//                    .into(profilePictureView);
-//        } else {
-//            if (facebookId != null) {
-//                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
-//                new DownloadImageTask(profilePictureView)
-//                        .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
-//            }
-//        }
-
-        String userName = currentUser.getString("displayName");
-
-        // Update UserName
-        if (userName != null) {
-            nameView.setText(userName);
+            });
+        //Otherwise, if they have a facebook id, use that picture instead
         } else {
-            nameView.setText("Anonymous");
-        }
-
-
-        //Update Riple count and Rank
-        ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
-        userRipleCountQuery.whereEqualTo("userPointer", currentUser);
-        userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                updateRipleCount(parseObject);
+            if (facebookId != null) {
+                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
+                new DownloadImageTask(profilePictureView)
+                        .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
             }
-        });
+
+
+//            //get parse profile picture if exists, if not, store Facebook picture on Parse and show
+//            if (parseProfilePicture != null) {
+//                Glide.with(this)
+//                        .load(parseProfilePicture.getUrl())
+//                        .crossFade()
+//                        .fallback(R.drawable.ic_user_default)
+//                        .error(R.drawable.ic_user_default)
+//                        .signature(new StringSignature(UUID.randomUUID().toString()))
+//                        .into(profilePictureView);
+//            } else {
+//                if (facebookId != null) {
+//                    Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
+//                    new DownloadImageTask(profilePictureView)
+//                            .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
+//                }
+//            }
+
+            String displayName = currentUser.getString("displayName");
+
+            // Update UserName
+            if (displayName != null) {
+                nameView.setText(displayName);
+            } else {
+                nameView.setText("Anonymous");
+            }
+
+
+            //Update Riple count and Rank
+            ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
+            userRipleCountQuery.whereEqualTo("userPointer", currentUser);
+            userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    updateRipleCount(parseObject);
+                }
+            });
+        }
     }
 
     public void updateRipleCount(ParseObject userObject) {
@@ -676,14 +680,14 @@ public class RipleTabFragment extends Fragment {
         profileRankView.setText(ripleRank);
     }
 
+    //Task to download the users facebook picture
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImageView;
+        ImageView bmImage;
 
 
         public DownloadImageTask(ImageView bmImage) {
-            this.bmImageView = bmImage;
+            this.bmImage = bmImage;
         }
-
 
         protected Bitmap doInBackground(String... urls) {
             String urldisplay = urls[0];
@@ -698,14 +702,31 @@ public class RipleTabFragment extends Fragment {
             return mIcon;
         }
 
-    }
+        protected void onPostExecute(Bitmap result) {
+            if (bmImage != null) {
+                bmImage.setImageBitmap(result);
+                //convert bitmap to byte array and upload to Parse
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                result.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
 
+                final ParseFile file = new ParseFile("parseProfilePicture.png", byteArray);
+                file.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            currentUser.put("parseProfilePicture", file);
+                            currentUser.saveInBackground();
+                        }
+                    }
+                });
+            }
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
         updateUserInfo();
     }
-
-
 }

@@ -39,12 +39,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="true"
-        android:paddingLeft="16dp"
         android:text="riple"
         android:textAlignment="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#ffffff"
-        android:textSize="96sp"/>
+        android:textSize="96sp"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="32dp"/>
 
     <TextView
         android:id="@+id/quote"
@@ -59,7 +60,6 @@
         android:layout_alignWithParentIfMissing="false"
         android:layout_below="@+id/definition"
         android:layout_marginTop="26dp"
-        android:paddingLeft="16dp"
         android:singleLine="false"
         android:text="@string/quote"
         android:textAlignment="center"
@@ -68,7 +68,9 @@
         android:textSize="20sp"
         android:textStyle="italic"
         android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"/>
+        android:layout_marginLeft="8dp"
+        android:paddingRight="16dp"
+        />
 
     <TextView
         android:id="@+id/motherTeresa"
@@ -77,11 +79,11 @@
         android:layout_alignEnd="@+id/quote"
         android:layout_alignRight="@+id/quote"
         android:layout_below="@+id/quote"
-        android:paddingRight="50dp"
         android:text="- Mother Teresa"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#ffffff"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="55dp"/>
 
     <TextView
         android:id="@+id/dictionary"
@@ -91,8 +93,7 @@
         android:layout_alignStart="@+id/titleText"
         android:layout_below="@+id/titleText"
         android:layout_marginTop="24dp"
-        android:paddingLeft="16dp"
-        android:text="verb | rip·ple | \ˈri-pəl\"
+        android:text="verb | rip·le | \ˈri-pəl\"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#ffffff"/>
 
@@ -104,7 +105,6 @@
         android:layout_alignStart="@+id/dictionary"
         android:layout_below="@+id/dictionary"
         android:layout_marginTop="26dp"
-        android:paddingLeft="16dp"
         android:text="1 : to change the world"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#ffffff"/>
