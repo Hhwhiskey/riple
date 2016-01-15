@@ -44,23 +44,26 @@ import java.util.Random;
 
 public class MessagingActivity extends AppCompatActivity {
 
+    private static final String TAG = "MessagingActivity";
     private String recipientId;
     private EditText messageBodyField;
     private String messageBody;
     private MessageService.MessageServiceInterface messageService;
-    private String currentUserId;
+    private String mCurrentUserId;
     private ServiceConnection serviceConnection = new MyServiceConnection();
     private MyMessageClientListener messageClientListener = new MyMessageClientListener();
     private MessageAdapter messageAdapter;
     private ListView messagesList;
     private ParseUser mCurrentUser;
     private Random random;
+    private ParseUser mRecipient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messaging);
         mCurrentUser = ParseUser.getCurrentUser();
+
 
         bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
 
@@ -76,18 +79,18 @@ public class MessagingActivity extends AppCompatActivity {
             }
         });
 
-
         //get recipientId from the intent
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
-        currentUserId = ParseUser.getCurrentUser().getObjectId();
+        mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
-        String[] userIds = {currentUserId, recipientId};
+        String[] userIds = {mCurrentUserId, recipientId};
 
         checkForRelation();
 
+        //Get messages for viewed conversation
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
         query.whereContainedIn("senderId", Arrays.asList(userIds));
         query.whereContainedIn("recipientId", Arrays.asList(userIds));
@@ -98,7 +101,7 @@ public class MessagingActivity extends AppCompatActivity {
                 if (e == null) {
                     for (int i = 0; i < messageList.size(); i++) {
                         WritableMessage message = new WritableMessage(messageList.get(i).get("recipientId").toString(), messageList.get(i).get("messageText").toString());
-                        if (messageList.get(i).get("senderId").toString().equals(currentUserId)) {
+                        if (messageList.get(i).get("senderId").toString().equals(mCurrentUserId)) {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
                         } else {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
@@ -118,7 +121,7 @@ public class MessagingActivity extends AppCompatActivity {
 
                 final Random random = new Random();
 
-                if (recipientId.equals(currentUserId)) {
+                if (recipientId.equals(mCurrentUserId)) {
                     String[] toastMessages = new String[]{
                             getString(R.string.message_self_1),
                             getString(R.string.message_self_2),
@@ -158,7 +161,7 @@ public class MessagingActivity extends AppCompatActivity {
         addToFriendsQuery.getInBackground(recipientId, new GetCallback<ParseUser>() {
             public void done(ParseUser recipient, ParseException e) {
                 if (e == null) {
-                    if (!recipientId.equals(currentUserId)) {
+                    if (!recipientId.equals(mCurrentUserId)) {
                         addFriendsRelation(recipient);
                     }
                 }
@@ -166,7 +169,7 @@ public class MessagingActivity extends AppCompatActivity {
         });
     }
 
-    //If this relation does not exist, create it so it can be displayed in the Friends tab
+    //Query for all the relations the user is involved
     public void addFriendsRelation(final ParseUser recipient) {
 
         final ArrayList mRecipientsList = new ArrayList<>();
@@ -204,8 +207,7 @@ public class MessagingActivity extends AppCompatActivity {
                         }
 
                         mRecipientsList.add(recipient.getObjectId());
-                        Log.e("MyApp", "mCurrentRelations size = " + mRecipientsList.size());
-                        //chatRecipient.put("recipient", markerUser);
+                        Log.e(TAG, "mCurrentRelations size = " + mRecipientsList.size());
                     }
                 }
                 chatAdditionRequest(mRecipientsList, recipient);
@@ -213,6 +215,7 @@ public class MessagingActivity extends AppCompatActivity {
         });
     }
 
+    //If the relation exists, do nothing, otherwise, create it
     private void chatAdditionRequest(List<String> mRecipientList, ParseUser recipient) {
         Boolean exists = false;
 
@@ -224,11 +227,13 @@ public class MessagingActivity extends AppCompatActivity {
             }
         }
         if (!exists) {
-            ParseObject relation = new ParseObject(Constants.FRIENDS);
-            relation.put(Constants.USER1, mCurrentUser);
-            relation.put(Constants.USER2, recipient);
-            relation.saveInBackground();
+            ParseObject relationship = new ParseObject(Constants.FRIENDS);
+            relationship.put(Constants.USER1, mCurrentUser);
+            relationship.put(Constants.USER2, recipient);
+            relationship.saveInBackground();
         }
+
+        mRecipient = recipient;
     }
 
     //unbind the service when the activity is destroyed
@@ -274,7 +279,7 @@ public class MessagingActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onMessageSent(MessageClient client, Message message, String recipientId) {
+        public void onMessageSent(MessageClient client, final Message message, final String recipientId) {
             //Display the message that was just sent
             final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
             messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
@@ -287,13 +292,36 @@ public class MessagingActivity extends AppCompatActivity {
                     if (e == null) {
                         if (messageList.size() == 0) {
                             ParseObject parseMessage = new ParseObject("ParseMessage");
-                            parseMessage.put("senderId", currentUserId);
+                            parseMessage.put("senderId", mCurrentUserId);
                             parseMessage.put("recipientId", writableMessage.getRecipientIds().get(0));
                             parseMessage.put("messageText", writableMessage.getTextBody());
                             parseMessage.put("sinchId", writableMessage.getMessageId());
-                            parseMessage.saveInBackground();
+                            parseMessage.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
 
-                            //messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
+                                    ParseObject [] queryConstraints = {mCurrentUser, mRecipient};
+
+                                    ParseQuery query = ParseQuery.getQuery("Friends");
+                                    query.whereContainedIn("user1", Arrays.asList(queryConstraints));
+                                    query.whereContainedIn("user2", Arrays.asList(queryConstraints));
+                                    query.getFirstInBackground(new GetCallback<ParseObject>() {
+                                        @Override
+                                        public void done(ParseObject parseObject, ParseException e) {
+                                            parseObject.put("lastMessage", writableMessage.getTextBody());
+                                            parseObject.saveInBackground();
+                                        }
+                                    });
+//
+//                                    FriendsTabFragment friendsTabFragment = new FriendsTabFragment();
+//                                    friendsTabFragment.loadFriendsListFromParse();
+//
+//                                    FriendAdapter adapter = new FriendAdapter();
+//                                    adapter.notifyDataSetChanged();
+                                }
+                            });
+
+
 
                             try {
                                 sendPushNotification();

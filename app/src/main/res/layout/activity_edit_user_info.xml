@@ -27,7 +27,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:hint="Share a little about yourself"
+        android:hint="@string/share_about_yourself_hint"
         android:maxLength="250"/>
         <requestFocus></requestFocus>
     </android.support.design.widget.TextInputLayout>

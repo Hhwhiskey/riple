@@ -20,8 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
@@ -40,7 +38,6 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
@@ -109,7 +106,7 @@ public class CommentFragment extends Fragment {
         postCommentButton = (Button) view.findViewById(R.id.button_post_comment);
 
         //Display current user picture
-        updateUserInfo();
+        showCurrentUserPictureInCommenterPosition();
 
         Intent intent = getActivity().getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
@@ -135,18 +132,19 @@ public class CommentFragment extends Fragment {
                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
                 displayName = (String) currentUser.get("displayName");
 
+                // Require the user has a picture and display name set before they post a comment
+
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+
                 if (parseProfilePicture == null && displayName == null) {
-                    Toast.makeText(getActivity(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    Toast.makeText(getActivity(), R.string.picAndNameToast, Toast.LENGTH_LONG).show();
                     startActivity(intent);
                 } else if (parseProfilePicture == null) {
-                    Toast.makeText(getActivity(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    Toast.makeText(getActivity(), R.string.picToast, Toast.LENGTH_LONG).show();
                     startActivity(intent);
 
                 } else if (displayName == null) {
-                    Toast.makeText(getActivity(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    Toast.makeText(getActivity(), R.string.nameToast, Toast.LENGTH_LONG).show();
                     startActivity(intent);
                 } else {
                     commentText = newCommentView.getEditableText().toString();
@@ -165,7 +163,7 @@ public class CommentFragment extends Fragment {
         return view;
     }
 
-    private void updateUserInfo() {
+    private void showCurrentUserPictureInCommenterPosition() {
         ParseUser currentUser = ParseUser.getCurrentUser();
         commenterProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
         Bundle parametersPicture = new Bundle();
@@ -173,18 +171,24 @@ public class CommentFragment extends Fragment {
 
         //get parse profile picture if exists, if not, store Facebook picture on Parse and show
 
-        if (commenterProfilePicture != null) {
-            Glide.with(this)
-                    .load(commenterProfilePicture.getUrl())
-                    .crossFade()
-                    .fallback(R.drawable.ic_user_default)
-                    .error(R.drawable.ic_user_default)
-                    .signature(new StringSignature(UUID.randomUUID().toString()))
-                    .into(commenterProfilePictureView);
-        } else {
-            Toast.makeText(getActivity(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getActivity(), SettingsActivity.class);
-            startActivity(intent);
+        if ((currentUser != null) && currentUser.isAuthenticated()) {
+
+            parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
+
+            //If user has a parse picture, get/set it
+            if (parseProfilePicture != null) {
+                parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] data, ParseException e) {
+                        if (e == null) {
+                            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                            commenterProfilePictureView.setImageBitmap(resized);
+                        }
+                    }
+                });
+            }
+
         }
     }
 

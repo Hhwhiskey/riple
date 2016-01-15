@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:gravity="bottom|center_horizontal"
         android:visibility="visible"
-        android:text="Nobody has completed this Drop yet. Why don't you be the first?"
+        android:text="@string/completed_empty_view"
         android:textSize="18sp"
         android:textStyle="italic"
         android:foregroundGravity="center"

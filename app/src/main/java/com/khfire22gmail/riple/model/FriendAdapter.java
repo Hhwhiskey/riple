@@ -39,6 +39,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     List<FriendItem> data = Collections.emptyList();
     private LayoutInflater inflater;
 
+    public FriendAdapter() {
+
+    }
+
     public FriendAdapter(Context context, ArrayList<FriendItem> data) {
         mContext = context;
         this.inflater = LayoutInflater.from(context);

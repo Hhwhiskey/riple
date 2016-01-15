@@ -119,6 +119,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                     user.setPassword(password);
                     user.put("username", email);
                     user.put("email", email);
+                    user.put("userInfo", "");
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
                     builder.setTitle("Not so fast...");

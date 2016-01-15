@@ -101,6 +101,9 @@ public class DropsTabFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
+//        LoadDropItemsFromParse loadDropItemsFromParse = new LoadDropItemsFromParse();
+//        loadDropItemsFromParse.runLoadDropItemsFromParse();
+
         if (isVisibleToUser && loadSavedPreferences()) {
             dropTip();
         }
@@ -186,7 +189,9 @@ public class DropsTabFragment extends Fragment {
                 skipNumber = pageMultiplier * queryLimit;
                 // Otherwise, clear the list, because this is a default(refresh) query
             } else {
-                mDropListFromParse.clear();
+                if (mDropListFromParse != null) {
+                    mDropListFromParse.clear();
+                }
             }
 
             ParseUser user = ParseUser.getCurrentUser();

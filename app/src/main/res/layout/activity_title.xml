@@ -83,7 +83,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#ffffff"
         android:layout_marginTop="8dp"
-        android:layout_marginRight="55dp"/>
+        android:layout_marginRight="60dp"/>
 
     <TextView
         android:id="@+id/dictionary"

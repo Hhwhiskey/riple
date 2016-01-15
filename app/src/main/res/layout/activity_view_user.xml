@@ -27,7 +27,7 @@
         android:layout_height="match_parent"
         android:gravity="bottom|center_horizontal"
         android:visibility="visible"
-        android:text="This is where you can see this users activity, once they get started."
+        android:text="@string/view_user_empty_view"
         android:textSize="18sp"
         android:textStyle="italic"
         android:foregroundGravity="center"

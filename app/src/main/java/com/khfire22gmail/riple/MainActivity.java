@@ -83,22 +83,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-//                showPopup(view);
+
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
                 displayName = (String) currentUser.get("displayName");
 
                 if (parseProfilePicture == null && displayName == null) {
-                    Toast.makeText(getApplicationContext(), "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), R.string.picAndNameToast, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                     startActivity(intent);
                 } else if (parseProfilePicture == null) {
-                    Toast.makeText(getApplicationContext(), "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), R.string.picToast, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                     startActivity(intent);
 
                 } else if (displayName == null) {
-                    Toast.makeText(getApplicationContext(), "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), R.string.nameToast, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                     startActivity(intent);
 
@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dropDescription = input.getText().toString();
                 int dropTextField = input.getText().length();
 
-                if (dropTextField > 49) {
+                if (dropTextField > 1) {
                     try {
                         createDrop(dropDescription);
                     } catch (InterruptedException e) {
@@ -377,13 +377,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 // Notify the user that their Drop has been posted and show it in the RipleTabFragment
                                 Toast.makeText(getApplicationContext(), "You have posted a new Drop!", Toast.LENGTH_SHORT).show();
 
-//                                Intent intent = getIntent();
-//                                finish();
-//                                startActivity(intent);
-
-//                                DropAdapter dropAdapter = new DropAdapter();
-//                                dropAdapter.notifyDataSetChanged();
-
                                 // Check the currentUser Report count
                                 ParseQuery query = ParseQuery.getQuery("UserReportCount");
                                 query.whereEqualTo("userPointer", currentUser);
@@ -392,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     public void done(final ParseObject parseObject, ParseException e) {
                                         int reportCount = parseObject.getInt("reportCount");
 
-                                        if (reportCount > 50) {
+                                        if (reportCount > 49) {
                                             //Get the banned users Drops for flush
                                             ParseQuery deleteUserQuery = ParseQuery.getQuery("Drop");
                                             deleteUserQuery.whereEqualTo("authorPointer", currentUser);

@@ -2,10 +2,7 @@ package com.khfire22gmail.riple.fragments;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,10 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
-import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
 import com.khfire22gmail.riple.utils.Constants;
@@ -71,17 +65,16 @@ public class FriendsTabFragment extends Fragment {
         mRecyclerView.setItemAnimator(new LandingAnimator());
         mRecyclerView.getItemAnimator().setRemoveDuration(500);
 
-
         friendsEmptyView = (TextView) view.findViewById(R.id.friends_tab_empty_view);
 
-        getConversationList();
+        loadFriendsListFromParse();
 //        showUserTips();
 
         //Pull refresh conversation list
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.friend_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
-                getConversationList();
+                loadFriendsListFromParse();
                 new refreshTask().execute();
             }
         });
@@ -92,6 +85,8 @@ public class FriendsTabFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+
+//        loadFriendsListFromParse();
 
         if (isVisibleToUser && loadSavedPreferences()) {
             friendTip();
@@ -116,9 +111,6 @@ public class FriendsTabFragment extends Fragment {
         editor.putBoolean(key, value);
         editor.putBoolean("allTipsBoolean", false);
         editor.commit();
-
-//        MainActivity mainActivity = new MainActivity();
-//        mainActivity.isBoxChecked(false);
     }
 
     public void friendTip() {
@@ -146,7 +138,7 @@ public class FriendsTabFragment extends Fragment {
     }
 
 //    Show list of all users
-    private void getConversationList() {
+    public void loadFriendsListFromParse() {
 
         final ArrayList<FriendItem> friendsList = new ArrayList<>();
 
@@ -163,7 +155,7 @@ public class FriendsTabFragment extends Fragment {
         queries.add(recipientQuery);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-        mainQuery.orderByDescending("createdAt");
+        mainQuery.orderByDescending("updatedAt");
         mainQuery.include("user1");
         mainQuery.include("user2");
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -194,8 +186,8 @@ public class FriendsTabFragment extends Fragment {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        friendItem.setFriendProfilePicture(bmp);
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 150, 150, true);
+                                        friendItem.setFriendProfilePicture(resized);
                                         updateFriendsListRecyclerView(friendsList);
                                     }
                                 }
@@ -238,60 +230,32 @@ public class FriendsTabFragment extends Fragment {
         scaleAdapter.setDuration(500);
     }
 
-    // Opens sinch conversation when it is clicked
-    public void openConversation(ArrayList<String> names, int pos) {
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("objectId", names.get(pos));
-        query.findInBackground(new FindCallback<ParseUser>() {
-            public void done(List<ParseUser> user, ParseException e) {
-                if (e == null) {
-                    Intent intent = new Intent(getActivity(), MessagingActivity.class);
-                    intent.putExtra("RECIPIENT_ID", user.get(0).getObjectId());
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getActivity(),
-                            "Error finding that user",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    //show a loading spinner while the sinch client starts
-    private void showSpinner() {
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Boolean success = intent.getBooleanExtra("success", false);
-                progressDialog.dismiss();
-                if (!success) {
-                    Toast.makeText(getActivity(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, new IntentFilter("com.khfire22gmail.riple.tabs.FriendsTabFragment"));
-
-    }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list_users, menu);
-        return true;
-    }*/
-
-
+//    //show a loading spinner while the sinch client starts
+//    private void showSpinner() {
+//        progressDialog = new ProgressDialog(getActivity());
+//        progressDialog.setTitle("Loading");
+//        progressDialog.setMessage("Please wait...");
+//        progressDialog.show();
+//
+//        receiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                Boolean success = intent.getBooleanExtra("success", false);
+//                progressDialog.dismiss();
+//                if (!success) {
+//                    Toast.makeText(getActivity(), "Messaging service failed to start", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        };
+//
+//        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, new IntentFilter("com.khfire22gmail.riple.tabs.FriendsTabFragment"));
+//
+//    }
 
     @Override
     public void onResume() {
-//  todo      getConversationList();
         super.onResume();
+        loadFriendsListFromParse();
     }
 
     @Override

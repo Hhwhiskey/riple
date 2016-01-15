@@ -69,7 +69,7 @@ public class RipleTabFragment extends Fragment {
     private ParseUser currentUser;
     public String userName;
     public String facebookId;
-    private ArrayList<DropItem> mOnScrollListFromFromParse;
+    private ArrayList<DropItem> mRipleListFromParse;
     private ArrayList<DropItem> mRipleListLocal;
     private List<ParseObject> listFromParse;
     private List<ParseObject> mParseList;
@@ -80,16 +80,16 @@ public class RipleTabFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        updateUserInfo();
+//        updateUserInfo();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
 
-        mOnScrollListFromFromParse = new ArrayList<>();
+        mRipleListFromParse = new ArrayList<>();
 
         currentUser = ParseUser.getCurrentUser();
-        userName  = currentUser.getString("displayName");
+        userName = currentUser.getString("displayName");
         facebookId = currentUser.getString("facebookId");
 
         mRipleRecyclerView = (RecyclerView) view.findViewById(R.id.riple_recycler_view);
@@ -104,9 +104,7 @@ public class RipleTabFragment extends Fragment {
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
 
-       //Call to get and set current user data on profile card
         updateUserInfo();
-
 
         //Default onCreate Query call
         LoadRipleItemsFromParse onCreateQuery = new LoadRipleItemsFromParse();
@@ -194,6 +192,9 @@ public class RipleTabFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+//
+//        LoadRipleItemsFromParse loadRipleItemsFromParse = new LoadRipleItemsFromParse();
+//        loadRipleItemsFromParse.runLoadRipleItemsFromParse();
 
         if (isVisibleToUser && loadSavedPreferences()) {
             ripleTip();
@@ -212,7 +213,7 @@ public class RipleTabFragment extends Fragment {
 
     }
 
-    public void saveTipPreferences(String key, Boolean value){
+    public void saveTipPreferences(String key, Boolean value) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
@@ -296,7 +297,7 @@ public class RipleTabFragment extends Fragment {
 
                 } else {
 
-                    mOnScrollListFromFromParse.clear();
+                    mRipleListFromParse.clear();
 
                     for (int i = 0; i < listParse.size(); i++) {
 
@@ -314,7 +315,7 @@ public class RipleTabFragment extends Fragment {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
                                         Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                                         dropItem.setParseProfilePicture(resized);
-                                        updateRecyclerView(mOnScrollListFromFromParse);
+                                        updateRecyclerView(mRipleListFromParse);
                                     }
                                 }
                             });
@@ -354,14 +355,13 @@ public class RipleTabFragment extends Fragment {
                             dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
                         }
 
-                        mOnScrollListFromFromParse.add(dropItem);
+                        mRipleListFromParse.add(dropItem);
 //                        ParseObject.pinAllInBackground("pinnedQuery", listParse);
                     }
                 }
             }
         });
     }
-
 
 
     //Riple Query method with 3 constructors for different parameters
@@ -397,8 +397,10 @@ public class RipleTabFragment extends Fragment {
                 int pageMultiplier = pageNumber - 1;
                 skipNumber = pageMultiplier * queryLimit;
                 // Otherwise, clear the list, because this is a default(refresh) query
-            }else {
-                mOnScrollListFromFromParse.clear();
+            } else {
+                if (mRipleListFromParse != null) {
+                    mRipleListFromParse.clear();
+                }
             }
 
             ParseUser currentUser = ParseUser.getCurrentUser();
@@ -447,7 +449,7 @@ public class RipleTabFragment extends Fragment {
                                             if (pageNumber != 0) {
                                                 mRipleAdapter.notifyDataSetChanged();
                                             } else {
-                                                updateRecyclerView(mOnScrollListFromFromParse);
+                                                updateRecyclerView(mRipleListFromParse);
                                             }
                                         }
                                     }
@@ -490,8 +492,8 @@ public class RipleTabFragment extends Fragment {
                                 dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
                             }
 
-                            Log.d(TAG, "Riple List = " + mOnScrollListFromFromParse.size());
-                            mOnScrollListFromFromParse.add(dropItem);
+                            Log.d(TAG, "Riple List = " + mRipleListFromParse.size());
+                            mRipleListFromParse.add(dropItem);
 
                         }
                     }
@@ -533,67 +535,51 @@ public class RipleTabFragment extends Fragment {
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
             parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
-        }
 
-        //If user has a parse picture, get/set it
-        if (parseProfilePicture != null) {
-            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                @Override
-                public void done(byte[] data, ParseException e) {
-                    if (e == null) {
-                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
-                        profilePictureView.setImageBitmap(resized);
+            //If user has a parse picture, get/set it
+            if (parseProfilePicture != null) {
+                parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] data, ParseException e) {
+                        if (e == null) {
+                            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
+                            profilePictureView.setImageBitmap(resized);
+                        }
                     }
-                }
-            });
-        //Otherwise, if they have a facebook id, use that picture instead
-        } else {
-            if (facebookId != null) {
-                Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
-                new DownloadImageTask(profilePictureView)
-                        .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
-            }
-
-
-//            //get parse profile picture if exists, if not, store Facebook picture on Parse and show
-//            if (parseProfilePicture != null) {
-//                Glide.with(this)
-//                        .load(parseProfilePicture.getUrl())
-//                        .crossFade()
-//                        .fallback(R.drawable.ic_user_default)
-//                        .error(R.drawable.ic_user_default)
-//                        .signature(new StringSignature(UUID.randomUUID().toString()))
-//                        .into(profilePictureView);
-//            } else {
-//                if (facebookId != null) {
-//                    Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
-//                    new DownloadImageTask(profilePictureView)
-//                            .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
-//                }
-//            }
-
-            String displayName = currentUser.getString("displayName");
-
-            // Update UserName
-            if (displayName != null) {
-                nameView.setText(displayName);
+                });
+                //Otherwise, if they have a facebook id, use that picture instead
             } else {
-                nameView.setText("Anonymous");
-            }
-
-
-            //Update Riple count and Rank
-            ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
-            userRipleCountQuery.whereEqualTo("userPointer", currentUser);
-            userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-                @Override
-                public void done(ParseObject parseObject, ParseException e) {
-                    updateRipleCount(parseObject);
+                if (facebookId != null) {
+                    Log.d("MyApp", "FB ID (Main Activity) = " + facebookId);
+                    new DownloadImageTask(profilePictureView)
+                            .execute("https://graph.facebook.com/" + facebookId + "/picture?type=large");
                 }
-            });
+            }
         }
+
+        //Get currentUser displayName
+        String displayName = currentUser.getString("displayName");
+
+        // Update UserName
+        if (displayName != null) {
+            nameView.setText(displayName);
+        } else {
+            nameView.setText("Anonymous");
+        }
+
+
+        //Update Riple count and Rank
+        ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
+        userRipleCountQuery.whereEqualTo("userPointer", currentUser);
+        userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                updateRipleCount(parseObject);
+            }
+        });
     }
+
 
     public void updateRipleCount(ParseObject userObject) {
 
@@ -664,7 +650,6 @@ public class RipleTabFragment extends Fragment {
         if (ripleCount > 49999) {
             ripleRank = ("\"10th Riple Master\"");//21
         }
-
 
         // Save the currentUser ripleCount and rank to the user table
         currentUser.put("userRipleCount", ripleCount);

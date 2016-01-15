@@ -26,7 +26,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:hint="Edit Your Display Name"
+        android:hint="@string/edit_display_name_hint"
         android:maxLength="15"/>
         <requestFocus></requestFocus>
     </android.support.design.widget.TextInputLayout>

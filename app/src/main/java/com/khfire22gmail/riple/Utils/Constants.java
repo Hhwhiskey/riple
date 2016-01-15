@@ -34,11 +34,6 @@ public class Constants {
     public static final String CLICKED_DROP_TAB_NAME = "mTabName";
     public static final String CLICKED_DROP_POSITION = "mPosition";
 
-
-
-
-
-
     //Push Constants
     public static final String PARSE_DATA = "com.parse.Data";
     public static final String PUSH_ALERT = "alert";

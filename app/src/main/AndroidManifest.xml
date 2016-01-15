@@ -87,11 +87,6 @@
             android:label="@string/title_activity_edit_profile"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".activities.ViewUserInfoActivity"
-            android:label="@string/title_activity_view_user_info"
-            android:screenOrientation="portrait">
-        </activity>
 
         <service android:name=".utils.MessageService"/>
 

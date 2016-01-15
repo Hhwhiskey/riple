@@ -159,18 +159,18 @@ public class TitleActivity extends AppCompatActivity {
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
 
-//        VideoView drops = (VideoView)findViewById(R.id.title_video);
-//        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
-//        drops.setVideoURI(Uri.parse(path));
-//        drops.start();
-//
-//        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                mp.setLooping(true);
-//            }
-//        });
+        VideoView drops = (VideoView)findViewById(R.id.title_video);
+        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
+        drops.setVideoURI(Uri.parse(path));
+        drops.start();
+
+        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
     }
 
     @Override
@@ -258,6 +258,8 @@ public class TitleActivity extends AppCompatActivity {
                                 currentUser.put("facebookId", jsonObject.getString("id"));
                                 currentUser.put("username", jsonObject.getString("id"));
                                 currentUser.put("displayName", jsonObject.getString("name"));
+                                currentUser.put("userInfo", "");
+                                currentUser.put("userRipleCount", 0);
                                 currentUser.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
@@ -273,14 +275,11 @@ public class TitleActivity extends AppCompatActivity {
                                         ParseObject userReportCount = new ParseObject("UserReportCount");
                                         userReportCount.put("userPointer", currentUser);
                                         userReportCount.put("reportCount", 0);
-                                        userReportCount.saveInBackground();
-
-                                        //Also create riple count tracker on the currentUser table for ease of use
-                                        currentUser.put("userRipleCount", 0);
-                                        currentUser.saveInBackground(new SaveCallback() {
+                                        userReportCount.saveInBackground(new SaveCallback() {
                                             @Override
                                             public void done(ParseException e) {
                                                 fbLogin();
+                                                finish();
                                             }
                                         });
                                     }

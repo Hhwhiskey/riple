@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:gravity="bottom|center_horizontal"
         android:visibility="visible"
-        android:text="Nobody has commented on this Drop yet. Have something to say?"
+        android:text="@string/comment_empty_view"
         android:textSize="18sp"
         android:textStyle="italic"
         android:foregroundGravity="center"
@@ -24,7 +24,6 @@
         android:layout_above="@+id/comment_post_profile_picture"
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"/>
-
 
     <Button
         android:id="@+id/button_post_comment"

@@ -413,8 +413,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         shareDialog = new ShareDialog((Activity) mContext);
 
         ShareLinkContent linkContent = new ShareLinkContent.Builder()
-                .setContentTitle("Make a Riple...")
-                .setContentDescription(displayName + " shared " + shareAuthor + "'s" + " Drop from \"Riple\":\n\n" + "\"" + shareDescription + "\"\n\n" + "If you have an Android device you can download \"Riple\" now and start making Riples of your own. Click the link to get started!\n" + "facebook.com/kevinhodges0")
+                .setContentTitle(displayName + " shared " + shareAuthor + "'s" + " Drop from \"Riple\".")
+                .setContentDescription(shareDescription + " ***Get Riple from the PlayStore now!***")
                 .setContentUrl(Uri.parse("https://play.google.com/store/search?q=pub:Google%20Inc."))
                 .setImageUrl(Uri.parse("https://scontent-ord1-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/923007_665600676799506_1701143490_n.png?oh=9a224427d5c5807ed0db56582363057b&oe=57079C4E"))
                 .build();
@@ -523,16 +523,16 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 displayNameCheck = (String) currentUser.get("displayName");
 
                 if (parseProfilePictureCheck == null && displayNameCheck == null) {
-                    Toast.makeText(mContext, "Please upload a picture and set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, R.string.picAndNameToast, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(mContext, SettingsActivity.class);
                     mContext.startActivity(intent);
                 } else if (parseProfilePicture == null) {
-                    Toast.makeText(mContext, "Please upload a picture first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, R.string.picToast, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(mContext, SettingsActivity.class);
                     mContext.startActivity(intent);
 
                 } else if (displayNameCheck == null) {
-                    Toast.makeText(mContext, "Please set your User Name first, don't be shy :)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, R.string.nameToast, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(mContext, SettingsActivity.class);
                     mContext.startActivity(intent);
                 //Add Drop to to-do list if user has picture and display name set

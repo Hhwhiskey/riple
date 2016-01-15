@@ -25,10 +25,12 @@
         android:foregroundGravity="center"
         android:gravity="bottom|center_horizontal"
         android:paddingBottom="300dp"
-        android:text="This is where your todo Drops will be displayed. Add Drops to this list to start making Riples!"
+        android:text="@string/drop_empty_view"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"/>
 
 </FrameLayout>
 

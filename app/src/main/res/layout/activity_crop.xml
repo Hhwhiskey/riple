@@ -31,7 +31,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please rotate and crop your picture to your liking..."
+        android:text="@string/rorate_picture_prompt"
         android:id="@+id/crop_title"
         android:textSize="26dp"
         android:textColor="#000000"

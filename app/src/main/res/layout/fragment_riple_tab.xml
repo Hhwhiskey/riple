@@ -44,8 +44,8 @@
         android:textSize="18sp"
         android:textStyle="italic"
         android:visibility="visible"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"/>
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"/>
     </FrameLayout>
 
 </LinearLayout>

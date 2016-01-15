@@ -105,6 +105,7 @@ public class ViewUserActivity extends AppCompatActivity {
         Log.d("rViewUser", "mClickedUserRipleCount = " + mClickedUserRipleCount);
         Log.d("rViewUser", "mClickedUserRank = " + mClickedUserRank);
 
+
         //Populate the viewed users data////////////////////////////////////
 
         //Get viewedUsers parseProfilePicture and set it to imageView
@@ -205,7 +206,7 @@ public class ViewUserActivity extends AppCompatActivity {
         //Set title to users name
         builder.setTitle(userName);
         //If user has message show it, otherwise show default note
-        if (userInfo.equals("")) {
+        if (userInfo.equals("") || userInfo == null) {
             builder.setMessage("This user has not added any information yet.");
         } else {
             builder.setMessage(userInfo);

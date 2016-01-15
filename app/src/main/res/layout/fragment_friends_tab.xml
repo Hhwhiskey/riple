@@ -25,11 +25,10 @@
         android:foregroundGravity="center"
         android:gravity="bottom|center_horizontal"
         android:paddingBottom="325dp"
-        android:text="This is where conversations with your friends will show up. Start making friends!"
+        android:text="@string/friends_empty_view"
         android:textSize="18sp"
         android:textStyle="italic"
         android:visibility="visible"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"
-        />
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"/>
 </FrameLayout>
