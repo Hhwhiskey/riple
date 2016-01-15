@@ -479,17 +479,17 @@ public class RipleTabFragment extends Fragment {
                             //Riple Count
                             int ripleCount = (listParse.get(i).getInt("ripleCount"));
                             if (ripleCount == 1) {
-                                dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riple"));
+                                dropItem.setRipleCount(String.valueOf(ripleCount) + " Riple");
                             } else {
-                                dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riples"));
+                                dropItem.setRipleCount(String.valueOf(ripleCount) + " Riples");
                             }
 
                             //Comment Count
                             int commentCount = (listParse.get(i).getInt("commentCount"));
                             if (commentCount == 1) {
-                                dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
+                                dropItem.setCommentCount(String.valueOf(commentCount) + " Comment");
                             } else {
-                                dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
+                                dropItem.setCommentCount(String.valueOf(commentCount) + " Comments");
                             }
 
                             Log.d(TAG, "Riple List = " + mRipleListFromParse.size());

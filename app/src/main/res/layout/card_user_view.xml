@@ -44,7 +44,7 @@
                 android:layout_alignParentTop="false"
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
-                android:textSize="22sp"
+                android:textSize="18dp"
                 android:textColor="#FFFFFF"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/other_profile_picture"
@@ -52,27 +52,26 @@
                 android:ellipsize="end"
                 android:layout_toRightOf="@+id/other_profile_picture"
                 android:textStyle="bold"
-                android:layout_toLeftOf="@+id/other_riple_count"
-                android:layout_toStartOf="@+id/other_riple_count"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginLeft="8dp"
-                />
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="45000"
+                android:text="with 45000 Riples"
                 android:id="@+id/other_riple_count"
-                android:textSize="24sp"
+                android:textSize="14dp"
                 android:textColor="#FFFFFF"
-                android:textStyle="bold"
+                android:gravity="top"
+                android:layout_alignTop="@+id/other_rank"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginRight="12dp"
-                android:layout_alignParentTop="false"
-                android:layout_alignTop="@+id/other_profile_picture"
-                android:layout_alignBottom="@+id/other_profile_picture"
-                android:gravity="center_vertical"/>
+                android:layout_toRightOf="@+id/other_rank"
+                android:layout_toEndOf="@+id/other_rank"
+                android:layout_marginLeft="6dp"
+                android:layout_alignBottom="@+id/other_rank"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,17 +81,33 @@
                 android:id="@+id/other_rank"
                 android:layout_alignLeft="@+id/other_display_name"
                 android:layout_alignStart="@+id/other_display_name"
-                android:textSize="18sp"
-                android:layout_alignBottom="@+id/other_profile_picture"
+                android:textSize="14dp"
                 android:textColor="#FFFFFF"
                 android:textStyle="italic"
                 android:layout_below="@+id/other_display_name"
-                android:layout_alignRight="@+id/other_display_name"
-                android:layout_alignEnd="@+id/other_display_name"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical"
+                android:gravity="top"
+                android:layout_alignParentTop="false"
+                android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Message..."
+                android:id="@+id/last_message_snippet"
+                android:textSize="14dp"
+                android:textColor="#FFFFFF"
+                android:gravity="top"
                 android:layout_alignParentBottom="false"
-                android:layout_alignParentTop="false"/>
+                android:layout_below="@+id/other_rank"
+                android:layout_toRightOf="@+id/other_profile_picture"
+                android:layout_alignRight="@+id/other_riple_count"
+                android:layout_alignEnd="@+id/other_riple_count"
+                android:layout_marginLeft="8dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="2dp"
+                android:alpha=".7"/>
 
 
         </RelativeLayout>

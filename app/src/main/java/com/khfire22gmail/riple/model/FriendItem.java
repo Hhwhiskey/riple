@@ -14,6 +14,17 @@ public class FriendItem {
     public String friendInfo;
     public String relationshipObjectId;
     public String friendObjectId;
+    public String lastMessageSnippet;
+
+
+
+    public String getLastMessageSnippet() {
+        return lastMessageSnippet;
+    }
+
+    public void setLastMessageSnippet(String lastMessageSnippet) {
+        this.lastMessageSnippet = lastMessageSnippet;
+    }
 
     public String getFriendInfo() {
         return friendInfo;

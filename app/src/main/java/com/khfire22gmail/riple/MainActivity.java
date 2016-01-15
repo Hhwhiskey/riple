@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dropDescription = input.getText().toString();
                 int dropTextField = input.getText().length();
 
-                if (dropTextField > 1) {
+                if (dropTextField > 49) {
                     try {
                         createDrop(dropDescription);
                     } catch (InterruptedException e) {

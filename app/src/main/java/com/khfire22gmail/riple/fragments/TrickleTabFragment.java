@@ -271,17 +271,17 @@ public class TrickleTabFragment extends Fragment {
                 //Riple Count
                 int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
                 if (ripleCount == 1) {
-                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riple"));
+                    dropItemAll.setRipleCount(String.valueOf(ripleCount) + " Riple");
                 } else {
-                    dropItemAll.setRipleCount(String.valueOf(listFromParse.get(i).getInt("ripleCount") + " Riples"));
+                    dropItemAll.setRipleCount(String.valueOf(ripleCount) + " Riples");
                 }
 
                 //Comment Count
                 int commentCount = (listFromParse.get(i).getInt("commentCount"));
                 if (commentCount == 1) {
-                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comment"));
+                    dropItemAll.setCommentCount(String.valueOf(commentCount) + " Comment");
                 } else {
-                    dropItemAll.setCommentCount(String.valueOf(listFromParse.get(i).getInt("commentCount") + " Comments"));
+                    dropItemAll.setCommentCount(String.valueOf(commentCount) + " Comments");
                 }
 
                 //Add all of these DropItems to the field arrayList allDropsList
@@ -472,5 +472,10 @@ public class TrickleTabFragment extends Fragment {
         AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mTrickleAdapter);
         mTrickleRecyclerView.setAdapter(alphaAdapter);
         alphaAdapter.setDuration(1000);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }

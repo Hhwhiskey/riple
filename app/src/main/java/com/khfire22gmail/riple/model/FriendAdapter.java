@@ -92,11 +92,13 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         private TextView friendName;
         private TextView ripleRank;
         private TextView ripleCount;
+        private TextView lastMessageSnippet;
 //        private ImageView menuButton;
 //        private RelativeLayout otherLayout;
         public FriendViewHolder(View itemView) {
             super(itemView);
 
+            lastMessageSnippet = (TextView) itemView.findViewById(R.id.last_message_snippet);
             otherProfilePicture = (ImageView) itemView.findViewById(R.id.other_profile_picture);
             friendName = (TextView) itemView.findViewById(R.id.other_display_name);
             ripleRank = (TextView) itemView.findViewById(R.id.other_rank);
@@ -118,6 +120,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
             FriendItem current = data.get(position);
 
+            lastMessageSnippet.setText(current.lastMessageSnippet);
             otherProfilePicture.setImageBitmap(current.friendProfilePicture);
             friendName.setText(current.friendName);
             ripleRank.setText(current.ripleRank);

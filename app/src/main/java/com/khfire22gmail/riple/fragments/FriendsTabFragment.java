@@ -195,14 +195,18 @@ public class FriendsTabFragment extends Fragment {
                         }
                         //Get relation objectId
                         friendItem.setRelationshipObjectId(list.get(i).getObjectId());
+                        friendItem.setLastMessageSnippet(list.get(i).getString("lastMessage"));
                         //Get all friend info
                         friendItem.setFriendObjectId(recipient.getObjectId());
                         friendItem.setFriendName(recipient.getString("displayName"));
                         friendItem.setRipleRank(recipient.getString("userRank"));
                         friendItem.setFriendInfo(recipient.getString("userInfo"));
-                        friendItem.setRipleCount(String.valueOf(recipient.getInt("userRipleCount")));
-
-
+                        int userRipleCount = recipient.getInt("userRipleCount");
+                        if (userRipleCount == 1) {
+                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riple")));
+                        } else {
+                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riples")));
+                        }
                         friendsList.add(friendItem);
                     }
                 }
