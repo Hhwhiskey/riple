@@ -3,7 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                xmlns:app="http://schemas.android.com/tools"
+
                 android:background="@color/Primary_Background_Color">
 
 
@@ -106,7 +106,6 @@
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                app:tabMode="scrollable"
                 android:layout_gravity="bottom"
                 android:layout_below="@+id/description"
                 android:fillViewport="false"/>
