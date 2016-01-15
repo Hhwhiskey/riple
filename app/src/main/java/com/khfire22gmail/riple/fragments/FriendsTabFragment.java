@@ -201,12 +201,15 @@ public class FriendsTabFragment extends Fragment {
                         friendItem.setFriendName(recipient.getString("displayName"));
                         friendItem.setRipleRank(recipient.getString("userRank"));
                         friendItem.setFriendInfo(recipient.getString("userInfo"));
-                        int userRipleCount = recipient.getInt("userRipleCount");
-                        if (userRipleCount == 1) {
-                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riple")));
-                        } else {
-                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riples")));
-                        }
+
+//                        int userRipleCount = recipient.getInt("userRipleCount");
+//                        if (userRipleCount == 1) {
+//                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riple")));
+//                        } else {
+//                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riples")));
+//                        }
+
+                        friendItem.setRipleCount(String.valueOf(recipient.getInt("userRipleCount")));
                         friendsList.add(friendItem);
                     }
                 }

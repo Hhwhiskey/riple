@@ -17,7 +17,6 @@ public class FriendItem {
     public String lastMessageSnippet;
 
 
-
     public String getLastMessageSnippet() {
         return lastMessageSnippet;
     }

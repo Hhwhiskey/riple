@@ -22,6 +22,7 @@ public class Constants {
     public static final String CLICKED_USER_RANK = "clickedUserRank";
     public static final String CLICKED_USER_RIPLE_COUNT = "clickedUserRipleCount";
     public static final String CLICKED_USER_INFO = "clickedUserInfo";
+    public static final String CLICKED_USER_RIPLE_COUNT_FOR_VIEW_USER_VIEW = "clickedUserRipleCountForViewUserView";
 
 
     //Intent Extra for Drop

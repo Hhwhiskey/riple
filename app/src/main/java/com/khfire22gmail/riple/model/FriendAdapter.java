@@ -93,6 +93,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         private TextView ripleRank;
         private TextView ripleCount;
         private TextView lastMessageSnippet;
+        String testVariable;
 //        private ImageView menuButton;
 //        private RelativeLayout otherLayout;
         public FriendViewHolder(View itemView) {
@@ -118,13 +119,18 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
         public void update(int position) {
 
+            testVariable = "1";
+
             FriendItem current = data.get(position);
 
             lastMessageSnippet.setText(current.lastMessageSnippet);
             otherProfilePicture.setImageBitmap(current.friendProfilePicture);
             friendName.setText(current.friendName);
             ripleRank.setText(current.ripleRank);
-            ripleCount.setText(current.ripleCount);
+
+            if (current.ripleCount.equals(testVariable)) {
+                ripleCount.setText("with " + current.ripleCount + " Riple");
+            } else ripleCount.setText("with " + current.ripleCount + " Riples");
         }
 
         @Override
