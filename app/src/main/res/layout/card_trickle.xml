@@ -102,7 +102,6 @@
                 android:id="@+id/description"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
                 android:enabled="true"
                 android:focusable="false"
                 android:maxLines="5"

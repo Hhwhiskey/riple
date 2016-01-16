@@ -1,6 +1,7 @@
 package com.khfire22gmail.riple.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -13,11 +14,20 @@ import com.khfire22gmail.riple.R;
 public class AboutActivity extends AppCompatActivity {
 
     private TextView emailHyperlink;
+    private TextView ripleVersion;
+    private String versionName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+
+        try {
+             versionName = this.getPackageManager()
+                    .getPackageInfo(this.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         emailHyperlink = (TextView) findViewById(R.id.email_hyperlink);
         emailHyperlink.setOnClickListener(new View.OnClickListener() {
@@ -30,6 +40,10 @@ public class AboutActivity extends AppCompatActivity {
                 startActivity(Intent.createChooser(emailIntent, ""));
             }
         });
+
+        ripleVersion = (TextView) findViewById(R.id.riple_version_tv);
+        ripleVersion.setText("Riple Version " + versionName);
+
     }
 
     @Override

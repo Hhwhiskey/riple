@@ -18,7 +18,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Edit Your Display Name..."
         android:id="@+id/edit_display_name_tv"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:textStyle="bold"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
@@ -31,9 +31,12 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="This is how others will see you..."
         android:id="@+id/textView4"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:layout_centerHorizontal="true"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:singleLine="true"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -58,7 +61,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Notifications Coming Soon!"
             android:id="@+id/textView8"
-            android:textSize="20sp"
+            android:textSize="20dp"
             android:layout_below="@+id/edit_info_tv"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="32dp"
@@ -157,7 +160,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Edit Your Info..."
         android:id="@+id/edit_info_tv"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:textStyle="bold"
         android:gravity="center_horizontal"
         android:layout_below="@+id/user_info_tv"

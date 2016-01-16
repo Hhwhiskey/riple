@@ -89,7 +89,6 @@
                 android:layout_height="wrap_content"
                 android:enabled="true"
                 android:focusable="false"
-                android:maxLines="5"
                 android:paddingRight="8dp"
                 android:singleLine="false"
                 android:text="Description"

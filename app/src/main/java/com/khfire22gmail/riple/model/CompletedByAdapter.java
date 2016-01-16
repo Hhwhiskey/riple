@@ -45,7 +45,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     @Override
     public CompletedByViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.card_user_view, parent, false);
+        View view = inflater.inflate(R.layout.card_completed, parent, false);
         CompletedByViewHolder viewHolder = new CompletedByViewHolder(view);
         return viewHolder;
     }
@@ -147,18 +147,18 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     class CompletedByViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        public TextView displayName;
+        public TextView displayNameView;
         public ImageView otherProfilePicture;
-        public TextView userRank;
-        public TextView userRipleCount;
+        public TextView userRankView;
+        public TextView userRipleCountView;
 
         public CompletedByViewHolder(View itemView) {
             super(itemView);
 
             otherProfilePicture = (ImageView) itemView.findViewById(R.id.other_profile_picture);
-            displayName = (TextView) itemView.findViewById(R.id.other_display_name);
-            userRank = (TextView) itemView.findViewById(R.id.other_rank);
-            userRipleCount = (TextView) itemView.findViewById(R.id.other_riple_count);
+            displayNameView = (TextView) itemView.findViewById(R.id.other_display_name);
+            userRankView = (TextView) itemView.findViewById(R.id.other_rank);
+            userRipleCountView = (TextView) itemView.findViewById(R.id.other_riple_count);
 
             //Set OCL
             itemView.setOnClickListener(this);
@@ -169,12 +169,17 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         //Update item based on position
         public void update(int position){
 
+            String testVariable = "1";
+
             CompletedByItem current = data.get(position);
 
             otherProfilePicture.setImageBitmap(current.parseProfilePicture);
-            displayName.setText(current.displayName);
-            userRank.setText(current.userRank);
-            userRipleCount.setText(String.valueOf(current.userRipleCount));
+            displayNameView.setText(current.displayName);
+            userRankView.setText(current.userRank);
+
+            if (current.userRipleCount.equals(testVariable)) {
+                userRipleCountView.setText("with " + current.userRipleCount + " Riple");
+            } else userRipleCountView.setText("with " + current.userRipleCount + " Riples");
         }
 
         @Override

@@ -93,7 +93,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         private TextView ripleRank;
         private TextView ripleCount;
         private TextView lastMessageSnippet;
-        String testVariable;
+
 //        private ImageView menuButton;
 //        private RelativeLayout otherLayout;
         public FriendViewHolder(View itemView) {
@@ -119,7 +119,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
         public void update(int position) {
 
-            testVariable = "1";
+            String testVariable = "1";
 
             FriendItem current = data.get(position);
 
