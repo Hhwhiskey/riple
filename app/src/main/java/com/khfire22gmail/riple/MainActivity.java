@@ -166,100 +166,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logUser();
     }
 
-    public void showUserTips() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean test = sharedPreferences.getBoolean("postDropTips", true);
-
-        if (test) {
-            viewUserTip();
-        }
-    }
-
     public void saveTipPreferences(String key, Boolean value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
         editor.putBoolean("allTipsBoolean", false);
         editor.commit();
-
-//        MainActivity mainActivity = new MainActivity();
-//        mainActivity.isBoxChecked(false);
     }
 
     public void viewUserTip() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean test = sharedPreferences.getBoolean("postDropTips", true);
 
-        builder.setTitle("Post a Drop");
-        builder.setMessage("Here, you can post a Drop for everyone to see. A Drop is an idea " +
-                "you have to make the world a better place. No matter how big or small your Drop " +
-                "is, you can create huge Riples. Post your Drop and then watch the Riples spread.");
+        if (test) {
 
-        builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("postDropTips", false);
-            }
-        });
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
 
-        builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.show();
+            builder.setTitle("Post a Drop");
+            builder.setMessage("Here, you can post a Drop for everyone to see. A Drop is an idea " +
+                    "you have to make the world a better place. No matter how big or small your Drop " +
+                    "is, you can create huge Riples. Post your Drop and then watch the Riples spread.");
+
+            builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    saveTipPreferences("postDropTips", false);
+                }
+            });
+
+            builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            builder.show();
+        }
     }
-
-
-    //Open up a dialog box for the creation of a Drop
-//    public void createDropDialog() {
-//
-//        final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
-//        builder.setTitle("Post a Drop");
-//
-//        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.drop_description);
-//
-//        builder.setView(view);
-//
-//        // Set up the buttons
-//        builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//
-//                dropDescription = input.getText().toString();
-//                int dropTextField = input.getText().length();
-//
-//                if (dropTextField > 0) {
-//                    try {
-//                        createDrop(dropDescription);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    Toast.makeText(getApplicationContext(), "Try adding some text before your" +
-//                            "Drop is posted.", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        builder.show();
-//
-//        showUserTips();
-//    }
 
     public void createDropDialog() {
 
+        // Check for connection before showing post dialog
         if (!detector.isConnectedToInternet()) {
             Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         } else {
 
+            // Show keyboard
             showSoftKeyboard();
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -273,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             final EditText input = (EditText) view.findViewById(R.id.drop_description);
 
             input.setText(copiedString);
-
 
             builder.setView(view);
 
@@ -306,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
-
                     //If the Drop is posted, clear the Text Field
                     removeDropStringFromSharedPreferences();
                 }
@@ -331,12 +280,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.show();
 
         }
+
+        // Show the postDropTips tip if enabled by user
+        viewUserTip();
     }
 
     public void showSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
-
     }
 
     public void hideSoftKeyboard() {
@@ -594,7 +545,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void logUser() {
         // TODO: Use the current user's information
         // You can call any combination of these three methods
+
         Crashlytics.setUserName(currentUser.getUsername());
+        Crashlytics.setUserIdentifier(currentUser.getString("displayName"));
     }
 }
 
