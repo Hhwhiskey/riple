@@ -110,8 +110,10 @@ public class MessageService extends Service implements SinchClientListener {
     }
     @Override
     public void onDestroy() {
-        sinchClient.stopListeningOnActiveConnection();
-        sinchClient.terminate();
+        if (sinchClient != null) {
+            sinchClient.stopListeningOnActiveConnection();
+            sinchClient.terminate();
+        }
     }
     //public interface for ListUsersActivity & MessagingActivity
     public class MessageServiceInterface extends Binder {

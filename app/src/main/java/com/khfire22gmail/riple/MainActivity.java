@@ -31,6 +31,7 @@ import com.khfire22gmail.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -67,11 +68,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MenuItem checkBox;
     private boolean checkTest;
     private ParseUser currentUser;
+    private ConnectionDetector detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        detector = new ConnectionDetector(this);
 
         currentUser = ParseUser.getCurrentUser();
 
@@ -252,75 +256,81 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void createDropDialog() {
 
-        showSoftKeyboard();
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        } else {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final String copiedString = sharedPreferences.getString("storedDropString", "");
+            showSoftKeyboard();
 
-        final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            final String copiedString = sharedPreferences.getString("storedDropString", "");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
-        builder.setTitle("Post a new Drop");
+            final View view = getLayoutInflater().inflate(R.layout.activity_create_drop, null);
 
-        final EditText input = (EditText) view.findViewById(R.id.drop_description);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+            builder.setTitle("Post a new Drop");
 
-        input.setText(copiedString);
+            final EditText input = (EditText) view.findViewById(R.id.drop_description);
+
+            input.setText(copiedString);
 
 
-        builder.setView(view);
+            builder.setView(view);
 
-        // Set up the buttons
-        builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+            // Set up the buttons
+            builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
-                dropDescription = input.getText().toString();
-                int dropTextField = input.getText().length();
+                    dropDescription = input.getText().toString();
+                    int dropTextField = input.getText().length();
 
-                if (dropTextField > 49) {
-                    try {
-                        createDrop(dropDescription);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if (dropTextField > 49) {
+                        try {
+                            createDrop(dropDescription);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Hold on...This is a fairly short Drop. Try " +
+                                "having at least 50 characters before you post.", Toast.LENGTH_LONG).show();
+
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("storedDropString", dropDescription);
+                        editor.commit();
                     }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Hold on...This is a fairly short Drop. Try " +
-                    "having at least 50 characters before you post.", Toast.LENGTH_LONG).show();
-
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("storedDropString", dropDescription);
-                    editor.commit();
                 }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
 
-                //If the Drop is posted, clear the Text Field
-               removeDropStringFromSharedPreferences();
-            }
-        });
+                    //If the Drop is posted, clear the Text Field
+                    removeDropStringFromSharedPreferences();
+                }
+            });
 
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                //If the Drop is posted, clear the Text Field
-               removeDropStringFromSharedPreferences();
-                hideSoftKeyboard();
-            }
-        });
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    //If the Drop is posted, clear the Text Field
+                    removeDropStringFromSharedPreferences();
+                    hideSoftKeyboard();
+                }
+            });
 
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                hideSoftKeyboard();
-            }
-        });
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    hideSoftKeyboard();
+                }
+            });
 
-        builder.show();
+            builder.show();
+
+        }
     }
 
     public void showSoftKeyboard() {
@@ -450,7 +460,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(MainActivity.this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -550,6 +562,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onBackPressed() {

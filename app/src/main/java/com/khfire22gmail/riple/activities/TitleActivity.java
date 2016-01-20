@@ -5,7 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.*;
+import android.os.Process;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -46,6 +47,7 @@ public class TitleActivity extends AppCompatActivity {
     private Button emailButton;
     private Intent intent;
     private Intent serviceIntent;
+    private ConnectionDetector detector;
 
 
     @Override
@@ -53,13 +55,13 @@ public class TitleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_title);
 
+        detector = new ConnectionDetector(this);
+
         //Remove status bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //Splash Video
-
-
-        VideoView drops = (VideoView)findViewById(R.id.title_video);
+        VideoView drops = (VideoView) findViewById(R.id.title_video);
         String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
         drops.setVideoURI(Uri.parse(path));
         drops.start();
@@ -78,17 +80,23 @@ public class TitleActivity extends AppCompatActivity {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
-
-        if (currentUser != null) {
-            boolean banBoolean = currentUser.getBoolean("isBan");
-            if (!banBoolean) {
-                startActivity(intent);
-                finish();
-                startService(serviceIntent);
-            } else {
-                showBanDialog();
+        //If there is no connection present show toast
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        //Otherwise, enter the MainActivity
+        } else {
+            if (currentUser != null) {
+                boolean banBoolean = currentUser.getBoolean("isBan");
+                if (!banBoolean) {
+                    startActivity(intent);
+                    finish();
+                    startService(serviceIntent);
+                } else {
+                    showBanDialog();
+                }
             }
         }
+
 
         // Check if there is a currently logged in use and it's linked to a Facebook account.
         /*ParseUser currentUser = ParseUser.getCurrentUser();
@@ -100,12 +108,6 @@ public class TitleActivity extends AppCompatActivity {
         //Calls the keyhash method
         //printKeyHash(this);
 
-        //Calls the connection detector
-        ConnectionDetector detector = new ConnectionDetector(this);
-        if (!detector.isConnectingToInternet()) {
-            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
-        }
-
 
         //Login Buttons///////////////////////////////////////////////////////////////////////
         //Parse login Button
@@ -113,7 +115,12 @@ public class TitleActivity extends AppCompatActivity {
         emailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parseLogin();
+
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(TitleActivity.this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    parseLogin();
+                }
             }
         });
 
@@ -123,25 +130,31 @@ public class TitleActivity extends AppCompatActivity {
         fbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(TitleActivity.this, R.style.MyAlertDialogStyle);
-                builder.setTitle("Not so fast...");
-                builder.setMessage("I will not post any spam or inappropriate/offensive material and I will report any that I encounter while I use Riple");
-                builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        moveTaskToBack(true);
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(1);
-                    }
-                });
 
-                builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        fbLogin();
-                    }
-                });
-                builder.show();
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(TitleActivity.this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(TitleActivity.this, R.style.MyAlertDialogStyle);
+                    builder.setTitle("Not so fast...");
+                    builder.setMessage("I will not post any spam or inappropriate/offensive material and I will report any that I encounter while I use Riple");
+                    builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            moveTaskToBack(true);
+                            android.os.Process.killProcess(Process.myPid());
+                            System.exit(1);
+                        }
+                    });
+
+                    builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            fbLogin();
+                        }
+                    });
+                    builder.show();
+                }
             }
         });
     }
@@ -159,7 +172,7 @@ public class TitleActivity extends AppCompatActivity {
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
 
-        VideoView drops = (VideoView)findViewById(R.id.title_video);
+        VideoView drops = (VideoView) findViewById(R.id.title_video);
         String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
         drops.setVideoURI(Uri.parse(path));
         drops.start();
@@ -182,10 +195,10 @@ public class TitleActivity extends AppCompatActivity {
     public void parseLogin() {
         Intent intent = new Intent(TitleActivity.this, ParseLoginActivity.class);
         startActivity(intent);
-        finish();
     }
 
     public void fbLogin() {
+
         List<String> permissions = Arrays.asList("public_profile", "email");
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
@@ -228,7 +241,7 @@ public class TitleActivity extends AppCompatActivity {
                 Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
                 emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 emailIntent.setType("vnd.android.cursor.item/email");
-                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"kevinhodgesriple@gmail.com"});
+                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"kevinhodgesriple@gmail.com"});
                 emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Ban investigation request");
                 emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
                 startActivity(Intent.createChooser(emailIntent, ""));

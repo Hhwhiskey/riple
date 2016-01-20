@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -18,12 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
@@ -76,15 +79,17 @@ public class RipleTabFragment extends Fragment {
     private EndlessRecyclerViewOnScrollListener mEndlessListener;
     private boolean visible;
     private LinearLayoutManager layoutManager;
+    private ConnectionDetector detector;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        updateUserInfo();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_riple_tab, container, false);
+
+        detector = new ConnectionDetector(getActivity());
 
         mRipleListFromParse = new ArrayList<>();
 
@@ -104,11 +109,17 @@ public class RipleTabFragment extends Fragment {
         profileRankView = (TextView) view.findViewById(R.id.profile_rank);
         profileRipleCountView = (TextView) view.findViewById(R.id.profile_riple_count);
 
-        updateUserInfo();
-
-        //Default onCreate Query call
-        LoadRipleItemsFromParse onCreateQuery = new LoadRipleItemsFromParse();
-        onCreateQuery.runLoadRipleItemsFromParse();
+        //Check for an internet connection
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        } else {
+            //If there is an connectin present...
+            //Update the currentUsers profile card
+//            updateUserInfo();
+            //Default onCreate Query call
+            LoadRipleItemsFromParse onCreateQuery = new LoadRipleItemsFromParse();
+            onCreateQuery.runLoadRipleItemsFromParse();
+        }
 
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,11 +154,15 @@ public class RipleTabFragment extends Fragment {
         mRipleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                Log.d(TAG, "onLoadMore current_page: " + current_page);
-                //OnScroll Query call
-                LoadRipleItemsFromParse onScrollQuery = new LoadRipleItemsFromParse(current_page);
-                onScrollQuery.runLoadRipleItemsFromParse();
 
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    Log.d(TAG, "onLoadMore current_page: " + current_page);
+                    //OnScroll Query call
+                    LoadRipleItemsFromParse onScrollQuery = new LoadRipleItemsFromParse(current_page);
+                    onScrollQuery.runLoadRipleItemsFromParse();
+                }
             }
         });
 
@@ -156,12 +171,26 @@ public class RipleTabFragment extends Fragment {
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Run the standard Riple Query for most recent items
-                //onRefresh Query call
-                LoadRipleItemsFromParse onRefreshQuery = new LoadRipleItemsFromParse(true);
-                onRefreshQuery.runLoadRipleItemsFromParse();
-                new ripleRefreshTask().execute();
 
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    // Run the standard Riple Query for most recent items
+                    //onRefresh Query call
+                    LoadRipleItemsFromParse onRefreshQuery = new LoadRipleItemsFromParse(true);
+                    onRefreshQuery.runLoadRipleItemsFromParse();
+                    new ripleRefreshTask().execute();
+                }
+
+                // Hide the refresh indicator if no data is found
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWaveSwipeRefreshLayout.setRefreshing(false);
+
+                    }
+                }, 5000);
             }
         });
 
@@ -192,9 +221,6 @@ public class RipleTabFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-//
-//        LoadRipleItemsFromParse loadRipleItemsFromParse = new LoadRipleItemsFromParse();
-//        loadRipleItemsFromParse.runLoadRipleItemsFromParse();
 
         if (isVisibleToUser && loadSavedPreferences()) {
             ripleTip();
@@ -240,7 +266,6 @@ public class RipleTabFragment extends Fragment {
             }
         });
 
-
         builder.setPositiveButton("KEEP THIS AROUND", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -266,103 +291,6 @@ public class RipleTabFragment extends Fragment {
         intent.putExtra(Constants.CLICKED_USER_INFO, currentUserInfo);
         getActivity().startActivity(intent);
     }
-
-
-    public void loadRipleItemsFromParse() {
-
-        int queryLimit = 10;
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
-        ParseRelation createdRelation = currentUser.getRelation("createdDrops");
-        ParseRelation completedRelation = currentUser.getRelation("completedDrops");
-
-        ParseQuery createdQuery = createdRelation.getQuery();
-        ParseQuery completedQuery = completedRelation.getQuery();
-
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(createdQuery);
-        queries.add(completedQuery);
-
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-        mainQuery.include("authorPointer");
-        mainQuery.orderByDescending("createdAt");
-        mainQuery.setLimit(queryLimit);
-        mainQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> listParse, ParseException e) {
-
-                if (e != null) {
-                    Log.i("KEVIN", "error error");
-
-                } else {
-
-                    mRipleListFromParse.clear();
-
-                    for (int i = 0; i < listParse.size(); i++) {
-
-                        final DropItem dropItem = new DropItem();
-
-                        //Drop Author Data//////////////////////////////////////////////////////////
-                        ParseObject authorData = (ParseObject) listParse.get(i).get("authorPointer");
-
-                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                        if (parseProfilePicture != null) {
-                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                @Override
-                                public void done(byte[] data, ParseException e) {
-                                    if (e == null) {
-                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        dropItem.setParseProfilePicture(resized);
-                                        updateRecyclerView(mRipleListFromParse);
-                                    }
-                                }
-                            });
-                        }
-
-                        //dropItemAll.setAuthorName(authorName);
-                        dropItem.setAuthorName((String) authorData.get("displayName"));
-                        //Author id
-                        dropItem.setAuthorId(authorData.getObjectId());
-                        //Author Rank
-                        dropItem.setAuthorRank(authorData.getString("userRank"));
-                        //Author Riple Count
-                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
-
-                        //Drop Data////////////////////////////////////////////////////////////////
-                        //DropObjectId
-                        dropItem.setObjectId(listParse.get(i).getObjectId());
-                        //CreatedAt
-                        dropItem.setCreatedAt(listParse.get(i).getCreatedAt());
-                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-                        //Drop description
-                        dropItem.setDescription(listParse.get(i).getString("description"));
-
-                        //Riple Count
-                        int ripleCount = (listParse.get(i).getInt("ripleCount"));
-                        if (ripleCount == 1) {
-                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riple"));
-                        } else {
-                            dropItem.setRipleCount(String.valueOf(listParse.get(i).getInt("ripleCount") + " Riples"));
-                        }
-
-                        //Comment Count
-                        int commentCount = (listParse.get(i).getInt("commentCount"));
-                        if (commentCount == 1) {
-                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comment"));
-                        } else {
-                            dropItem.setCommentCount(String.valueOf(listParse.get(i).getInt("commentCount") + " Comments"));
-                        }
-
-                        mRipleListFromParse.add(dropItem);
-//                        ParseObject.pinAllInBackground("pinnedQuery", listParse);
-                    }
-                }
-            }
-        });
-    }
-
 
     //Riple Query method with 3 constructors for different parameters
     public class LoadRipleItemsFromParse {
@@ -568,14 +496,17 @@ public class RipleTabFragment extends Fragment {
             nameView.setText("Anonymous");
         }
 
-
         //Update Riple count and Rank
         ParseQuery userRipleCountQuery = ParseQuery.getQuery("UserRipleCount");
         userRipleCountQuery.whereEqualTo("userPointer", currentUser);
         userRipleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
-                updateRipleCount(parseObject);
+
+                if (e != null) {
+                } else {
+                    updateRipleCount(parseObject);
+                }
             }
         });
     }
@@ -587,82 +518,82 @@ public class RipleTabFragment extends Fragment {
 
         int ripleCount = userObject.getInt("ripleCount");
 
-        if (ripleCount > 4) {
-            ripleRank = ("\"Volunteer\"");//2
-        }
-        if (ripleCount > 9) {
-            ripleRank = ("\"Contributor\"");//3
+        if (ripleCount != 0) {
 
-        }
-        if (ripleCount > 19) {
-            ripleRank = ("\"Do-Gooder\"");//4
+            if (ripleCount > 4) {
+                ripleRank = ("\"Volunteer\"");//2
+            }
+            if (ripleCount > 9) {
+                ripleRank = ("\"Contributor\"");//3
+            }
+            if (ripleCount > 19) {
+                ripleRank = ("\"Do-Gooder\"");//4
+            }
+            if (ripleCount > 39) {
+                ripleRank = ("\"Kind\"");//5
+            }
+            if (ripleCount > 79) {
+                ripleRank = ("\"Generous\"");//6
+            }
+            if (ripleCount > 159) {
+                ripleRank = ("\"Patron\"");//7
+            }
+            if (ripleCount > 319) {
+                ripleRank = ("\"Benevolent\"");//8
+            }
+            if (ripleCount > 639) {
+                ripleRank = ("\"Humanitarian\"");//9
+            }
+            if (ripleCount > 1279) {
+                ripleRank = ("\"Altruist\"");//10
+            }
+            if (ripleCount > 2559) {
+                ripleRank = ("\"Saint\"");//11
+            }
+            if (ripleCount > 4999) {
+                ripleRank = ("\"Riple Master\"");//12
+            }
+            if (ripleCount > 9999) {
+                ripleRank = ("\"2nd Riple Master\"");//13
+            }
+            if (ripleCount > 14999) {
+                ripleRank = ("\"3rd Riple Master\"");//14
+            }
+            if (ripleCount > 19999) {
+                ripleRank = ("\"4th Riple Master\"");//15
+            }
+            if (ripleCount > 24999) {
+                ripleRank = ("\"5th Riple Master\"");//16
+            }
+            if (ripleCount > 29999) {
+                ripleRank = ("\"6th Riple Master\"");//17
+            }
+            if (ripleCount > 34999) {
+                ripleRank = ("\"7th Riple Master\"");//18
+            }
+            if (ripleCount > 39999) {
+                ripleRank = ("\"8th Riple Master\"");//19
+            }
+            if (ripleCount > 44999) {
+                ripleRank = ("\"9th Riple Master\"");//20
+            }
+            if (ripleCount > 49999) {
+                ripleRank = ("\"10th Riple Master\"");//21
+            }
 
-        }
-        if (ripleCount > 39) {
-            ripleRank = ("\"Kind\"");//5
-        }
-        if (ripleCount > 79) {
-            ripleRank = ("\"Generous\"");//6
-        }
-        if (ripleCount > 159) {
-            ripleRank = ("\"Patron\"");//7
-        }
-        if (ripleCount > 319) {
-            ripleRank = ("\"Benevolent\"");//8
-        }
-        if (ripleCount > 639) {
-            ripleRank = ("\"Humanitarian\"");//9
-        }
-        if (ripleCount > 1279) {
-            ripleRank = ("\"Altruist\"");//10
-        }
-        if (ripleCount > 2559) {
-            ripleRank = ("\"Saint\"");//11
-        }
-        if (ripleCount > 4999) {
-            ripleRank = ("\"Riple Master\"");//12
-        }
+            // Save the currentUser ripleCount and rank to the user table
+            currentUser.put("userRipleCount", ripleCount);
+            currentUser.put("userRank", ripleRank);
+            currentUser.saveInBackground();
 
-        if (ripleCount > 9999) {
-            ripleRank = ("\"2nd Riple Master\"");//13
+            // Display the currentUser riple count and rank
+            if (ripleCount == 1) {
+                profileRipleCountView.setText(String.valueOf(ripleCount) + " Riple");
+            } else {
+                profileRipleCountView.setText(String.valueOf(ripleCount) + " Riples");
+            }
+            profileRankView.setText(ripleRank);
         }
-        if (ripleCount > 14999) {
-            ripleRank = ("\"3rd Riple Master\"");//14
-        }
-        if (ripleCount > 19999) {
-            ripleRank = ("\"4th Riple Master\"");//15
-        }
-        if (ripleCount > 24999) {
-            ripleRank = ("\"5th Riple Master\"");//16
-        }
-        if (ripleCount > 29999) {
-            ripleRank = ("\"6th Riple Master\"");//17
-        }
-        if (ripleCount > 34999) {
-            ripleRank = ("\"7th Riple Master\"");//18
-        }
-        if (ripleCount > 39999) {
-            ripleRank = ("\"8th Riple Master\"");//19
-        }
-        if (ripleCount > 44999) {
-            ripleRank = ("\"9th Riple Master\"");//20
-        }
-        if (ripleCount > 49999) {
-            ripleRank = ("\"10th Riple Master\"");//21
-        }
-
-        // Save the currentUser ripleCount and rank to the user table
-        currentUser.put("userRipleCount", ripleCount);
-        currentUser.put("userRank", ripleRank);
-        currentUser.saveInBackground();
-
-        // Display the currentUser riple count and rank
-        if (ripleCount == 1) {
-            profileRipleCountView.setText(String.valueOf(ripleCount) + " Riple");
-        } else {
-            profileRipleCountView.setText(String.valueOf(ripleCount) + " Riples");
-        }
-        profileRankView.setText(ripleRank);
     }
 
     //Task to download the users facebook picture
@@ -712,6 +643,10 @@ public class RipleTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateUserInfo();
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        } else {
+            updateUserInfo();
+        }
     }
 }

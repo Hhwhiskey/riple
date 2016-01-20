@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -19,10 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
@@ -55,10 +58,13 @@ public class FriendsTabFragment extends Fragment {
     private ArrayList<String> displayNames;
     private TextView friendsEmptyView;
     private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
+    private ConnectionDetector detector;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_tab, container, false);
+
+        detector = new ConnectionDetector(getActivity());
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.friends_list_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -74,8 +80,23 @@ public class FriendsTabFragment extends Fragment {
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.friend_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
-                loadFriendsListFromParse();
-                new refreshTask().execute();
+
+                // Check for network connection
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    loadFriendsListFromParse();
+                    new refreshTask().execute();
+                }
+
+                // Hide the refresh indicator after 5 seconds if no data is found
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWaveSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 5000);
             }
         });
 

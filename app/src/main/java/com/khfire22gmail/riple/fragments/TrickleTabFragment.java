@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -17,10 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnticipateInterpolator;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -54,10 +57,13 @@ public class TrickleTabFragment extends Fragment {
     private TextView trickleEmptyView;
     private EndlessRecyclerViewOnScrollListener mEndlessListener;
     ParseUser currentUser;
+    private ConnectionDetector detector;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
+
+        detector = new ConnectionDetector(getActivity());
 
         //Get currentUser
         currentUser = ParseUser.getCurrentUser();
@@ -75,17 +81,26 @@ public class TrickleTabFragment extends Fragment {
         //This is the emptyTextView that will be displayed if the data for the RV is empty
         trickleEmptyView = (TextView) view.findViewById(R.id.trickle_tab_empty_view);
 
-        //Default query call
-        LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask();
-        loadAllDropsTask.execute();
+
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        } else {
+            //Default query call
+            LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask();
+            loadAllDropsTask.execute();
+        }
 
         //Scroll Query listener
         mTrickleRecyclerView.addOnScrollListener(mEndlessListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask(current_page);
-                loadAllDropsTask.execute();
 
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask(current_page);
+                    loadAllDropsTask.execute();
+                }
             }
         });
 
@@ -93,9 +108,24 @@ public class TrickleTabFragment extends Fragment {
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.trickle_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
-                // Load all drops and refresh
-                LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask(true);
-                loadAllDropsTask.execute();
+
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    // Load all drops and refresh
+                    LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask(true);
+                    loadAllDropsTask.execute();
+                }
+
+                // Hide the refresh indicator after 5 seconds if no data is found
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWaveSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 5000);
+
             }
         });
 
@@ -226,66 +256,68 @@ public class TrickleTabFragment extends Fragment {
             }
 
             //Iterate through the list and get all required Drop and Author data
-            for (int i = 0; i < listFromParse.size(); i++) {
+            if (listFromParse != null) {
+                for (int i = 0; i < listFromParse.size(); i++) {
 
-                final DropItem dropItemAll = new DropItem();
+                    final DropItem dropItemAll = new DropItem();
 
-                //Drop Author Data/////////////////////////////////////////////////////////
-                ParseObject authorData = (ParseObject) listFromParse.get(i).get("authorPointer");
+                    //Drop Author Data/////////////////////////////////////////////////////////
+                    ParseObject authorData = (ParseObject) listFromParse.get(i).get("authorPointer");
 
-                //Get the authors picture
-                ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                if (parseProfilePicture != null) {
-                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                        //Decode the picture at 100x100
-                        @Override
-                        public void done(byte[] data, ParseException e) {
-                            if (e == null) {
-                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                dropItemAll.setParseProfilePicture(resized);
+                    //Get the authors picture
+                    ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                    if (parseProfilePicture != null) {
+                        parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                            //Decode the picture at 100x100
+                            @Override
+                            public void done(byte[] data, ParseException e) {
+                                if (e == null) {
+                                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                    dropItemAll.setParseProfilePicture(resized);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+
+                    //Author display name
+                    dropItemAll.setAuthorName((String) authorData.get("displayName"));
+                    //Author id
+                    dropItemAll.setAuthorId(authorData.getObjectId());
+                    //Author Rank
+                    dropItemAll.setAuthorRank(authorData.getString("userRank"));
+                    //Author Riple Count
+                    dropItemAll.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+                    //Author Info
+                    dropItemAll.setAuthorInfo(authorData.getString("userInfo"));
+
+                    //Drop Data///////////////////////////////////////////////////////////////
+                    //DropObjectId
+                    dropItemAll.setObjectId(listFromParse.get(i).getObjectId());
+                    //Drop description
+                    dropItemAll.setDescription(listFromParse.get(i).getString("description"));
+                    //CreatedAt
+                    dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
+
+                    //Riple Count
+                    int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
+                    if (ripleCount == 1) {
+                        dropItemAll.setRipleCount(String.valueOf(ripleCount) + " Riple");
+                    } else {
+                        dropItemAll.setRipleCount(String.valueOf(ripleCount) + " Riples");
+                    }
+
+                    //Comment Count
+                    int commentCount = (listFromParse.get(i).getInt("commentCount"));
+                    if (commentCount == 1) {
+                        dropItemAll.setCommentCount(String.valueOf(commentCount) + " Comment");
+                    } else {
+                        dropItemAll.setCommentCount(String.valueOf(commentCount) + " Comments");
+                    }
+
+                    //Add all of these DropItems to the field arrayList allDropsList
+                    allDropsList.add(dropItemAll);
                 }
-
-                //Author display name
-                dropItemAll.setAuthorName((String) authorData.get("displayName"));
-                //Author id
-                dropItemAll.setAuthorId(authorData.getObjectId());
-                //Author Rank
-                dropItemAll.setAuthorRank(authorData.getString("userRank"));
-                //Author Riple Count
-                dropItemAll.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
-                //Author Info
-                dropItemAll.setAuthorInfo(authorData.getString("userInfo"));
-
-                //Drop Data///////////////////////////////////////////////////////////////
-                //DropObjectId
-                dropItemAll.setObjectId(listFromParse.get(i).getObjectId());
-                //Drop description
-                dropItemAll.setDescription(listFromParse.get(i).getString("description"));
-                //CreatedAt
-                dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
-
-                //Riple Count
-                int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
-                if (ripleCount == 1) {
-                    dropItemAll.setRipleCount(String.valueOf(ripleCount) + " Riple");
-                } else {
-                    dropItemAll.setRipleCount(String.valueOf(ripleCount) + " Riples");
-                }
-
-                //Comment Count
-                int commentCount = (listFromParse.get(i).getInt("commentCount"));
-                if (commentCount == 1) {
-                    dropItemAll.setCommentCount(String.valueOf(commentCount) + " Comment");
-                } else {
-                    dropItemAll.setCommentCount(String.valueOf(commentCount) + " Comments");
-                }
-
-                //Add all of these DropItems to the field arrayList allDropsList
-                allDropsList.add(dropItemAll);
             }
 
             //Return the said list

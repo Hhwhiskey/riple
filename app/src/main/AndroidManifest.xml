@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.khfire22gmail.riple"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="com.khfire22gmail.riple"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- TODO Update permissions for Marshmallow http://guides.codepath.com/android/Understanding-App-Permissions#runtime-permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.VIBRATE" />
+
+
 
      <!--<uses-permission android:author="android.Permission.PUBLIC_PROFILE"/> -->
     <application
@@ -16,6 +20,13 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:largeHeap="true">
+
+        <receiver android:name=".utils.NetworkStateChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".activities.TitleActivity"
             android:label="@string/app_name"

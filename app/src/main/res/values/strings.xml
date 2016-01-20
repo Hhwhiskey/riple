@@ -9,7 +9,7 @@
     <string name="title">riple</string>
     <string name="facebooklogintext">Facebook</string>
     <string name="fb_namespace">riple_hodges</string>
-    <string name="no_connection">No network connection detected. Check your network settings.</string>
+    <string name="no_connection">No network connection detected. Please check your network settings.</string>
     <string name="title_activity_about">About</string>
     <string name="explanation">Welcome to Riple! Where making a difference is only one Riple away. Start by creating a Drop, the start of every Riple. Then watch your Riple spread as others share and complete your Drop. You can also make an impact by completing and sharing others Drops, just add them to your "Drop" list and complete them as you encounter friends, family and strangers. Remember, the smallest drop can create a Riple!</string>
     <string name="title_activity_settings">Settings</string>
@@ -84,6 +84,7 @@
     <string name="rorate_picture_prompt">Please rotate and crop your picture to your liking...</string>
     <string name="edit_display_name_hint">Edit Your Display Name</string>
     <string name="share_about_yourself_hint">Share a little about yourself</string>
+    <string name="network_connection_established">Network connection established!</string>
 
     <string-array name="showGuidelinesArray">showGuidlinesArray
         <item>Off</item>

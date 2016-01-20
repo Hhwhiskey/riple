@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -35,23 +36,33 @@ public class ParseLoginActivity extends AppCompatActivity {
     private Context context;
     private Boolean emailVerified;
     private TextView forgotPassword;
+    private ConnectionDetector detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        detector = new ConnectionDetector(this);
 
         intent = new Intent(getApplicationContext(), MainActivity.class);
         serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         final ParseUser user = ParseUser.getCurrentUser();
 
-        if (user != null) {
-            emailVerified = user.getBoolean("emailVerified");
-            if (emailVerified) {
-                boolean banBoolean = user.getBoolean("isBan");
-                if (!banBoolean) {
-                    startActivity(intent);
-                    finish();
+        //If there is no connection present show toast
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+            //Otherwise, enter the MainActivity
+        } else {
+
+            if (user != null) {
+                emailVerified = user.getBoolean("emailVerified");
+                if (emailVerified) {
+                    boolean banBoolean = user.getBoolean("isBan");
+                    if (!banBoolean) {
+                        startActivity(intent);
+                        finish();
+                    }
                 }
             }
         }

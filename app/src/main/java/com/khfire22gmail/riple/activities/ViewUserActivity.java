@@ -226,20 +226,23 @@ public class ViewUserActivity extends AppCompatActivity {
         viewUserQuery.getInBackground(mClickedUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser clickedUserObject, ParseException e) {
-                ParseFile viewUserProfilePicture = (ParseFile) clickedUserObject.get("parseProfilePicture");
-                parseProfilePicture = viewUserProfilePicture;
-                if (parseProfilePicture != null) {
-                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                if (e != null) {
+                } else {
+                    ParseFile viewUserProfilePicture = (ParseFile) clickedUserObject.get("parseProfilePicture");
+                    parseProfilePicture = viewUserProfilePicture;
+                    if (parseProfilePicture != null) {
+                        parseProfilePicture.getDataInBackground(new GetDataCallback() {
 
-                        @Override
-                        public void done(byte[] data, ParseException e) {
-                            if (e == null) {
-                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 500, 500, true);
-                                profilePictureView.setImageBitmap(resized);
+                            @Override
+                            public void done(byte[] data, ParseException e) {
+                                if (e == null) {
+                                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 500, 500, true);
+                                    profilePictureView.setImageBitmap(resized);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
@@ -286,86 +289,90 @@ public class ViewUserActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseUser viewedUser, ParseException e) {
 
-                    ParseRelation createdRelation = viewedUser.getRelation("createdDrops");
-                    ParseRelation completedRelation = viewedUser.getRelation("completedDrops");
+                    if (e != null) {
+                        Log.i("KEVIN", "error error" + e);
+                    } else {
 
-                    ParseQuery createdQuery = createdRelation.getQuery();
-                    ParseQuery completedQuery = completedRelation.getQuery();
+                        ParseRelation createdRelation = viewedUser.getRelation("createdDrops");
+                        ParseRelation completedRelation = viewedUser.getRelation("completedDrops");
 
-                    List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-                    queries.add(createdQuery);
-                    queries.add(completedQuery);
+                        ParseQuery createdQuery = createdRelation.getQuery();
+                        ParseQuery completedQuery = completedRelation.getQuery();
 
-                    ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-                    mainQuery.include("authorPointer");
-                    mainQuery.orderByDescending("createdAt");
-                    mainQuery.setSkip(skipNumber);
-                    mainQuery.setLimit(queryLimit);
-                    mainQuery.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> list, ParseException e) {
+                        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+                        queries.add(createdQuery);
+                        queries.add(completedQuery);
 
-                            if (e != null) {
-                                Log.i("KEVIN", "error error");
+                        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+                        mainQuery.include("authorPointer");
+                        mainQuery.orderByDescending("createdAt");
+                        mainQuery.setSkip(skipNumber);
+                        mainQuery.setLimit(queryLimit);
+                        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> list, ParseException e) {
 
-                            } else {
-                                for (int i = 0; i < list.size(); i++) {
+                                if (e != null) {
+                                    Log.i("KEVIN", "error error");
+                                } else {
+                                    for (int i = 0; i < list.size(); i++) {
 
-                                    final DropItem dropItem = new DropItem();
+                                        final DropItem dropItem = new DropItem();
 
-                                    //Drop Author Data//////////////////////////////////////////////////////////
-                                    ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
+                                        //Drop Author Data//////////////////////////////////////////////////////////
+                                        ParseObject authorData = (ParseObject) list.get(i).get("authorPointer");
 
-                                    ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
-                                    if (parseProfilePicture != null) {
-                                        parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                            @Override
-                                            public void done(byte[] data, ParseException e) {
-                                                if (e == null) {
-                                                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                                    dropItem.setParseProfilePicture(resized);
+                                        ParseFile parseProfilePicture = (ParseFile) authorData.get("parseProfilePicture");
+                                        if (parseProfilePicture != null) {
+                                            parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                                @Override
+                                                public void done(byte[] data, ParseException e) {
+                                                    if (e == null) {
+                                                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                                        dropItem.setParseProfilePicture(resized);
 
-                                                    if (pageNumber != 0) {
-                                                        mViewUserAdapter.notifyDataSetChanged();
-                                                    } else {
-                                                        updateRecyclerView(mViewUserDropList);
+                                                        if (pageNumber != 0) {
+                                                            mViewUserAdapter.notifyDataSetChanged();
+                                                        } else {
+                                                            updateRecyclerView(mViewUserDropList);
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        });
+                                            });
+                                        }
+
+                                        //dropItemAll.setAuthorName(authorName);
+                                        dropItem.setAuthorName((String) authorData.get("displayName"));
+                                        //Author id
+                                        dropItem.setAuthorId(authorData.getObjectId());
+                                        //Author Rank
+                                        dropItem.setAuthorRank(authorData.getString("userRank"));
+                                        //Author RipleCount
+                                        dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
+                                        //Author Info
+                                        dropItem.setAuthorInfo(authorData.getString("userInfo"));
+
+                                        //Drop Data////////////////////////////////////////////////////////////////
+                                        //DropObjectId
+                                        dropItem.setObjectId(list.get(i).getObjectId());
+                                        //CreatedAt
+                                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
+                                        //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+                                        //Drop description
+                                        dropItem.setDescription(list.get(i).getString("description"));
+                                        //Riple Count
+                                        dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
+                                        //Comment Count
+                                        dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
+
+
+                                        mViewUserDropList.add(dropItem);
                                     }
-
-                                    //dropItemAll.setAuthorName(authorName);
-                                    dropItem.setAuthorName((String) authorData.get("displayName"));
-                                    //Author id
-                                    dropItem.setAuthorId(authorData.getObjectId());
-                                    //Author Rank
-                                    dropItem.setAuthorRank(authorData.getString("userRank"));
-                                    //Author RipleCount
-                                    dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
-                                    //Author Info
-                                    dropItem.setAuthorInfo(authorData.getString("userInfo"));
-
-                                    //Drop Data////////////////////////////////////////////////////////////////
-                                    //DropObjectId
-                                    dropItem.setObjectId(list.get(i).getObjectId());
-                                    //CreatedAt
-                                    dropItem.setCreatedAt(list.get(i).getCreatedAt());
-                                    //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
-                                    //Drop description
-                                    dropItem.setDescription(list.get(i).getString("description"));
-                                    //Riple Count
-                                    dropItem.setRipleCount(String.valueOf(list.get(i).getInt("ripleCount") + " Riples"));
-                                    //Comment Count
-                                    dropItem.setCommentCount(String.valueOf(list.get(i).getInt("commentCount") + " Comments"));
-
-
-                                    mViewUserDropList.add(dropItem);
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
 
             });

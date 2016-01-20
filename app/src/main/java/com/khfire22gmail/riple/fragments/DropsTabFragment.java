@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -18,10 +19,12 @@ import android.view.ViewGroup;
 import android.view.animation.AnticipateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
@@ -55,11 +58,14 @@ public class DropsTabFragment extends Fragment {
     private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
     private EndlessRecyclerViewOnScrollListener mEndlessOnScrollListener;
     private LinearLayoutManager layoutManager;
+    private ConnectionDetector detector;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drop_tab, container, false);
+
+        detector = new ConnectionDetector(getActivity());
 
         mDropListFromParse = new ArrayList<>();
 
@@ -71,26 +77,50 @@ public class DropsTabFragment extends Fragment {
         mDropRecyclerView.getItemAnimator().setRemoveDuration(500);
         dropEmptyView = (TextView) view.findViewById(R.id.drop_tab_empty_view);
 
-        LoadDropItemsFromParse dropOnCreateQuery = new LoadDropItemsFromParse();
-        dropOnCreateQuery.runLoadDropItemsFromParse();
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+        } else {
+
+            LoadDropItemsFromParse dropOnCreateQuery = new LoadDropItemsFromParse();
+            dropOnCreateQuery.runLoadDropItemsFromParse();
+        }
 
         mDropRecyclerView.addOnScrollListener(mEndlessOnScrollListener = new EndlessRecyclerViewOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                LoadDropItemsFromParse dropOnScrollQuery = new LoadDropItemsFromParse(current_page);
-                dropOnScrollQuery.runLoadDropItemsFromParse();
 
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    LoadDropItemsFromParse dropOnScrollQuery = new LoadDropItemsFromParse(current_page);
+                    dropOnScrollQuery.runLoadDropItemsFromParse();
+                }
             }
         });
 
         //Swipe Refresh
         mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.drop_swipe);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
-            @Override public void onRefresh() {
-                // Do work to refresh the list here.
-                LoadDropItemsFromParse dropRefreshQuery = new LoadDropItemsFromParse(true);
-                dropRefreshQuery.runLoadDropItemsFromParse();
-                new dropRefreshTask().execute();
+            @Override
+            public void onRefresh() {
+
+                if (!detector.isConnectedToInternet()) {
+                    Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                } else {
+                    // Do work to refresh the list here.
+                    LoadDropItemsFromParse dropRefreshQuery = new LoadDropItemsFromParse(true);
+                    dropRefreshQuery.runLoadDropItemsFromParse();
+                    new dropRefreshTask().execute();
+                }
+
+                // Hide the refresh indicator after 5 seconds if no data is found
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWaveSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 5000);
             }
         });
 
@@ -121,7 +151,7 @@ public class DropsTabFragment extends Fragment {
 
     }
 
-    public void saveTipPreferences(String key, Boolean value){
+    public void saveTipPreferences(String key, Boolean value) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
@@ -295,8 +325,7 @@ public class DropsTabFragment extends Fragment {
         if (dropList.isEmpty()) {
             mDropRecyclerView.setVisibility(View.GONE);
             dropEmptyView.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mDropRecyclerView.setVisibility(View.VISIBLE);
             dropEmptyView.setVisibility(View.GONE);
         }
@@ -325,7 +354,8 @@ public class DropsTabFragment extends Fragment {
             return new String[0];
         }
 
-        @Override protected void onPostExecute(String[] result) {
+        @Override
+        protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
             mWaveSwipeRefreshLayout.setRefreshing(false);
             mEndlessOnScrollListener.reset(1, 0, true);
