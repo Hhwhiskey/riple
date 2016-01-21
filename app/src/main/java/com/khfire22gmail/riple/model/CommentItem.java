@@ -2,8 +2,6 @@ package com.khfire22gmail.riple.model;
 
 import android.graphics.Bitmap;
 
-import java.util.Date;
-
 /**
  * Created by Kevin on 10/27/2015.
  */
@@ -12,7 +10,7 @@ public class CommentItem {
     public String dropObjectId;
     public String commentObjectId;
     public String commentText;
-    public Date createdAt;
+    public String createdAt;
 
     public String commenterId;
     public String commenterName;
@@ -86,11 +84,11 @@ public class CommentItem {
         this.commenterName = commenterName;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 

@@ -90,7 +90,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Riple is a place of good. A community whose members strive to make the world a better place. In the event that your account contains offensive material, you will be reported and your account will be removed. Thanks for following the rules!"
+        android:text="@string/riple_is_a_place_of_good_a_community_whose_members_strive_to_make_the_world_a_better_place_in_the_event_that_your_account_contains_spam_or_offensive_inappropriate_material_you_will_be_reported_and_your_account_will_be_removed_thanks_for_following_the_rules"
         android:id="@+id/textView10"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="8dp"

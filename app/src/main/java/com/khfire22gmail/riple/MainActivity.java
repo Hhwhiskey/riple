@@ -33,6 +33,7 @@ import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.MessageService;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -78,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         detector = new ConnectionDetector(this);
 
         currentUser = ParseUser.getCurrentUser();
-
-//        SharedPreferences settings = getSharedPreferences("MY_APP", MODE_PRIVATE);
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
         startService(serviceIntent);
@@ -166,14 +165,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logUser();
     }
 
-    public void saveTipPreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
-    }
+//    public void saveTipPreferences(String key, Boolean value){
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean(key, value);
+//        editor.putBoolean("allTipsBoolean", false);
+//        editor.commit();
+//    }
 
+    // Tip dialog box method that will show if tips enabled by the user
     public void viewUserTip() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean test = sharedPreferences.getBoolean("postDropTips", true);
@@ -190,7 +190,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    saveTipPreferences("postDropTips", false);
+//                    SaveToSharedPrefs(this, "postDropTips", false);
+
+//                    SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs(MainActivity.this, "postDropTips", false);
+//                    saveToSharedPrefs.saveBooleanPreferences();
                 }
             });
 
@@ -278,7 +281,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
 
             builder.show();
-
         }
 
         // Show the postDropTips tip if enabled by user
@@ -421,10 +423,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void isBoxChecked(boolean status) {
-        this.isBoxChecked = status;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -443,72 +441,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.settingsButton) {
-            Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
-            startActivity(intentSettings);
-            return true;
-        }
+        SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
 
-        if (id == R.id.aboutButton) {
-            Intent intentSettings = new Intent(getApplicationContext(), AboutActivity.class);
-            startActivity(intentSettings);
-            return true;
-        }
+        // Check for valid network before these respond
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(this, R.string.no_connection, Toast.LENGTH_LONG).show();
+        } else {
 
-        //If checkbox is actuated
-        if (id == R.id.tips) {
+            if (id == R.id.settingsButton) {
 
-//            if (checkTest) {
-//                item.setChecked(item.isChecked());
-//            } else {
-//               item.setChecked(!item.isChecked());
-//            }
-
-            item.setChecked(!item.isChecked());
-
-            //If the box is checked
-            SharedPreferences.Editor editor;
-            if (item.isChecked()) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                editor = sharedPreferences.edit();
-                editor.putBoolean("allTipsBoolean", true);
-                editor.putBoolean("ripleTips", true);
-                editor.putBoolean("dropTips", true);
-                editor.putBoolean("trickleTips", true);
-                editor.putBoolean("friendTips", true);
-                editor.putBoolean("postDropTips", true);
-                editor.putBoolean("viewUserTips", true);
-                editor.putBoolean("viewDropTips", true);
-                editor.commit();
-
-                Toast.makeText(MainActivity.this, "All tips will be displayed.", Toast.LENGTH_LONG).show();
-
-            //If the box is unchecked
-            } else {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                editor = sharedPreferences.edit();
-                editor.putBoolean("allTipsBoolean", false);
-                editor.putBoolean("ripleTips", false);
-                editor.putBoolean("dropTips", false);
-                editor.putBoolean("trickleTips", false);
-                editor.putBoolean("friendTips", false);
-                editor.putBoolean("postDropTips", false);
-                editor.putBoolean("viewUserTips", false);
-                editor.putBoolean("viewDropTips", false);
-                editor.commit();
-
-                Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
+                Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intentSettings);
+                return true;
             }
-            return true;
-        }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.logoutButton) {
-            ParseUser.logOut();
-            Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
-            startActivity(intentLogout);
-            finish();
-            return true;
+            if (id == R.id.aboutButton) {
+                Intent intentSettings = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(intentSettings);
+                return true;
+            }
+
+            //If checkbox is actuated activate all tips
+            if (id == R.id.tips) {
+
+                item.setChecked(!item.isChecked());
+
+                //If the box is checked
+                if (item.isChecked()) {
+                    saveToSharedPrefs.saveAllTipsBoolean(this, true);
+                    Toast.makeText(MainActivity.this, "All tips will be displayed.", Toast.LENGTH_LONG).show();
+
+                //If the box is unchecked, hide all tips
+                } else {
+                    saveToSharedPrefs.saveAllTipsBoolean(this, false);
+                    Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.logoutButton) {
+                ParseUser.logOut();
+                Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
+                startActivity(intentLogout);
+                finish();
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -546,8 +524,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // TODO: Use the current user's information
         // You can call any combination of these three methods
 
-        Crashlytics.setUserName(currentUser.getUsername());
-        Crashlytics.setUserIdentifier(currentUser.getString("displayName"));
+        Crashlytics.setUserIdentifier(currentUser.getUsername());
+        Crashlytics.setUserName(currentUser.getString("displayName"));
     }
 }
 

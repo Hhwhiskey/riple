@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.activities.MessagingActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.Vibrate;
 import com.parse.GetCallback;
@@ -38,15 +39,16 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     Context mContext;
     List<FriendItem> data = Collections.emptyList();
     private LayoutInflater inflater;
+    private ConnectionDetector detector;
 
     public FriendAdapter() {
-
     }
 
     public FriendAdapter(Context context, ArrayList<FriendItem> data) {
         mContext = context;
         this.inflater = LayoutInflater.from(context);
         this.data = data;
+        detector = new ConnectionDetector(mContext);
     }
 
     @Override
@@ -136,10 +138,15 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         @Override
         public void onClick(View v) {
 
-            if (v == otherProfilePicture) {
-                viewFriendProfile(getAdapterPosition());
+            if (!detector.isConnectedToInternet()) {
+                Toast.makeText(mContext, R.string.no_connection, Toast.LENGTH_LONG).show();
             } else {
-                openConversation(getAdapterPosition());
+
+                if (v == otherProfilePicture) {
+                    viewFriendProfile(getAdapterPosition());
+                } else {
+                    openConversation(getAdapterPosition());
+                }
             }
         }
 
@@ -147,7 +154,12 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         public boolean onLongClick(View v) {
             Vibrate vibrate = new Vibrate();
             vibrate.vibrate(mContext);
-            openFriendMenu();
+
+            if (!detector.isConnectedToInternet()) {
+                Toast.makeText(mContext, R.string.no_connection, Toast.LENGTH_LONG).show();
+            } else {
+                openFriendMenu();
+            }
             return false;
         }
 

@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 
 import com.parse.ParseObject;
 
-import java.util.Date;
-
 /**
  * Created by Kevin on 9/16/2015.
  */
@@ -13,7 +11,6 @@ public class DropItem {
 
     public static final String DROP_KEY = "Drop";
 
-    public Date createdAt;
     public String objectId;
     public String authorId;
     public String authorName;
@@ -26,9 +23,7 @@ public class DropItem {
     public String commentCount;
     public ParseObject drop;
     public Bitmap parseProfilePicture;
-
-
-
+    public String createdAt;
 
     public String getAuthorInfo() {
         return authorInfo;
@@ -102,11 +97,11 @@ public class DropItem {
         this.authorId = authorId;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 

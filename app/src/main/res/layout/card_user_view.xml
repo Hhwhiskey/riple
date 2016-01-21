@@ -62,7 +62,7 @@
                 android:layout_height="match_parent"
                 android:text="with 45000 Riples"
                 android:id="@+id/other_riple_count"
-                android:textSize="14dp"
+                android:textSize="16dp"
                 android:textColor="#FFFFFF"
                 android:gravity="top"
                 android:layout_alignTop="@+id/other_rank"
@@ -81,13 +81,13 @@
                 android:id="@+id/other_rank"
                 android:layout_alignLeft="@+id/other_display_name"
                 android:layout_alignStart="@+id/other_display_name"
-                android:textSize="14dp"
+                android:textSize="16dp"
                 android:textColor="#FFFFFF"
                 android:textStyle="italic"
                 android:layout_below="@+id/other_display_name"
                 android:gravity="top"
                 android:layout_alignParentTop="false"
-                android:layout_marginTop="2dp"/>
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -106,7 +106,6 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="2dp"
                 android:alpha=".7"/>
 
 

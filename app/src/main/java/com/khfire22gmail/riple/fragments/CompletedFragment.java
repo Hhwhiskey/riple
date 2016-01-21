@@ -26,7 +26,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
@@ -44,7 +43,7 @@ public class CompletedFragment extends Fragment {
     private String mDropDescription;
     private String mRipleCount;
     private String mCommentCount;
-    private Date mCreatedAt;
+    private String mCreatedAt;
     private String mTabName;
     private CompletedByAdapter mCompletedByAdapter;
     private RecyclerView mRecyclerView;
@@ -86,7 +85,7 @@ public class CompletedFragment extends Fragment {
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
-        mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
+//        mCreatedAt = (String) intent.getSerializableExtra("createdAt");
         mTabName = intent.getStringExtra("mTabName");
 
         loadCompletedListFromParse();
@@ -102,48 +101,56 @@ public class CompletedFragment extends Fragment {
         dropQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
-                ParseRelation<ParseObject> completedByRelation = parseObject.getRelation("completedBy");
-                ParseQuery completedByQuery = completedByRelation.getQuery();
-                completedByQuery.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> list, ParseException e) {
 
-                        if (e != null) {
+                if (e != null) {
 
-                        } else {
-                            for (int i = 0; i < list.size(); i++) {
+                } else {
 
-                                Log.d("list", "list= " + list);
+                    ParseRelation<ParseObject> completedByRelation = parseObject.getRelation("completedBy");
+                    ParseQuery completedByQuery = completedByRelation.getQuery();
+                    completedByQuery.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> list, ParseException e) {
 
-                                final CompletedByItem completedByItem = new CompletedByItem();
+                            if (e != null) {
 
-                                ParseFile parseProfilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
-                                if (parseProfilePicture != null) {
-                                    parseProfilePicture.getDataInBackground(new GetDataCallback() {
-                                        @Override
-                                        public void done(byte[] data, ParseException e) {
-                                            if (e == null) {
-                                                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                                completedByItem.setParseProfilePicture(resized);
-                                                updateRecyclerView(completedByList);
+                            } else {
+                                for (int i = 0; i < list.size(); i++) {
+
+                                    Log.d("list", "list= " + list);
+
+                                    final CompletedByItem completedByItem = new CompletedByItem();
+
+                                    ParseFile parseProfilePicture = (ParseFile) list.get(i).get("parseProfilePicture");
+                                    if (parseProfilePicture != null) {
+                                        parseProfilePicture.getDataInBackground(new GetDataCallback() {
+                                            @Override
+                                            public void done(byte[] data, ParseException e) {
+                                                if (e != null) {
+
+                                                } else {
+                                                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                                    completedByItem.setParseProfilePicture(resized);
+                                                    updateRecyclerView(completedByList);
+                                                }
+
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
+
+                                    completedByItem.setUserObjectId(list.get(i).getObjectId());
+                                    completedByItem.setDisplayName((String) list.get(i).get("displayName"));
+                                    completedByItem.setUserRank(list.get(i).getString("userRank"));
+                                    completedByItem.setUserInfo(list.get(i).getString("userInfo"));
+                                    completedByItem.setUserRipleCount(String.valueOf(list.get(i).getInt("userRipleCount")));
+
+                                    completedByList.add(completedByItem);
                                 }
-
-                                completedByItem.setUserObjectId(list.get(i).getObjectId());
-                                completedByItem.setDisplayName((String) list.get(i).get("displayName"));
-                                completedByItem.setUserRank(list.get(i).getString("userRank"));
-                                completedByItem.setUserInfo(list.get(i).getString("userInfo"));
-                                completedByItem.setUserRipleCount(String.valueOf(list.get(i).getInt("userRipleCount")));
-
-
-                                completedByList.add(completedByItem);
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     }

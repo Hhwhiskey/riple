@@ -85,6 +85,8 @@
     <string name="edit_display_name_hint">Edit Your Display Name</string>
     <string name="share_about_yourself_hint">Share a little about yourself</string>
     <string name="network_connection_established">Network connection established!</string>
+    <string name="riple_is_a_place_of_good_a_community_whose_members_strive_to_make_the_world_a_better_place_in_the_event_that_your_account_contains_spam_or_offensive_inappropriate_material_you_will_be_reported_and_your_account_will_be_removed_thanks_for_following_the_rules">Riple is a place of good. A community whose members strive to make the world a better place. In the event that your account contains spam or offensive/inappropriate material, you will be reported and your account will be removed. Thanks for following the rules!</string>
+    <string name="riple_tip">This is your Riple headquarters. All of your created and completed Drops will be listed here. You will be given a rank based on how many Riples you have created. Nobody likes a showoff, but it certainly does feel good to see the impact you have made. You may pull to refresh this and all other tabs when you are ready to see new information.</string>
 
     <string-array name="showGuidelinesArray">showGuidlinesArray
         <item>Off</item>

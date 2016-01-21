@@ -25,6 +25,7 @@ import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -33,6 +34,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -158,14 +161,14 @@ public class TrickleTabFragment extends Fragment {
 
     }
 
-    //Saves the shared prefs when the currentUser hides the tip
-    public void saveTipPreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
-    }
+//    //Saves the shared prefs when the currentUser hides the tip
+//    public void saveTipPreferences(String key, Boolean value){
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean(key, value);
+//        editor.putBoolean("allTipsBoolean", false);
+//        editor.commit();
+//    }
 
     //Dialog box that shows Trickle tip upon viewing of this fragment until hidden by user
     public void trickleTip() {
@@ -180,8 +183,8 @@ public class TrickleTabFragment extends Fragment {
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("trickleTips", false);
-
+                SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+                saveToSharedPrefs.saveBooleanPreferences(getActivity(), "trickleTips", false);
             }
         });
 
@@ -296,8 +299,11 @@ public class TrickleTabFragment extends Fragment {
                     dropItemAll.setObjectId(listFromParse.get(i).getObjectId());
                     //Drop description
                     dropItemAll.setDescription(listFromParse.get(i).getString("description"));
-                    //CreatedAt
-                    dropItemAll.setCreatedAt(listFromParse.get(i).getCreatedAt());
+
+                    //Get created at from parse and convert it to friendly String
+                    Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                    String dateAfter = formatter.format(listFromParse.get(i).getCreatedAt());
+                    dropItemAll.setCreatedAt(dateAfter);
 
                     //Riple Count
                     int ripleCount = (listFromParse.get(i).getInt("ripleCount"));
@@ -319,6 +325,7 @@ public class TrickleTabFragment extends Fragment {
                     allDropsList.add(dropItemAll);
                 }
             }
+
 
             //Return the said list
             return allDropsList;

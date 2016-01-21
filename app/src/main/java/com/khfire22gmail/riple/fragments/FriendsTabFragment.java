@@ -27,6 +27,7 @@ import com.khfire22gmail.riple.model.FriendAdapter;
 import com.khfire22gmail.riple.model.FriendItem;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.Constants;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -123,15 +124,6 @@ public class FriendsTabFragment extends Fragment {
         } else {
             return true;
         }
-
-    }
-
-    public void saveTipPreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
     }
 
     public void friendTip() {
@@ -145,7 +137,8 @@ public class FriendsTabFragment extends Fragment {
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("friendTips", false);
+                SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+                saveToSharedPrefs.saveBooleanPreferences(getActivity(), "friendTips", false);
 
             }
         });

@@ -22,9 +22,9 @@ import com.sinch.android.rtc.messaging.WritableMessage;
 
 public class MessageService extends Service implements SinchClientListener {
 
-    private static final String APP_KEY = "deb1a018-2618-47b2-ade6-dc028ae98f11";
-    private static final String APP_SECRET = "5/DZkA0LnEWBHBaH6bBEhA==";
-    private static final String ENVIRONMENT = "sandbox.sinch.com";
+    private static final String APP_KEY = "d2aa40c9-0a4e-457d-a36f-be618813ba20";
+    private static final String APP_SECRET = "jrpAeLa1wkKsVOD3HAJtnA==";
+    private static final String ENVIRONMENT = "clientapi.sinch.com";
     private final MessageServiceInterface serviceInterface = new MessageServiceInterface();
     private SinchClient sinchClient = null;
     private MessageClient messageClient = null;

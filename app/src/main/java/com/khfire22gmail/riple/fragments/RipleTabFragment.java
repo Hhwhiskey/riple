@@ -29,6 +29,7 @@ import com.khfire22gmail.riple.model.DropItem;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -42,6 +43,8 @@ import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,10 +116,6 @@ public class RipleTabFragment extends Fragment {
         if (!detector.isConnectedToInternet()) {
             Toast.makeText(getActivity(), getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         } else {
-            //If there is an connectin present...
-            //Update the currentUsers profile card
-//            updateUserInfo();
-            //Default onCreate Query call
             LoadRipleItemsFromParse onCreateQuery = new LoadRipleItemsFromParse();
             onCreateQuery.runLoadRipleItemsFromParse();
         }
@@ -239,30 +238,29 @@ public class RipleTabFragment extends Fragment {
 
     }
 
-    public void saveTipPreferences(String key, Boolean value) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
-
-//        MainActivity mainActivity = new MainActivity();
-//        mainActivity.isBoxChecked(false);
-    }
+//    public void saveTipPreferences(String key, Boolean value) {
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean(key, value);
+//        editor.putBoolean("allTipsBoolean", false);
+//        editor.commit();
+//
+////        MainActivity mainActivity = new MainActivity();
+////        mainActivity.isBoxChecked(false);
+//    }
 
     public void ripleTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(RipleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Riple...");
-        builder.setMessage("This is your Riple headquarters. All of your created and " +
-                "completed Drops will be listed here. You will be given a rank based on how many " +
-                "Riples you have created. Nobody likes a showoff, but it certainly does feel good " +
-                "to see the impact you have made.");
+        builder.setMessage(getString(R.string.riple_tip));
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("ripleTips", false);
+
+                SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+                saveToSharedPrefs.saveBooleanPreferences(getActivity(), "ripleTips", false);
             }
         });
 
@@ -277,19 +275,24 @@ public class RipleTabFragment extends Fragment {
     // Extra for currentUser profile view
     private void viewCurrentUserProfileExtra() {
 
-        String currentUserId = currentUser.getObjectId();
-        String currentUserDisplayName = currentUser.getString("displayName");
-        String currentUserRank = currentUser.getString("userRank");
-        String currentUserRipleCount = String.valueOf(currentUser.getInt("userRipleCount"));
-        String currentUserInfo = currentUser.getString("userInfo");
+        if (!detector.isConnectedToInternet()) {
+            Toast.makeText(getActivity(), R.string.no_connection, Toast.LENGTH_LONG).show();
+        } else {
 
-        Intent intent = new Intent(getActivity(), ViewUserActivity.class);
-        intent.putExtra(Constants.CLICKED_USER_ID, currentUserId);
-        intent.putExtra(Constants.CLICKED_USER_NAME, currentUserDisplayName);
-        intent.putExtra(Constants.CLICKED_USER_RANK, currentUserRank);
-        intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, currentUserRipleCount);
-        intent.putExtra(Constants.CLICKED_USER_INFO, currentUserInfo);
-        getActivity().startActivity(intent);
+            String currentUserId = currentUser.getObjectId();
+            String currentUserDisplayName = currentUser.getString("displayName");
+            String currentUserRank = currentUser.getString("userRank");
+            String currentUserRipleCount = String.valueOf(currentUser.getInt("userRipleCount"));
+            String currentUserInfo = currentUser.getString("userInfo");
+
+            Intent intent = new Intent(getActivity(), ViewUserActivity.class);
+            intent.putExtra(Constants.CLICKED_USER_ID, currentUserId);
+            intent.putExtra(Constants.CLICKED_USER_NAME, currentUserDisplayName);
+            intent.putExtra(Constants.CLICKED_USER_RANK, currentUserRank);
+            intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, currentUserRipleCount);
+            intent.putExtra(Constants.CLICKED_USER_INFO, currentUserInfo);
+            getActivity().startActivity(intent);
+        }
     }
 
     //Riple Query method with 3 constructors for different parameters
@@ -398,9 +401,12 @@ public class RipleTabFragment extends Fragment {
                             //Drop Data////////////////////////////////////////////////////////////////
                             //DropObjectId
                             dropItem.setObjectId(listParse.get(i).getObjectId());
-                            //CreatedAt
-                            dropItem.setCreatedAt(listParse.get(i).getCreatedAt());
-                            //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
+
+                            //Get created at from parse and convert it to friendly String
+                            Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                            String dateAfter = formatter.format(listParse.get(i).getCreatedAt());
+                            dropItem.setCreatedAt(dateAfter);
+
                             //Drop description
                             dropItem.setDescription(listParse.get(i).getString("description"));
 

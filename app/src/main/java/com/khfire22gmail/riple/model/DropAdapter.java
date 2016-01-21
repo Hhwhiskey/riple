@@ -30,6 +30,7 @@ import com.khfire22gmail.riple.activities.ViewDropActivity;
 import com.khfire22gmail.riple.activities.ViewUserActivity;
 import com.khfire22gmail.riple.fragments.DropsTabFragment;
 import com.khfire22gmail.riple.fragments.TrickleTabFragment;
+import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.Vibrate;
 import com.parse.FindCallback;
@@ -67,6 +68,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private boolean stop;
     private Context applicationContext;
     private static final String TAG = "DropAdapter";
+    private ConnectionDetector detector;
 
     public DropAdapter() {
 //        this.data =
@@ -77,6 +79,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         this.mContext = context;
         this.data = data;
         this.mTabName = tabName;
+        detector = new ConnectionDetector(mContext);
 
         inflater = LayoutInflater.from(context);
     }
@@ -289,7 +292,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String ripleCount = (data.get(position).getRipleCount());
         String commentCount = (data.get(position).getCommentCount());
 //        String mPosition = String.valueOf((data.get(position)));
-        Date createdAt = (data.get(position).getCreatedAt());
+        String createdAt = (data.get(position).getCreatedAt());
 
         Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + dropObjectId);
         Log.d("sViewDropAcitivty", "Send drop's authorId = " + authorId);
@@ -391,7 +394,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                                 @Override
                                 public void done(ParseException e) {
                                     Toast.makeText(mContext, "The author has been reported. " +
-                                            "Thank you for keeping Riple safe!",
+                                                    "Thank you for keeping Riple safe!",
                                             Toast.LENGTH_LONG).show();
                                 }
                             });
@@ -506,7 +509,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             DropItem current = data.get(position);
 
             parseProfilePicture.setImageBitmap(current.parseProfilePicture);
-            createdAt.setText(String.valueOf(current.createdAt));
+            createdAt.setText(current.createdAt);
             authorName.setText(current.authorName);
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));
@@ -516,60 +519,71 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         @Override
         public void onClick(View view) {
-            if (view == todoButton) {
-                //Check to see if user has picture and display name set
-                ParseUser currentUser = ParseUser.getCurrentUser();
-                parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
-                displayNameCheck = (String) currentUser.get("displayName");
 
-                if (parseProfilePictureCheck == null && displayNameCheck == null) {
-                    Toast.makeText(mContext, R.string.picAndNameToast, Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(mContext, SettingsActivity.class);
-                    mContext.startActivity(intent);
-                } else if (parseProfilePicture == null) {
-                    Toast.makeText(mContext, R.string.picToast, Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(mContext, SettingsActivity.class);
-                    mContext.startActivity(intent);
-
-                } else if (displayNameCheck == null) {
-                    Toast.makeText(mContext, R.string.nameToast, Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(mContext, SettingsActivity.class);
-                    mContext.startActivity(intent);
-                //Add Drop to to-do list if user has picture and display name set
-                } else {
-                    getTrickleObjectFromRowToAdd(getAdapterPosition());
-                    removeDropFromView(getAdapterPosition());
-                }
-            //Complete the Drop
-            } else if (view == completeButton) {
-                getDropObjectFromRowToComplete(getAdapterPosition());
-                removeDropFromView(getAdapterPosition());
-            //Show menu context
-            } else if (view == menuButton) {
-                if (mTabName.equals(drop)) {
-                    showDropMenu();
-                } else {
-                    showTrickleMenu();
-                }
-            //If click is anywhere on picture or toolbar, view the user
-            } else if (view == parseProfilePicture || view == toolbar) {
-                viewOtherUser(getAdapterPosition());
+            if (!detector.isConnectedToInternet()) {
+                Toast.makeText(mContext, R.string.no_connection, Toast.LENGTH_LONG).show();
             } else {
-                //otherwise, view the Drop
-                viewDrop(getAdapterPosition());
+
+                if (view == todoButton) {
+                    //Check to see if user has picture and display name set
+                    ParseUser currentUser = ParseUser.getCurrentUser();
+                    parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
+                    displayNameCheck = (String) currentUser.get("displayName");
+
+                    if (parseProfilePictureCheck == null && displayNameCheck == null) {
+                        Toast.makeText(mContext, R.string.picAndNameToast, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(mContext, SettingsActivity.class);
+                        mContext.startActivity(intent);
+                    } else if (parseProfilePicture == null) {
+                        Toast.makeText(mContext, R.string.picToast, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(mContext, SettingsActivity.class);
+                        mContext.startActivity(intent);
+
+                    } else if (displayNameCheck == null) {
+                        Toast.makeText(mContext, R.string.nameToast, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(mContext, SettingsActivity.class);
+                        mContext.startActivity(intent);
+                        //Add Drop to to-do list if user has picture and display name set
+                    } else {
+                        getTrickleObjectFromRowToAdd(getAdapterPosition());
+                        removeDropFromView(getAdapterPosition());
+                    }
+                    //Complete the Drop
+                } else if (view == completeButton) {
+                    getDropObjectFromRowToComplete(getAdapterPosition());
+                    removeDropFromView(getAdapterPosition());
+                    //Show menu context
+                } else if (view == menuButton) {
+                    if (mTabName.equals(drop)) {
+                        showDropMenu();
+                    } else {
+                        showTrickleMenu();
+                    }
+                    //If click is anywhere on picture or toolbar, view the user
+                } else if (view == parseProfilePicture || view == toolbar) {
+                    viewOtherUser(getAdapterPosition());
+                } else {
+                    //otherwise, view the Drop
+                    viewDrop(getAdapterPosition());
+                }
             }
         }
-
 
 
         @Override
         public boolean onLongClick(View view) {
             Vibrate vibrate = new Vibrate();
             vibrate.vibrate(mContext);
-            if (mTabName.equals(drop)) {
-                showDropMenu();
+
+            if (!detector.isConnectedToInternet()) {
+                Toast.makeText(mContext, R.string.no_connection, Toast.LENGTH_LONG).show();
             } else {
-                showTrickleMenu();
+
+                if (mTabName.equals(drop)) {
+                    showDropMenu();
+                } else {
+                    showTrickleMenu();
+                }
             }
             return false;
         }
@@ -585,13 +599,13 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 public void onClick(DialogInterface dialog, int selected) {
                     if (selected == 0) {
                         messageTheAuthor(getAdapterPosition());
-                    }else if (selected == 1) {
+                    } else if (selected == 1) {
                         shareToFacebook(getAdapterPosition());
 
                     } else if (selected == 2) {
                         shareWithOther(getAdapterPosition());
 
-                    }else if (selected == 3) {
+                    } else if (selected == 3) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
                         builderVerify.setTitle("Report Drop Author");
                         builderVerify.setMessage("Does this user or Drop contain spam or inappropriate/offensive material?");
@@ -627,10 +641,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     if (selected == 0) {
                         messageTheAuthor(getAdapterPosition());
 
-                    }else if (selected == 1) {
+                    } else if (selected == 1) {
                         shareToFacebook(getAdapterPosition());
 
-                    }else if (selected == 2) {
+                    } else if (selected == 2) {
                         shareWithOther(getAdapterPosition());
 
                     } else if (selected == 3) {

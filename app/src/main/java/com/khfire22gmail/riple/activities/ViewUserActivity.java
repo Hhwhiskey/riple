@@ -28,6 +28,7 @@ import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.khfire22gmail.riple.utils.Constants;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -38,6 +39,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,8 +93,6 @@ public class ViewUserActivity extends AppCompatActivity {
         mViewUserRecyclerView.setLayoutManager(layoutManager);
         mViewUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
         viewUserEmptyView = (TextView) findViewById(R.id.view_user_empty_view);
-        ////////////////////////////////////////////////////////////////////////////
-
 
         //Receive extra intent information to load clicked user's profile
         Intent intent = getIntent();
@@ -115,28 +116,46 @@ public class ViewUserActivity extends AppCompatActivity {
         collapsingToolbar.setTitle(mClickedUserName);
         authorRipleRank.setText(mClickedUserRank);
 
+
+
+
+
+
+        // Compares the viewedUser's riple count against "1"
+        // If 1, use "Riple", otherwise use "Riples"
         stringTestVariable = String.valueOf(1);
+
+        final String ripleString;
 
         //If ripleCount == stringTestVariable(1)
         if (mClickedUserRipleCount.equals(stringTestVariable)) {
-            authorRipleCount.setText(mClickedUserRipleCount + " Riple");
+            ripleString = "Riple";
         } else {
-            authorRipleCount.setText(mClickedUserRipleCount + " Riples");
+            ripleString = "Riples";
         }
-        ////////////////////////////////////////////////////////////////////
 
-        LoadUserActivityFromParse onCreateQuery = new LoadUserActivityFromParse();
-        onCreateQuery.runLoadUserActivityFromParse();
+        authorRipleCount.setText(mClickedUserRipleCount + " " + ripleString);
 
         //Set hero image OCL
         profilePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewUserInfo(mClickedUserName, mClickedUserInfo);
+                viewUserInfo(mClickedUserName, mClickedUserRank + " with " +
+                        mClickedUserRipleCount + " " + ripleString + "...\n\n" + mClickedUserInfo);
             }
         });
 
-       //Set FAB onClick for messaging the user
+
+
+
+
+
+
+        // Get the viewedUser's data from Parse onCreate
+        LoadUserActivityFromParse onCreateQuery = new LoadUserActivityFromParse();
+        onCreateQuery.runLoadUserActivityFromParse();
+
+        //Set FAB onClick for messaging the user
         FloatingActionButton messageFab = (FloatingActionButton) findViewById(R.id.fab_message);
         messageFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -166,17 +185,6 @@ public class ViewUserActivity extends AppCompatActivity {
         }
     }
 
-    public void saveTipPreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
-
-//        MainActivity mainActivity = new MainActivity();
-//        mainActivity.isBoxChecked(false);
-    }
-
     public void viewUserTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
 
@@ -187,7 +195,8 @@ public class ViewUserActivity extends AppCompatActivity {
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("viewUserTips", false);
+                SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+                saveToSharedPrefs.saveBooleanPreferences(ViewUserActivity.this, "viewUserTips", false);
             }
         });
 
@@ -356,8 +365,12 @@ public class ViewUserActivity extends AppCompatActivity {
                                         //Drop Data////////////////////////////////////////////////////////////////
                                         //DropObjectId
                                         dropItem.setObjectId(list.get(i).getObjectId());
-                                        //CreatedAt
-                                        dropItem.setCreatedAt(list.get(i).getCreatedAt());
+
+                                        //Get created at from parse and convert it to friendly String
+                                        Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                                        String dateAfter = formatter.format(list.get(i).getCreatedAt());
+                                        dropItem.setCreatedAt(dateAfter);
+
                                         //dropItem.createdAt = new SimpleDateFormat("EEE, MMM d yyyy @ hh 'o''clock' a").parse("date");
                                         //Drop description
                                         dropItem.setDescription(list.get(i).getString("description"));

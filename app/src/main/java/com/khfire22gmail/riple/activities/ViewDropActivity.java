@@ -34,6 +34,7 @@ import com.khfire22gmail.riple.ViewPagers.DropPagerAdapter;
 import com.khfire22gmail.riple.model.CommentItem;
 import com.khfire22gmail.riple.model.CompletedByAdapter;
 import com.khfire22gmail.riple.utils.Constants;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -45,7 +46,6 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.util.Date;
 import java.util.List;
 
 public class ViewDropActivity extends AppCompatActivity {
@@ -63,7 +63,7 @@ public class ViewDropActivity extends AppCompatActivity {
     private String mObjectId;
     private String mRipleCount;
     private String mCommentCount;
-    private Date mCreatedAt;
+    private String mCreatedAt;
     private ProfilePictureView profilePictureView;
     private TextView nameView;
     private TextView descriptionView;
@@ -117,7 +117,7 @@ public class ViewDropActivity extends AppCompatActivity {
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
-        mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
+        mCreatedAt = (String) intent.getSerializableExtra("createdAt");
         mTabName = intent.getStringExtra("mTabName");
 
         Log.d("rDropExtra", "mDropObjectId = " + mDropObjectId);
@@ -206,17 +206,6 @@ public class ViewDropActivity extends AppCompatActivity {
         }
     }
 
-    public void saveTipPreferences(String key, Boolean value){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
-
-//        MainActivity mainActivity = new MainActivity();
-//        mainActivity.isBoxChecked(false);
-    }
-
     public void viewUserTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
 
@@ -227,7 +216,8 @@ public class ViewDropActivity extends AppCompatActivity {
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("viewDropTips", false);
+                SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+                saveToSharedPrefs.saveBooleanPreferences(ViewDropActivity.this, "viewDropTips", false);
             }
         });
 

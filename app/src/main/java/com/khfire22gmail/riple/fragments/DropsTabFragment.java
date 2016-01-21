@@ -26,6 +26,7 @@ import com.khfire22gmail.riple.model.DropAdapter;
 import com.khfire22gmail.riple.model.DropItem;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.EndlessRecyclerViewOnScrollListener;
+import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -35,6 +36,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,16 +154,16 @@ public class DropsTabFragment extends Fragment {
 
     }
 
-    public void saveTipPreferences(String key, Boolean value) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.putBoolean("allTipsBoolean", false);
-        editor.commit();
-
-//        MainActivity mainActivity = new MainActivity();
-//        mainActivity.isBoxChecked(false);
-    }
+//    public void saveTipPreferences(String key, Boolean value) {
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean(key, value);
+//        editor.putBoolean("allTipsBoolean", false);
+//        editor.commit();
+//
+////        MainActivity mainActivity = new MainActivity();
+////        mainActivity.isBoxChecked(false);
+//    }
 
     public void dropTip() {
         AlertDialog.Builder builder = new AlertDialog.Builder(DropsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
@@ -174,7 +177,8 @@ public class DropsTabFragment extends Fragment {
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveTipPreferences("dropTips", false);
+                SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+                saveToSharedPrefs.saveBooleanPreferences(getActivity(), "dropTips", false);
 
             }
         });
@@ -288,8 +292,11 @@ public class DropsTabFragment extends Fragment {
                             dropItem.setObjectId(list.get(i).getObjectId());
                             //Drop description
                             dropItem.setDescription(list.get(i).getString("description"));
-                            //CreatedAt
-                            dropItem.setCreatedAt(list.get(i).getCreatedAt());
+
+                            //Get created at from parse and convert it to friendly String
+                            Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                            String dateAfter = formatter.format(list.get(i).getCreatedAt());
+                            dropItem.setCreatedAt(dateAfter);
 
                             //Riple Count
                             int ripleCount = (list.get(i).getInt("ripleCount"));

@@ -100,7 +100,13 @@ public class MessagingActivity extends AppCompatActivity {
             public void done(List<ParseObject> messageList, com.parse.ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < messageList.size(); i++) {
+
                         WritableMessage message = new WritableMessage(messageList.get(i).get("recipientId").toString(), messageList.get(i).get("messageText").toString());
+
+                        //Get created at from parse and convert it to friendly String
+//                        Format formatter = new SimpleDateFormat("MMM dd @ h':'mm a");
+//                        message.addHeader("date", formatter.format(messageList.get(i).getCreatedAt()));
+
                         if (messageList.get(i).get("senderId").toString().equals(mCurrentUserId)) {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
                         } else {
@@ -312,12 +318,6 @@ public class MessagingActivity extends AppCompatActivity {
                                             parseObject.saveInBackground();
                                         }
                                     });
-//
-//                                    FriendsTabFragment friendsTabFragment = new FriendsTabFragment();
-//                                    friendsTabFragment.loadFriendsListFromParse();
-//
-//                                    FriendAdapter adapter = new FriendAdapter();
-//                                    adapter.notifyDataSetChanged();
                                 }
                             });
 

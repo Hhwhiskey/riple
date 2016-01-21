@@ -35,8 +35,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
@@ -55,7 +56,7 @@ public class CommentFragment extends Fragment {
     private String mDropDescription;
     private String mRipleCount;
     private String mCommentCount;
-    private Date mCreatedAt;
+    private String mCreatedAt;
     private String mTabName;
     private RecyclerView mRecyclerView;
     private TextView mViewDropEmptyView;
@@ -118,7 +119,7 @@ public class CommentFragment extends Fragment {
         mAuthorInfo = intent.getStringExtra("commenterInfo");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
-        mCreatedAt = (Date) intent.getSerializableExtra("createdAt");
+        mCreatedAt = (String) intent.getSerializableExtra("createdAt");
         mTabName = intent.getStringExtra("mTabName");
 
         loadCommentsFromParse();
@@ -180,7 +181,9 @@ public class CommentFragment extends Fragment {
                 parseProfilePicture.getDataInBackground(new GetDataCallback() {
                     @Override
                     public void done(byte[] data, ParseException e) {
-                        if (e == null) {
+                        if (e != null) {
+
+                        } else {
                             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
                             Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
                             commenterProfilePictureView.setImageBitmap(resized);
@@ -204,80 +207,87 @@ public class CommentFragment extends Fragment {
             comment.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    Toast.makeText(getActivity(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
-                    loadCommentsFromParse();
-                    // At the time of a comment post, query the currentUser comment report count. If
-                    // over the threshold, ban the user and give dialog box.
-                    ParseQuery query = ParseQuery.getQuery("UserReportCount");
-                    query.whereEqualTo("userPointer", currentUser);
-                    query.getFirstInBackground(new GetCallback<ParseObject>() {
-                        @Override
-                        public void done(final ParseObject parseObject, ParseException e) {
-                            int reportCount = parseObject.getInt("reportCount");
 
-                            if (reportCount > 0) {
-                                //Get the banned users Drops for deletion
-                                ParseQuery dropFlushQuery = ParseQuery.getQuery("Drop");
-                                dropFlushQuery.whereEqualTo("authorPointer", currentUser);
-                                dropFlushQuery.findInBackground(new FindCallback<ParseObject>() {
-                                    @Override
-                                    public void done(List dropFlushList, ParseException e) {
-                                    // Flush the banned users Drops
-                                        try {
-                                            ParseObject.deleteAll(dropFlushList);
-                                        } catch (ParseException e1) {
-                                            e1.printStackTrace();
-                                        }
-                                        //Get the banned users comments for deletion
-                                        ParseQuery commentFlushQuery = ParseQuery.getQuery("Comments");
-                                        commentFlushQuery.whereEqualTo("commenterPointer", currentUser);
-                                        commentFlushQuery.findInBackground(new FindCallback<ParseObject>() {
-                                            @Override
-                                            public void done(List commentFlushList, ParseException e) {
-                                                //Flush the banned users Comments
-                                                try {
-                                                    ParseObject.deleteAll(commentFlushList);
-                                                } catch (ParseException e1) {
-                                                    e1.printStackTrace();
-                                                }
+                    if (e != null) {
+
+                    } else {
+
+                        Toast.makeText(getActivity(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
+                        loadCommentsFromParse();
+                        // At the time of a comment post, query the currentUser comment report count. If
+                        // over the threshold, ban the user and give dialog box.
+                        ParseQuery query = ParseQuery.getQuery("UserReportCount");
+                        query.whereEqualTo("userPointer", currentUser);
+                        query.getFirstInBackground(new GetCallback<ParseObject>() {
+                            @Override
+                            public void done(final ParseObject parseObject, ParseException e) {
+                                int reportCount = parseObject.getInt("reportCount");
+
+                                if (reportCount > 0) {
+                                    //Get the banned users Drops for deletion
+                                    ParseQuery dropFlushQuery = ParseQuery.getQuery("Drop");
+                                    dropFlushQuery.whereEqualTo("authorPointer", currentUser);
+                                    dropFlushQuery.findInBackground(new FindCallback<ParseObject>() {
+                                        @Override
+                                        public void done(List dropFlushList, ParseException e) {
+                                            // Flush the banned users Drops
+                                            try {
+                                                ParseObject.deleteAll(dropFlushList);
+                                            } catch (ParseException e1) {
+                                                e1.printStackTrace();
                                             }
-                                        });
-                                        //Set the banned users banned boolean to true
-                                        currentUser.put("isBan", true);
-                                        currentUser.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                //Toast to notify user of ban
-                                                Toast.makeText(getActivity(), "As a result of reports against you, you have been permanently banned.", Toast.LENGTH_LONG).show();
-
-                                                Handler handler = new Handler();
-                                                handler.postDelayed(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        //Log user out and return to login activity after 3 seconds
-                                                        ParseUser.logOut();
-                                                        Intent intentLogout = new Intent(getActivity(), TitleActivity.class);
-                                                        getActivity().startActivity(intentLogout);
+                                            //Get the banned users comments for deletion
+                                            ParseQuery commentFlushQuery = ParseQuery.getQuery("Comments");
+                                            commentFlushQuery.whereEqualTo("commenterPointer", currentUser);
+                                            commentFlushQuery.findInBackground(new FindCallback<ParseObject>() {
+                                                @Override
+                                                public void done(List commentFlushList, ParseException e) {
+                                                    //Flush the banned users Comments
+                                                    try {
+                                                        ParseObject.deleteAll(commentFlushList);
+                                                    } catch (ParseException e1) {
+                                                        e1.printStackTrace();
                                                     }
-                                                }, 3000);
-                                            }
-                                        });
-                                    }
-                                });
-                            } else {
-                                //Get the Drop object and increment the comment count then save in background
-                                ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
-                                query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
-                                    public void done(ParseObject drop, ParseException e) {
-                                        if (e == null) {
-                                            drop.increment("commentCount");
-                                            drop.saveInBackground();
+                                                }
+                                            });
+                                            //Set the banned users banned boolean to true
+                                            currentUser.put("isBan", true);
+                                            currentUser.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    //Toast to notify user of ban
+                                                    Toast.makeText(getActivity(), "As a result of reports against you, you have been permanently banned.", Toast.LENGTH_LONG).show();
+
+                                                    Handler handler = new Handler();
+                                                    handler.postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            //Log user out and return to login activity after 3 seconds
+                                                            ParseUser.logOut();
+                                                            Intent intentLogout = new Intent(getActivity(), TitleActivity.class);
+                                                            getActivity().startActivity(intentLogout);
+                                                        }
+                                                    }, 3000);
+                                                }
+                                            });
                                         }
-                                    }
-                                });
+                                    });
+                                } else {
+                                    //Get the Drop object and increment the comment count then save in background
+                                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Drop");
+                                    query.getInBackground(mDropObjectId, new GetCallback<ParseObject>() {
+                                        public void done(ParseObject drop, ParseException e) {
+                                            if (e == null) {
+                                                drop.increment("commentCount");
+                                                drop.saveInBackground();
+                                            }
+                                        }
+                                    });
+                                }
                             }
-                        }
-                    });
+
+                        });
+                    }
                 }
             });
         } else {
@@ -350,8 +360,10 @@ public class CommentFragment extends Fragment {
                         //Comment text
                         commentItem.setCommentText(list.get(i).getString("commentText"));
 
-                        //Comment create at Date
-                        commentItem.setCreatedAt(list.get(i).getCreatedAt());
+                        //Get created at from parse and convert it to friendly String
+                        Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                        String dateAfter = formatter.format(list.get(i).getCreatedAt());
+                        commentItem.setCreatedAt(dateAfter);
 
                         commentList.add(commentItem);
                     }
