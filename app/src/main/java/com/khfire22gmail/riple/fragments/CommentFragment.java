@@ -185,8 +185,10 @@ public class CommentFragment extends Fragment {
 
                         } else {
                             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                            commenterProfilePictureView.setImageBitmap(resized);
+                            if (bmp != null) {
+                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                commenterProfilePictureView.setImageBitmap(resized);
+                            }
                         }
                     }
                 });
@@ -329,8 +331,10 @@ public class CommentFragment extends Fragment {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                        commentItem.setCommenterParseProfilePicture(resized);
+                                        if (bmp != null) {
+                                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                            commentItem.setCommenterParseProfilePicture(resized);
+                                        }
                                         updateRecyclerView(commentList);
                                     }
                                 }
@@ -361,7 +365,7 @@ public class CommentFragment extends Fragment {
                         commentItem.setCommentText(list.get(i).getString("commentText"));
 
                         //Get created at from parse and convert it to friendly String
-                        Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                        Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h a");
                         String dateAfter = formatter.format(list.get(i).getCreatedAt());
                         commentItem.setCreatedAt(dateAfter);
 

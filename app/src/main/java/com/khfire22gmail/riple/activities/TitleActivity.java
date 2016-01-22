@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.*;
+import android.os.Bundle;
 import android.os.Process;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +26,6 @@ import com.khfire22gmail.riple.MainActivity;
 import com.khfire22gmail.riple.R;
 import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
-import com.khfire22gmail.riple.utils.MessageService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -76,7 +75,7 @@ public class TitleActivity extends AppCompatActivity {
 
         // Bypass login screen if user is currently logged in
         intent = new Intent(getApplicationContext(), MainActivity.class);
-        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+//        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -89,7 +88,7 @@ public class TitleActivity extends AppCompatActivity {
                 boolean banBoolean = currentUser.getBoolean("isBan");
                 if (!banBoolean) {
                     startActivity(intent);
-                    startService(serviceIntent);
+//                    startService(serviceIntent);
                 } else {
                     showBanDialog();
                 }
@@ -327,6 +326,7 @@ public class TitleActivity extends AppCompatActivity {
     private void launchMainActivity() {
         Intent intent = new Intent(TitleActivity.this, MainActivity.class);
         startActivity(intent);
+//        startService(serviceIntent);
     }
 
 

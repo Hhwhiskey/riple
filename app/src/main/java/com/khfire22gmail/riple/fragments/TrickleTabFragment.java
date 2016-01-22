@@ -175,10 +175,7 @@ public class TrickleTabFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(TrickleTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Trickle...");
-        builder.setMessage("This is the Trickle. A steady flow of Drops where every Riple begins. " +
-                "Find a Drop you want to complete and add it to your To-Do list. Once there, " +
-                "you may complete it at your leisure. Please, do your part and report spam or " +
-                "inappropriate/offensive material here.");
+        builder.setMessage(R.string.trickle_tip);
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
@@ -300,10 +297,26 @@ public class TrickleTabFragment extends Fragment {
                     //Drop description
                     dropItemAll.setDescription(listFromParse.get(i).getString("description"));
 
-                    //Get created at from parse and convert it to friendly String
-                    Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+
+
+                   //Get created at from parse and convert it to friendly String
+                    Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h a");
                     String dateAfter = formatter.format(listFromParse.get(i).getCreatedAt());
                     dropItemAll.setCreatedAt(dateAfter);
+
+
+//                    //Get created at from parse and convert it to friendly String
+//                    SimpleDateFormat input = new SimpleDateFormat( "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
+//                    input.setTimeZone(TimeZone.getTimeZone("UTC"));
+//                    Date date = listFromParse.get(i).getCreatedAt();
+//
+//                    SimpleDateFormat output = new SimpleDateFormat("MMM dd, yyyy @ h a z");
+//                    output.setTimeZone(TimeZone.getDefault());
+//                    String dateAfter = input.format(date);
+//                    dropItemAll.setCreatedAt(dateAfter);
+
+
+
 
                     //Riple Count
                     int ripleCount = (listFromParse.get(i).getInt("ripleCount"));

@@ -210,8 +210,7 @@ public class ViewDropActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
 
         builder.setTitle("View Drop");
-        builder.setMessage("This is where you can get a better look at a Drop and " +
-                "post comments. You can even swipe to the right to see who has completed this Drop.");
+        builder.setMessage(R.string.view_drop_tip);
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
@@ -244,8 +243,10 @@ public class ViewDropActivity extends AppCompatActivity {
                             if (e == null) {
 
                                 Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                authorProfilePictureView.setImageBitmap(resized);
+                                if (bmp != null) {
+                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                    authorProfilePictureView.setImageBitmap(resized);
+                                }
                             }
                         }
                     });

@@ -15,7 +15,15 @@ public class FriendItem {
     public String relationshipObjectId;
     public String friendObjectId;
     public String lastMessageSnippet;
+    public String lastMessageTimeStamp;
 
+    public String getLastMessageTimeStamp() {
+        return lastMessageTimeStamp;
+    }
+
+    public void setLastMessageTimeStamp(String lastMessageTimeStamp) {
+        this.lastMessageTimeStamp = lastMessageTimeStamp;
+    }
 
     public String getLastMessageSnippet() {
         return lastMessageSnippet;

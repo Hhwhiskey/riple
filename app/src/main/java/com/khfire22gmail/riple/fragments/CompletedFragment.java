@@ -130,8 +130,10 @@ public class CompletedFragment extends Fragment {
 
                                                 } else {
                                                     Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                                    completedByItem.setParseProfilePicture(resized);
+                                                    if (bmp != null) {
+                                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                                        completedByItem.setParseProfilePicture(resized);
+                                                    }
                                                     updateRecyclerView(completedByList);
                                                 }
 

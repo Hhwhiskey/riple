@@ -189,8 +189,7 @@ public class ViewUserActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
 
         builder.setTitle("View Riple");
-        builder.setMessage("Here, you can view other users Riple activity. View all the Drops" +
-                " they have created and completed. Feel free to send them a message as well.");
+        builder.setMessage(R.string.view_user_tip);
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
@@ -246,8 +245,10 @@ public class ViewUserActivity extends AppCompatActivity {
                             public void done(byte[] data, ParseException e) {
                                 if (e == null) {
                                     Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    Bitmap resized = Bitmap.createScaledBitmap(bmp, 500, 500, true);
-                                    profilePictureView.setImageBitmap(resized);
+                                    if (bmp != null) {
+                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 500, 500, true);
+                                        profilePictureView.setImageBitmap(resized);
+                                    }
                                 }
                             }
                         });

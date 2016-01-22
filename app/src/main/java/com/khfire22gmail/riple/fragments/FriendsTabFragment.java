@@ -36,6 +36,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,9 +132,7 @@ public class FriendsTabFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(FriendsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Friends...");
-        builder.setMessage("This is your friends list. Everyone you have contacted will automatically" +
-                " show up here so you can easily keep in touch. You may also long press your friends" +
-                " cards for additional actions.");
+        builder.setMessage(R.string.friend_tip);
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
@@ -200,8 +200,10 @@ public class FriendsTabFragment extends Fragment {
                                 public void done(byte[] data, ParseException e) {
                                     if (e == null) {
                                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                        Bitmap resized = Bitmap.createScaledBitmap(bmp, 150, 150, true);
-                                        friendItem.setFriendProfilePicture(resized);
+                                        if (bmp != null) {
+                                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 150, 150, true);
+                                            friendItem.setFriendProfilePicture(resized);
+                                        }
                                         updateFriendsListRecyclerView(friendsList);
                                     }
                                 }
@@ -210,11 +212,20 @@ public class FriendsTabFragment extends Fragment {
                         //Get relation objectId
                         friendItem.setRelationshipObjectId(list.get(i).getObjectId());
                         friendItem.setLastMessageSnippet(list.get(i).getString("lastMessage"));
+
+                        //Get created at from parse and convert it to friendly String
+                        Format formatter = new SimpleDateFormat("MMM d");
+                        String dateAfter = formatter.format(list.get(i).getUpdatedAt());
+                        friendItem.setLastMessageTimeStamp(dateAfter);
+
                         //Get all friend info
                         friendItem.setFriendObjectId(recipient.getObjectId());
                         friendItem.setFriendName(recipient.getString("displayName"));
                         friendItem.setRipleRank(recipient.getString("userRank"));
                         friendItem.setFriendInfo(recipient.getString("userInfo"));
+
+
+
 
 //                        int userRipleCount = recipient.getInt("userRipleCount");
 //                        if (userRipleCount == 1) {

@@ -77,11 +77,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         detector = new ConnectionDetector(this);
-
         currentUser = ParseUser.getCurrentUser();
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
-        startService(serviceIntent);
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            startService(serviceIntent);
+        }
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
@@ -183,9 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
 
             builder.setTitle("Post a Drop");
-            builder.setMessage("Here, you can post a Drop for everyone to see. A Drop is an idea " +
-                    "you have to make the world a better place. No matter how big or small your Drop " +
-                    "is, you can create huge Riples. Post your Drop and then watch the Riples spread.");
+            builder.setMessage(R.string.post_drop_tip);
 
             builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
                 @Override
@@ -485,6 +486,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intentLogout = new Intent(getApplicationContext(), TitleActivity.class);
                 startActivity(intentLogout);
                 finish();
+
                 return true;
             }
         }

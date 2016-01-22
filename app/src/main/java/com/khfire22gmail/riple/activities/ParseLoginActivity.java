@@ -48,26 +48,27 @@ public class ParseLoginActivity extends AppCompatActivity {
         detector = new ConnectionDetector(this);
 
         intent = new Intent(getApplicationContext(), MainActivity.class);
-        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+//        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         final ParseUser user = ParseUser.getCurrentUser();
 
-        //If there is no connection present show toast
-        if (!detector.isConnectedToInternet()) {
-            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
-            //Otherwise, enter the MainActivity
-        } else {
-
-            if (user != null) {
-                emailVerified = user.getBoolean("emailVerified");
-                if (emailVerified) {
-                    boolean banBoolean = user.getBoolean("isBan");
-                    if (!banBoolean) {
-                        startActivity(intent);
-                    }
-                }
-            }
-        }
+//        //If there is no connection present show toast
+//        if (!detector.isConnectedToInternet()) {
+//            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+//            //Otherwise, enter the MainActivity
+//        } else {
+//
+//            if (user != null) {
+//                emailVerified = user.getBoolean("emailVerified");
+//                if (emailVerified) {
+//                    boolean banBoolean = user.getBoolean("isBan");
+//                    if (!banBoolean) {
+//                        startActivity(intent);
+//                        startService(serviceIntent);
+//                    }
+//                }
+//            }
+//        }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String storedEmail = sharedPreferences.getString("storedEmail", "");
@@ -105,6 +106,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                                 if (emailVerified) {
                                     if (!banBoolean) {
                                         startActivity(intent);
+//                                        startService(serviceIntent);
                                         finish();
 
                                         // Store the emai in the email field's shared prefs
@@ -177,6 +179,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                                                 emailVerified = user.getBoolean("emailVerified");
                                                 if (emailVerified) {
                                                     startActivity(intent);
+//                                                    startService(serviceIntent);
                                                 } else {
                                                     Toast.makeText(ParseLoginActivity.this, "An email has been sent. Please verify your email" +
                                                                     " address before you begin using Riple!",

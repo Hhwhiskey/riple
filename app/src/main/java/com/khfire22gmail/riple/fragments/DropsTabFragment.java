@@ -169,10 +169,7 @@ public class DropsTabFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(DropsTabFragment.this.getActivity(), R.style.MyAlertDialogStyle);
 
         builder.setTitle("Drops...");
-        builder.setMessage("This is your Drops list. Your very own To-Do list of Drops. Once added to " +
-                "this list, challenge yourself to complete them as you go about your" +
-                " day. Once complete, the author of the Drop will receive a" +
-                " Riple, and you will have helped make the world a better place.");
+        builder.setMessage(R.string.drop_tip);
 
         builder.setNegativeButton("HIDE THIS TIP", new DialogInterface.OnClickListener() {
             @Override
@@ -269,7 +266,10 @@ public class DropsTabFragment extends Fragment {
                                             if (pageNumber != 0) {
                                                 mDropAdapter.notifyDataSetChanged();
                                             } else {
-                                                updateRecyclerView(mDropListFromParse);
+
+                                                if (mDropListFromParse != null) {
+                                                    updateRecyclerView(mDropListFromParse);
+                                                }
                                             }
                                         }
                                     }
@@ -294,7 +294,7 @@ public class DropsTabFragment extends Fragment {
                             dropItem.setDescription(list.get(i).getString("description"));
 
                             //Get created at from parse and convert it to friendly String
-                            Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                            Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h a");
                             String dateAfter = formatter.format(list.get(i).getCreatedAt());
                             dropItem.setCreatedAt(dateAfter);
 

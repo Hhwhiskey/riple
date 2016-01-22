@@ -374,8 +374,10 @@ public class RipleTabFragment extends Fragment {
                                     public void done(byte[] data, ParseException e) {
                                         if (e == null) {
                                             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                            dropItem.setParseProfilePicture(resized);
+                                           if (bmp != null) {
+                                               Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                               dropItem.setParseProfilePicture(resized);
+                                           }
 
                                             if (pageNumber != 0) {
                                                 mRipleAdapter.notifyDataSetChanged();
@@ -403,7 +405,7 @@ public class RipleTabFragment extends Fragment {
                             dropItem.setObjectId(listParse.get(i).getObjectId());
 
                             //Get created at from parse and convert it to friendly String
-                            Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h 'o''clock'");
+                            Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h a");
                             String dateAfter = formatter.format(listParse.get(i).getCreatedAt());
                             dropItem.setCreatedAt(dateAfter);
 
@@ -477,8 +479,10 @@ public class RipleTabFragment extends Fragment {
                     public void done(byte[] data, ParseException e) {
                         if (e == null) {
                             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                            Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
-                            profilePictureView.setImageBitmap(resized);
+                            if (bmp != null) {
+                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
+                                profilePictureView.setImageBitmap(resized);
+                            }
                         }
                     }
                 });

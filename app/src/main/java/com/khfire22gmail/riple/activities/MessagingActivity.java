@@ -295,7 +295,9 @@ public class MessagingActivity extends AppCompatActivity {
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> messageList, com.parse.ParseException e) {
-                    if (e == null) {
+                    if (e != null) {
+                    } else {
+                        // Save the message on Parse
                         if (messageList.size() == 0) {
                             ParseObject parseMessage = new ParseObject("ParseMessage");
                             parseMessage.put("senderId", mCurrentUserId);
@@ -305,29 +307,35 @@ public class MessagingActivity extends AppCompatActivity {
                             parseMessage.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
+                                    if (e != null) {
 
-                                    ParseObject [] queryConstraints = {mCurrentUser, mRecipient};
+                                    } else {
 
-                                    ParseQuery query = ParseQuery.getQuery("Friends");
-                                    query.whereContainedIn("user1", Arrays.asList(queryConstraints));
-                                    query.whereContainedIn("user2", Arrays.asList(queryConstraints));
-                                    query.getFirstInBackground(new GetCallback<ParseObject>() {
-                                        @Override
-                                        public void done(ParseObject parseObject, ParseException e) {
-                                            parseObject.put("lastMessage", writableMessage.getTextBody());
-                                            parseObject.saveInBackground();
-                                        }
-                                    });
+                                        // Find the relationship on Parse, based on the conversation
+                                        ParseObject[] queryConstraints = {mCurrentUser, mRecipient};
+                                        ParseQuery query = ParseQuery.getQuery("Friends");
+                                        query.whereContainedIn("user1", Arrays.asList(queryConstraints));
+                                        query.whereContainedIn("user2", Arrays.asList(queryConstraints));
+                                        query.getFirstInBackground(new GetCallback<ParseObject>() {
+                                            @Override
+                                            public void done(ParseObject parseObject, ParseException e) {
+                                                if (e != null) {
+                                                } else {
+                                                    // Save instance of last message in this relationship
+                                                    parseObject.put("lastMessage", writableMessage.getTextBody());
+                                                    parseObject.saveInBackground();
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
                             });
-
-
-
-                            try {
-                                sendPushNotification();
-                            } catch (JSONException error) {
-                                error.printStackTrace();
-                            }
+                            // Send push notification
+//                            try {
+//                                sendPushNotification();
+//                            } catch (JSONException error) {
+//                                error.printStackTrace();
+//                            }
                         }
                     }
                 }
