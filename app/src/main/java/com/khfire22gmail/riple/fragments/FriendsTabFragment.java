@@ -43,7 +43,6 @@ import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 /**
@@ -257,9 +256,9 @@ public class FriendsTabFragment extends Fragment {
 
         //Set animating adapter to recyclerView
         friendAdapter = new FriendAdapter(getActivity(), friendsList);
-        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(friendAdapter);
-        mRecyclerView.setAdapter(new AlphaInAnimationAdapter(scaleAdapter));
-        scaleAdapter.setDuration(500);
+        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(friendAdapter);
+        mRecyclerView.setAdapter(alphaInAnimationAdapter);
+        alphaInAnimationAdapter.setDuration(500);
     }
 
 //    //show a loading spinner while the sinch client starts

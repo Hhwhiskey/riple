@@ -66,7 +66,6 @@ public class MessageService extends Service implements SinchClientListener {
     public void onClientFailed(SinchClient client, SinchError error) {
         broadcastIntent.putExtra("success", false);
         broadcaster.sendBroadcast(broadcastIntent);
-
         sinchClient = null;
     }
 

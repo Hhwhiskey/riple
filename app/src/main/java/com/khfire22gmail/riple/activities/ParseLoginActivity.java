@@ -48,9 +48,8 @@ public class ParseLoginActivity extends AppCompatActivity {
         detector = new ConnectionDetector(this);
 
         intent = new Intent(getApplicationContext(), MainActivity.class);
-//        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
+        serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
-        final ParseUser user = ParseUser.getCurrentUser();
 
 //        //If there is no connection present show toast
 //        if (!detector.isConnectedToInternet()) {
@@ -105,9 +104,33 @@ public class ParseLoginActivity extends AppCompatActivity {
 
                                 if (emailVerified) {
                                     if (!banBoolean) {
-                                        startActivity(intent);
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
+                                        builder.setTitle("Not so fast...");
+                                        builder.setMessage("I will not post any spam or inappropriate/offensive material and I will report any that I encounter while I use Riple");
+                                        builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                moveTaskToBack(true);
+                                                android.os.Process.killProcess(android.os.Process.myPid());
+                                                System.exit(1);
+
+                                            }
+                                        });
+
+
+                                        builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                startActivity(intent);
 //                                        startService(serviceIntent);
-                                        finish();
+                                                finish();
+                                            }
+                                        });
+
+                                        builder.show();
+
 
                                         // Store the emai in the email field's shared prefs
                                         SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
@@ -153,68 +176,45 @@ public class ParseLoginActivity extends AppCompatActivity {
                         user.put("username", email);
                         user.put("email", email);
                         user.put("userInfo", "");
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ParseLoginActivity.this, R.style.MyAlertDialogStyle);
-                        builder.setTitle("Not so fast...");
-                        builder.setMessage("I will not post any spam or inappropriate/offensive material and I will report any that I encounter while I use Riple");
-                        builder.setNegativeButton("Cya", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                moveTaskToBack(true);
-                                android.os.Process.killProcess(android.os.Process.myPid());
-                                System.exit(1);
-
-                            }
-                        });
-
-
-                        builder.setPositiveButton("I promise", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                user.signUpInBackground(new SignUpCallback() {
-                                    public void done(com.parse.ParseException e) {
-                                        if (e == null) {
-                                            if (user != null) {
-                                                emailVerified = user.getBoolean("emailVerified");
-                                                if (emailVerified) {
-                                                    startActivity(intent);
+                        user.signUpInBackground(new SignUpCallback() {
+                            public void done(com.parse.ParseException e) {
+                                if (e == null) {
+                                    if (user != null) {
+                                        emailVerified = user.getBoolean("emailVerified");
+                                        if (emailVerified) {
+                                            startActivity(intent);
 //                                                    startService(serviceIntent);
-                                                } else {
-                                                    Toast.makeText(ParseLoginActivity.this, "An email has been sent. Please verify your email" +
-                                                                    " address before you begin using Riple!",
-                                                            Toast.LENGTH_LONG).show();
-                                                }
-                                            }
                                         } else {
-                                            Toast.makeText(getApplicationContext(),
-                                                    "There was an error signing up. You must enter a " +
-                                                            "properly formatted and unique email address"
-                                                    , Toast.LENGTH_LONG).show();
+                                            Toast.makeText(ParseLoginActivity.this, "An email has been sent. Please verify your email" +
+                                                            " address before you begin using Riple!",
+                                                    Toast.LENGTH_LONG).show();
                                         }
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(),
+                                            "There was an error signing up. You must enter a " +
+                                                    "properly formatted and unique email address"
+                                            , Toast.LENGTH_LONG).show();
+                                }
 
-                                        //Create riple count tracker on UserRipleCount table to avoid ACL restrictions
-                                        ParseObject userRipleCount = new ParseObject("UserRipleCount");
-                                        userRipleCount.put("userPointer", user);
-                                        userRipleCount.put("ripleCount", 0);
-                                        userRipleCount.saveInBackground();
+                                //Create riple count tracker on UserRipleCount table to avoid ACL restrictions
+                                ParseObject userRipleCount = new ParseObject("UserRipleCount");
+                                userRipleCount.put("userPointer", user);
+                                userRipleCount.put("ripleCount", 0);
+                                userRipleCount.saveInBackground();
 
-                                        //Create report count tracker on UserReportCount table to avoid ACL restrictions
-                                        ParseObject userReportCount = new ParseObject("UserReportCount");
-                                        userReportCount.put("userPointer", user);
-                                        userReportCount.put("reportCount", 0);
-                                        userReportCount.saveInBackground();
+                                //Create report count tracker on UserReportCount table to avoid ACL restrictions
+                                ParseObject userReportCount = new ParseObject("UserReportCount");
+                                userReportCount.put("userPointer", user);
+                                userReportCount.put("reportCount", 0);
+                                userReportCount.saveInBackground();
 
 //                                  //Also create riple count tracker on the currentUser table for ease of use
-                                        user.put("userRipleCount", 0);
-                                        user.saveInBackground();
+                                user.put("userRipleCount", 0);
+                                user.saveInBackground();
 
-                                    }
-                                });
                             }
                         });
-                        builder.show();
-
                     } else {
                         Toast.makeText(getApplicationContext(),
                                 "Your Username must be at least 3 characters and your password " +
@@ -224,6 +224,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                 }
             }
         });
+
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -294,7 +295,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                 Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
                 emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 emailIntent.setType("vnd.android.cursor.item/email");
-                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"kevinhodgesriple@gmail.com"});
+                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"kevinhodgesriple@gmail.com"});
                 emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Ban investigation request");
                 emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
                 startActivity(Intent.createChooser(emailIntent, ""));
@@ -308,12 +309,5 @@ public class ParseLoginActivity extends AppCompatActivity {
             }
         });
         builder.show();
-    }
-
-    // TODO: 11/30/2015
-    @Override
-    public void onDestroy() {
-        stopService(new Intent(this, MessageService.class));
-        super.onDestroy();
     }
 }

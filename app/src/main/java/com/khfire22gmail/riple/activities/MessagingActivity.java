@@ -67,17 +67,17 @@ public class MessagingActivity extends AppCompatActivity {
 
         bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
 
-        // Unsub from message notifications
-        ParsePush.unsubscribeInBackground("message", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("MyApp", "successfully unsubscribed to the broadcast channel.");
-                } else {
-                    Log.e("MyApp", "failed to unsubscribe for push" + e);
-                }
-            }
-        });
+//        // Unsub from message notifications
+//        ParsePush.unsubscribeInBackground("message", new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (e == null) {
+//                    Log.d("MyApp", "successfully unsubscribed to the broadcast channel.");
+//                } else {
+//                    Log.e("MyApp", "failed to unsubscribe for push" + e);
+//                }
+//            }
+//        });
 
         //get recipientId from the intent
         Intent intent = getIntent();
@@ -88,6 +88,7 @@ public class MessagingActivity extends AppCompatActivity {
         messagesList.setAdapter(messageAdapter);
         String[] userIds = {mCurrentUserId, recipientId};
 
+        // Method to see if this person is your friend
         checkForRelation();
 
         //Get messages for viewed conversation
