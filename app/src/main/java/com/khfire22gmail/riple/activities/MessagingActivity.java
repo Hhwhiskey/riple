@@ -62,10 +62,11 @@ public class MessagingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messaging);
-        mCurrentUser = ParseUser.getCurrentUser();
-
 
         bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
+
+        mCurrentUser = ParseUser.getCurrentUser();
+        mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
 
 //        // Unsub from message notifications
 //        ParsePush.unsubscribeInBackground("message", new SaveCallback() {
@@ -82,7 +83,6 @@ public class MessagingActivity extends AppCompatActivity {
         //get recipientId from the intent
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
-        mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
@@ -331,13 +331,15 @@ public class MessagingActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-                            // Send push notification
-//                            try {
-//                                sendPushNotification();
-//                            } catch (JSONException error) {
-//                                error.printStackTrace();
-//                            }
+
                         }
+                    }
+
+                    // Send push notification
+                    try {
+                        sendPushNotification();
+                    } catch (JSONException error) {
+                        error.printStackTrace();
                     }
                 }
             });
@@ -357,14 +359,16 @@ public class MessagingActivity extends AppCompatActivity {
 
     private void sendPushNotification() throws JSONException {
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-        query.whereEqualTo(Constants.USER_ID, recipientId);
-        query.whereEqualTo(Constants.CHANNELS, Constants.MESSAGE_PUSH);
+        query.whereEqualTo("userObjectId", recipientId);
+        query.whereEqualTo("channels", "messages");
+
+        String pusherName = ParseUser.getCurrentUser().getString("displayName");
+        String pusherId = ParseUser.getCurrentUser().getObjectId();
 
         JSONObject data = new JSONObject();
-        data.put(Constants.PUSH_ALERT, "You have a message from " +
-                ParseUser.getCurrentUser().get(Constants.NAME) + "!");
-        data.put(Constants.PUSH_ID, ParseUser.getCurrentUser().getObjectId());
-        data.put(Constants.PUSH_NAME, ParseUser.getCurrentUser().get(Constants.NAME));
+        data.put("alert", "You have a message from " + pusherName + "!");
+        data.put("pusherId", pusherId);
+        data.put("pusherName", pusherName);
 
         ParsePush push = new ParsePush();
         push.setQuery(query);

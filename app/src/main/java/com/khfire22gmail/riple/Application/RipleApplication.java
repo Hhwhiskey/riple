@@ -8,7 +8,9 @@ import com.khfire22gmail.riple.R;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -35,13 +37,25 @@ public class RipleApplication extends Application {
         ParseFacebookUtils.initialize(this);
 
         //Saves current parse instance in the background
-        ParseInstallation.getCurrentInstallation().saveInBackground();
+        updateParseInstallation();
+
+        // Sub currentUser to Push channels
+        ParsePush.subscribeInBackground("messages");
     }
 
+    // Update the current user installation, which will label it on parse
     public static void updateParseInstallation() {
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 
-        installation.put("userObjectId", ParseUser.getCurrentUser().getObjectId());
+        String userObjectId = ParseUser.getCurrentUser().getObjectId();
+        String displayName = ParseUser.getCurrentUser().getString("displayName");
+
+        if (displayName == null) {
+            displayName = "newUser";
+        }
+
+        installation.put("userObjectId", userObjectId);
+        installation.put("displayName", displayName);
         installation.saveInBackground();
         ParseUser.enableRevocableSessionInBackground();
     }

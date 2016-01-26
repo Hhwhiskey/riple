@@ -137,5 +137,16 @@ public class MessageService extends Service implements SinchClientListener {
         public boolean isSinchClientStarted() {
             return MessageService.this.isSinchClientStarted();
         }
+
+//        public NotificationResult relayRemotePushNotificationPayload(Intent intent) {
+//            if (sinchClient == null && !mSettings.getUsername().isEmpty()) {
+//                startSinchClient(mSettings.getUsername());
+//            } else if (sinchClient == null && mSettings.getUsername().isEmpty()) {
+//                Log.e("MyApp", "Can't start a SinchClient as no username is available, unable to relay push.");
+//                return null;
+//            }
+//            return sinchClient.relayRemotePushNotificationPayload(intent);
+//        }
+
     }
 }
