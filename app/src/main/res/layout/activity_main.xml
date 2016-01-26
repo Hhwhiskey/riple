@@ -23,7 +23,7 @@
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
             app:layout_scrollFlags="scroll|enterAlways|snap"/>
 
-        <com.khfire22gmail.riple.ViewPagers.MainSlidingTabLayout
+        <com.khfire22.riple.ViewPagers.MainSlidingTabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         android:src="@drawable/ic_fab_post_new_drop"
         app:rippleColor="#ffffff"
         app:elevation="8dp"
-        app:layout_behavior="com.khfire22gmail.riple.utils.ScrollingFABBehavior"/>
+        app:layout_behavior="com.khfire22.riple.utils.ScrollingFABBehavior"/>
 
 
 </android.support.design.widget.CoordinatorLayout>

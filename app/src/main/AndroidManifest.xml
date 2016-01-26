@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="com.khfire22gmail.riple"
+    package="com.khfire22.riple"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- TODO Update permissions for Marshmallow http://guides.codepath.com/android/Understanding-App-Permissions#runtime-permissions -->
@@ -13,13 +13,13 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:name="com.khfire22gmail.riple.permission.C2D_MESSAGE"
+    <permission android:name="com.khfire22.riple.permission.C2D_MESSAGE"
                 android:protectionLevel="signature" />
-    <uses-permission android:name="com.khfire22gmail.riple.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.khfire22.riple.permission.C2D_MESSAGE" />
 
 
     <application
-        android:name=".application.RipleApplication"
+        android:name="com.khfire22.riple.application.RipleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -29,9 +29,9 @@
         <!--tools:ignore="HardcodedDebugMode">-->
 
         // Services
-        <service android:name=".utils.MessageService"/>
+        <service android:name="com.khfire22.riple.utils.MessageService"/>
         <service android:name="com.parse.PushService" />
-        <service android:name=".utils.GcmIntentService"
+        <service android:name="com.khfire22.riple.utils.GcmIntentService"
             android:exported="false"/>
 
         // GCM Broadcast Receiver
@@ -41,7 +41,7 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.khfire22gmail.riple" />
+                <category android:name="com.khfire22.riple" />
             </intent-filter>
         </receiver>
 
@@ -66,7 +66,7 @@
 
         // Custom Broadcast Receiver
         <receiver
-            android:name=".utils.CustomPushBroadcastReceiver"
+            android:name="com.khfire22.riple.utils.CustomPushBroadcastReceiver"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.OPEN" />
@@ -74,14 +74,14 @@
         </receiver>
 
         // Network detector receiver
-        <receiver android:name=".utils.NetworkStateChangeReceiver">
+        <receiver android:name="com.khfire22.riple.utils.NetworkStateChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
 
         <activity
-            android:name=".activities.TitleActivity"
+            android:name="com.khfire22.riple.activities.TitleActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
 
@@ -92,7 +92,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.khfire22.riple.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>
@@ -112,46 +112,46 @@
             android:exported="true"/>
 
         <activity
-            android:name=".activities.AboutActivity"
+            android:name="com.khfire22.riple.activities.AboutActivity"
             android:label="@string/title_activity_about"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.CreateDropActivity"
+            android:name="com.khfire22.riple.activities.CreateDropActivity"
             android:label="@string/title_activity_create_drop"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.ViewDropActivity"
+            android:name="com.khfire22.riple.activities.ViewDropActivity"
             android:label="@string/title_activity_clicked_drop"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.ViewUserActivity"
+            android:name="com.khfire22.riple.activities.ViewUserActivity"
             android:label="@string/title_activity_view_riple"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.MessagingActivity"
+            android:name="com.khfire22.riple.activities.MessagingActivity"
             android:label="@string/title_activity_messaging">
 
         </activity>
         <activity
-            android:name=".activities.ParseLoginActivity"
+            android:name="com.khfire22.riple.activities.ParseLoginActivity"
             android:label="@string/title_activity_parse_login_activity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name="com.khfire22.riple.activities.SettingsActivity"
             android:label="@string/title_activity_edit_profile"
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".activities.CompletedActivity"
+        <activity android:name="com.khfire22.riple.activities.CompletedActivity"
                   android:screenOrientation="portrait">
 
         </activity>
-        <activity android:name=".activities.CropActivity"
+        <activity android:name="com.khfire22.riple.activities.CropActivity"
                   android:screenOrientation="portrait">
         </activity>
 
