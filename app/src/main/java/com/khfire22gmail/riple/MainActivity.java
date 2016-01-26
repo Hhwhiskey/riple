@@ -31,6 +31,7 @@ import com.khfire22gmail.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22gmail.riple.activities.AboutActivity;
 import com.khfire22gmail.riple.activities.SettingsActivity;
 import com.khfire22gmail.riple.activities.TitleActivity;
+import com.khfire22gmail.riple.application.RipleApplication;
 import com.khfire22gmail.riple.utils.ConnectionDetector;
 import com.khfire22gmail.riple.utils.MessageService;
 import com.khfire22gmail.riple.utils.SaveToSharedPrefs;
@@ -75,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Saves current parse instance in the background
+        RipleApplication.updateParseInstallation();
 
         detector = new ConnectionDetector(this);
         currentUser = ParseUser.getCurrentUser();

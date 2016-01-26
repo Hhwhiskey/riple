@@ -36,27 +36,26 @@ public class RipleApplication extends Application {
         // Initializes FB Parse
         ParseFacebookUtils.initialize(this);
 
-        //Saves current parse instance in the background
-        updateParseInstallation();
-
         // Sub currentUser to Push channels
         ParsePush.subscribeInBackground("messages");
     }
 
     // Update the current user installation, which will label it on parse
     public static void updateParseInstallation() {
+
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 
-        String userObjectId = ParseUser.getCurrentUser().getObjectId();
-        String displayName = ParseUser.getCurrentUser().getString("displayName");
+            String userObjectId = ParseUser.getCurrentUser().getObjectId();
+            String displayName = ParseUser.getCurrentUser().getString("displayName");
 
-        if (displayName == null) {
-            displayName = "newUser";
-        }
+            if (displayName == null) {
+                displayName = "newUser";
+            }
 
-        installation.put("userObjectId", userObjectId);
-        installation.put("displayName", displayName);
-        installation.saveInBackground();
-        ParseUser.enableRevocableSessionInBackground();
+            installation.put("userObjectId", userObjectId);
+            installation.put("displayName", displayName);
+            installation.saveInBackground();
+            ParseUser.enableRevocableSessionInBackground();
+
     }
 }
