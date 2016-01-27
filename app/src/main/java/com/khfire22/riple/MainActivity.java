@@ -77,6 +77,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        AIzaSyDCZ0w0ycJ3l4AlzjdM1hPQktSPvI7XAE4
+//
+//        606769846786
+
         //Saves current parse instance in the background
         RipleApplication.updateParseInstallation();
 

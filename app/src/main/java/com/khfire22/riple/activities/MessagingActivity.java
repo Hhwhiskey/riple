@@ -337,7 +337,7 @@ public class MessagingActivity extends AppCompatActivity {
 
                     // Send push notification
                     try {
-                        sendPushNotification();
+                        sendPushNotification(messageBody);
                     } catch (JSONException error) {
                         error.printStackTrace();
                     }
@@ -357,7 +357,7 @@ public class MessagingActivity extends AppCompatActivity {
         }
     }
 
-    private void sendPushNotification() throws JSONException {
+    private void sendPushNotification(String messageBody) throws JSONException {
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
         query.whereEqualTo("userObjectId", recipientId);
         query.whereEqualTo("channels", "messages");
@@ -366,9 +366,9 @@ public class MessagingActivity extends AppCompatActivity {
         String pusherId = ParseUser.getCurrentUser().getObjectId();
 
         JSONObject data = new JSONObject();
-        data.put("alert", "You have a message from " + pusherName + "!");
         data.put("pusherId", pusherId);
         data.put("pusherName", pusherName);
+        data.put("alert", messageBody);
 
         ParsePush push = new ParsePush();
         push.setQuery(query);
