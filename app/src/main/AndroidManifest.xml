@@ -31,7 +31,7 @@
         // Services
         <service android:name="com.khfire22.riple.utils.MessageService"/>
         <service android:name="com.parse.PushService" />
-        <service android:name="com.khfire22.riple.utils.GcmIntentService"
+        <!--<service android:name="com.khfire22.riple.utils.GcmIntentService"-->
             android:exported="false"/>
 
         // GCM Broadcast Receiver
@@ -69,7 +69,8 @@
             android:name="com.khfire22.riple.utils.CustomPushBroadcastReceiver"
             android:exported="false" >
             <intent-filter>
-                <action android:name="com.parse.push.intent.OPEN" />
+                <action android:name="com.parse.push.intent.OPEN"/>
+                <action android:name="com.parse.push.intent.RECEIVE" />
             </intent-filter>
         </receiver>
 
