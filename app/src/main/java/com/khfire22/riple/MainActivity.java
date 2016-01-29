@@ -458,7 +458,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
 
             if (id == R.id.settingsButton) {
-
                 Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intentSettings);
                 return true;

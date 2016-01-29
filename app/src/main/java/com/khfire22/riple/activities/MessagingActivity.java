@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -19,9 +18,9 @@ import com.khfire22.riple.R;
 import com.khfire22.riple.model.MessageAdapter;
 import com.khfire22.riple.utils.Constants;
 import com.khfire22.riple.utils.MessageService;
+import com.khfire22.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseInstallation;
@@ -61,12 +60,13 @@ public class MessagingActivity extends AppCompatActivity {
     private ParseUser mCurrentUser;
     private Random random;
     private ParseUser mRecipient;
-    private String pusherName;
-    private String pusherId;
+    private String currentUserPusherName;
+    private String currentUserPusherId;
     private ParseFile currentUserPictureFile;
     private Bitmap resizedBitmap;
     private byte[] pusherPictureString;
     private String base64PusherPicture;
+    private int unreadCount;
 
 
     @Override
@@ -78,9 +78,8 @@ public class MessagingActivity extends AppCompatActivity {
 
         mCurrentUser = ParseUser.getCurrentUser();
         mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
-        currentUserPicFromBitmapToString();
 
-//        // Unsub from message notifications
+        // Unsub from message notifications
 //        ParsePush.unsubscribeInBackground("message", new SaveCallback() {
 //            @Override
 //            public void done(ParseException e) {
@@ -93,36 +92,37 @@ public class MessagingActivity extends AppCompatActivity {
 //        });
 
 
-         pusherName = ParseUser.getCurrentUser().getString("displayName");
-         pusherId = ParseUser.getCurrentUser().getObjectId();
+         currentUserPusherName = ParseUser.getCurrentUser().getString("displayName");
+         currentUserPusherId = ParseUser.getCurrentUser().getObjectId();
 
         //get recipientId from the intent
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
+//        unreadCount = Integer.parseInt(intent.getStringExtra("unreadCount"));
+
+        SaveToSharedPrefs.saveUnreadCount(this, recipientId, 0);
+
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
-        String[] userIds = {mCurrentUserId, recipientId};
+        final String[] userIds = {mCurrentUserId, recipientId};
 
         // Method to see if this person is your friend
         checkForRelation();
 
         //Get messages for viewed conversation
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
         query.whereContainedIn("senderId", Arrays.asList(userIds));
         query.whereContainedIn("recipientId", Arrays.asList(userIds));
         query.orderByAscending("createdAt");
+        query.setLimit(1000);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> messageList, ParseException e) {
+            public void done(final List<ParseObject> messageList, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < messageList.size(); i++) {
 
                         WritableMessage message = new WritableMessage(messageList.get(i).get("recipientId").toString(), messageList.get(i).get("messageText").toString());
-
-                        //Get created at from parse and convert it to friendly String
-//                        Format formatter = new SimpleDateFormat("MMM dd @ h':'mm a");
-//                        message.addHeader("date", formatter.format(messageList.get(i).getCreatedAt()));
 
                         if (messageList.get(i).get("senderId").toString().equals(mCurrentUserId)) {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
@@ -130,10 +130,30 @@ public class MessagingActivity extends AppCompatActivity {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
                         }
                     }
+
+                    // If messageList is over 900, delete the oldest 100 messages
+                    if (messageList.size() > 900) {
+                        ParseQuery queryDelete = ParseQuery.getQuery("ParseMessage");
+                        queryDelete.whereContainedIn("senderId", Arrays.asList(userIds));
+                        queryDelete.whereContainedIn("recipientId", Arrays.asList(userIds));
+                        queryDelete.orderByDescending("createdAt");
+                        queryDelete.setLimit(1000);
+                        queryDelete.setSkip(900);
+                        queryDelete.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> deleteList, ParseException e) {
+
+                                try {
+                                    ParseObject.deleteAll(deleteList);
+                                } catch (ParseException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        });
+                    }
                 }
             }
         });
-
 
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
 
@@ -176,32 +196,6 @@ public class MessagingActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void currentUserPicFromBitmapToString() {
-        currentUserPictureFile = ParseUser.getCurrentUser().getParseFile("parseProfilePicture");
-        if (currentUserPictureFile != null) {
-            currentUserPictureFile.getDataInBackground(new GetDataCallback() {
-                @Override
-                public void done(byte[] data, ParseException e) {
-                    if (e != null) {
-
-                    } else {
-
-//                        pusherPictureString = data;
-                         base64PusherPicture = Base64.encodeToString(data, Base64.DEFAULT);
-                    }
-                }
-            });
-        }
-    }
-
-//    public String bitmapToString(Bitmap bitmap) {
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-//        byte[] byteArray = byteArrayOutputStream .toByteArray();
-//        return String.valueOf(byteArray);
-//    }
-
 
     //Check to see if this relation already exists on parse
     public void checkForRelation() {
@@ -404,10 +398,9 @@ public class MessagingActivity extends AppCompatActivity {
         query.whereEqualTo("channels", "messages");
 
         JSONObject data = new JSONObject();
-        data.put("pusherId", pusherId);
-        data.put("pusherName", pusherName);
+        data.put("sendPusherId", currentUserPusherId);
+        data.put("sendPusherName", currentUserPusherName);
         data.put("pushMessageBody", pushMessageBody);
-//        data.put("pusherImage", base64PusherPicture);
 
         ParsePush push = new ParsePush();
         push.setQuery(query);
