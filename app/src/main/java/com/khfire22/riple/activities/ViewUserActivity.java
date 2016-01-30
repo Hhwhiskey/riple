@@ -214,8 +214,8 @@ public class ViewUserActivity extends AppCompatActivity {
         //Set title to users name
         builder.setTitle(userName);
         //If user has message show it, otherwise show default note
-        if (userInfo.equals("") || userInfo == null) {
-            builder.setMessage("This user has not added any information yet.");
+        if (mClickedUserInfo.equals("") || mClickedUserInfo == null) {
+            builder.setMessage(userInfo + "No information entered yet.");
         } else {
             builder.setMessage(userInfo);
         }

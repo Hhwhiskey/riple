@@ -72,7 +72,6 @@ public class ParseLoginActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String storedEmail = sharedPreferences.getString("storedEmail", "");
 
-
         setContentView(R.layout.activity_parse_login);
 
         loginButton = (Button) findViewById(R.id.button_login);
@@ -217,7 +216,7 @@ public class ParseLoginActivity extends AppCompatActivity {
                         });
                     } else {
                         Toast.makeText(getApplicationContext(),
-                                "Your Username must be at least 3 characters and your password " +
+                                "Your must enter a valid email and your password " +
                                         "must be at least 6 characters",
                                 Toast.LENGTH_LONG).show();
                     }

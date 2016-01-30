@@ -6,15 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".activities.TitleActivity">
 
-    <!--<VideoView-->
-        <!--android:id="@+id/title_video"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="fill_parent"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:fitsSystemWindows="true"/>-->
+    <VideoView
+        android:id="@+id/title_video"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:fitsSystemWindows="true"/>
 
     Switch
     android:id="@+id/fb_switch"

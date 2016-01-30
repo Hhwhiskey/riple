@@ -45,8 +45,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.Riple
         }
+
+        // SET DEBUGGABLE TO FALSE THEN TEST THAT IT HAS BEEN REMOVED!!!!!!!!!!!!!!!
         release {
-            debuggable true
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.Riple

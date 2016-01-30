@@ -65,10 +65,11 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     private void viewFriendProfile(int position) {
 
-        String clickedUserId = (data.get(position).getFriendObjectId());
-        String clickedUserName = (data.get(position).getFriendName());
-        String clickedUserRank = (data.get(position).getRipleRank());
-        String clickedUserRipleCount = (data.get(position).getRipleCount());
+        String clickedUserId = data.get(position).getFriendObjectId();
+        String clickedUserName = data.get(position).getFriendName();
+        String clickedUserRank = data.get(position).getRipleRank();
+        String clickedUserRipleCount = data.get(position).getRipleCount();
+        String clickedUserInfo = data.get(position).getFriendInfo();
 
         Log.d("sDropViewUser", "Clicked User's Id = " + clickedUserId);
         Log.d("sDropViewUser", "Clicked User's Name = " + clickedUserName);
@@ -78,6 +79,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         intent.putExtra(Constants.CLICKED_USER_NAME, clickedUserName);
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
+        intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
         mContext.startActivity(intent);
     }
 
