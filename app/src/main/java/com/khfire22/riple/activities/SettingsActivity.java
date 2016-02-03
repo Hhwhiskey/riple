@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.khfire22.riple.MainActivity;
 import com.khfire22.riple.R;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -51,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageView editProfilePictureView;
     private Button homeButton;
     private String parseDisplayName;
-    private TextView displayNameView;
+    private TextView displayNameTV;
     private TextView displayNameEdit;
     private String displayNameString;
     private String userInfoEntry;
@@ -62,8 +63,9 @@ public class SettingsActivity extends AppCompatActivity {
     private Bitmap bitmap;
     private ProgressDialog selectDialog;
     private String userInfoString;
-    private TextView userInfoView;
+    private TextView userInfoTV;
     private Context mContext;
+    private TextView userLocationTV;
 
 
     @Override
@@ -71,13 +73,17 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        MainActivity mainActivity = new MainActivity();
+
+
         currentUser = ParseUser.getCurrentUser();
 
         //Instantiate the views
         editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
         displayNameEdit = (TextView) findViewById(R.id.edit_display_name_tv);
-        displayNameView = (TextView) findViewById(R.id.display_name_tv);
-        userInfoView = (TextView) findViewById(R.id.user_info_tv);
+        displayNameTV = (TextView) findViewById(R.id.display_name_tv);
+        userInfoTV = (TextView) findViewById(R.id.user_info_tv);
+        userLocationTV = (TextView) findViewById(R.id.user_location_tv);
         //if currentUser is not null, get their name, picture and facebookId from Parse
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
@@ -111,8 +117,10 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         //Set curentUser name and info to textviews
-        displayNameView.setText(parseDisplayName);
-        userInfoView.setText(userInfoString);
+        displayNameTV.setText(parseDisplayName);
+        userInfoTV.setText(userInfoString);
+//        userLocationTV.setText();
+
 
         //Get the currentUser displayImage if it's available, and set it to editProfilePictureView
 //        if (parseProfilePicture != null) {

@@ -59,13 +59,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Notifications Coming Soon!"
-            android:id="@+id/textView8"
+            android:text="User Location"
+            android:id="@+id/user_location_tv"
             android:textSize="20dp"
-            android:layout_below="@+id/edit_info_tv"
+            android:layout_below="@+id/edit_display_name_tv"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"
-            />
+            android:layout_marginTop="32dp"/>
 
         <!--<GridLayout-->
             <!--android:layout_width="match_parent"-->
@@ -172,7 +171,7 @@
         android:layout_height="wrap_content"
         android:text="User Info"
         android:id="@+id/user_info_tv"
-        android:layout_below="@+id/edit_display_name_tv"
+        android:layout_below="@+id/user_location_tv"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
         android:layout_marginLeft="24dp"

@@ -1,22 +1,28 @@
 package com.khfire22.riple;
 
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +32,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.khfire22.riple.ViewPagers.MainSlidingTabLayout;
 import com.khfire22.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22.riple.activities.AboutActivity;
@@ -48,8 +60,10 @@ import com.sinch.android.rtc.SinchClient;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
+    private static final String TAG = "MainActivity";
     Toolbar toolbar;
     ViewPager mPager;
     MainViewPagerAdapter adapter;
@@ -71,18 +85,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean checkTest;
     private ParseUser currentUser;
     private ConnectionDetector detector;
+    private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1000;
+    public GoogleApiClient mGoogleApiClient;
+    private boolean mRequestingLocationUpdates = false;
+    private LocationRequest mLocationRequest;
+    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
+    public Location mLastLocation;
+    public String mLatitudeText;
+    public String mLongitudeText;
+    public String mLastLocationString;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        AIzaSyDCZ0w0ycJ3l4AlzjdM1hPQktSPvI7XAE4
-//
-//        606769846786
-
         //Saves current parse instance in the background
         RipleApplication.updateParseInstallation();
+
+        // First we need to check availability of play services
+        if (checkGooglePlayServices()) {
+
+            // Building the GoogleApi client
+            buildGoogleApiClient();
+        }
 
         detector = new ConnectionDetector(this);
         currentUser = ParseUser.getCurrentUser();
@@ -97,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
                 displayName = (String) currentUser.get("displayName");
@@ -120,6 +146,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     createDropDialog();
                 }
             }
+
+
         });
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -298,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void showSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     public void hideSoftKeyboard() {
@@ -309,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //If the Drop dialog is cleared or canceled, clear the stored string from S.P
-    public void removeDropStringFromSharedPreferences () {
+    public void removeDropStringFromSharedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("storedDropString", "");
@@ -425,6 +453,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!detector.isConnectedToInternet()) {
             Toast.makeText(MainActivity.this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         }
+
+        checkGooglePlayServices();
+
+        // Resuming the periodic location updates
+        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -479,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     saveToSharedPrefs.saveAllTipsBoolean(this, true);
                     Toast.makeText(MainActivity.this, "All tips will be displayed.", Toast.LENGTH_LONG).show();
 
-                //If the box is unchecked, hide all tips
+                    //If the box is unchecked, hide all tips
                 } else {
                     saveToSharedPrefs.saveAllTipsBoolean(this, false);
                     Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
@@ -546,6 +585,91 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopService(new Intent(this, MessageService.class));
         super.onDestroy();
     }
+
+    /******************************************************************************************
+     * Google api callback methods
+     */
+
+
+    /**
+     * Method to verify google play services on the device
+     * */
+
+    private boolean checkGooglePlayServices() {
+        int checkGooglePlayServices = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (checkGooglePlayServices != ConnectionResult.SUCCESS) {
+		/*
+		* Google Play Services is missing or update is required
+		*  return code could be
+		* SUCCESS,
+		* SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED,
+		* SERVICE_DISABLED, SERVICE_INVALID.
+		*/
+            GooglePlayServicesUtil.getErrorDialog(checkGooglePlayServices,
+                    this, REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLatitudeText = String.valueOf(mLastLocation.getLatitude());
+            mLongitudeText = String.valueOf(mLastLocation.getLongitude());
+            mLastLocationString = String.valueOf(mLastLocation);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+       Log.d(TAG, "location error = " + connectionResult.getErrorCode());
+    }
+
 
 }
 

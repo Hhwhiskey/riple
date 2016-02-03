@@ -17,7 +17,6 @@
         android:id="@+id/view_user_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/view_user_user_tool_bar"
         android:background="@color/Primary_Background_Color"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
