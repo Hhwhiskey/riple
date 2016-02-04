@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.khfire22.riple.MainActivity;
 import com.khfire22.riple.R;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -40,8 +39,8 @@ import java.io.InputStream;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final String TAG = "SettingsActivity";
     private static final int REQUEST_CODE = 1;
-    private static final String TAG = null;
     private ImageView editProfilePicture;
     public ParseUser currentUser;
     private ParseFile parseProfilePicture;
@@ -66,6 +65,9 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView userInfoTV;
     private Context mContext;
     private TextView userLocationTV;
+    private String mlastLocationString;
+    private SharedPreferences sharedPreferences;
+    private String mUserLocaton;
 
 
     @Override
@@ -73,10 +75,11 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        MainActivity mainActivity = new MainActivity();
-
-
         currentUser = ParseUser.getCurrentUser();
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mUserLocaton = sharedPreferences.getString("userLocation", "");
+
 
         //Instantiate the views
         editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
@@ -84,6 +87,7 @@ public class SettingsActivity extends AppCompatActivity {
         displayNameTV = (TextView) findViewById(R.id.display_name_tv);
         userInfoTV = (TextView) findViewById(R.id.user_info_tv);
         userLocationTV = (TextView) findViewById(R.id.user_location_tv);
+
         //if currentUser is not null, get their name, picture and facebookId from Parse
         if ((currentUser != null) && currentUser.isAuthenticated()) {
 
@@ -119,7 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
         //Set curentUser name and info to textviews
         displayNameTV.setText(parseDisplayName);
         userInfoTV.setText(userInfoString);
-//        userLocationTV.setText();
+        userLocationTV.setText(mUserLocaton);
 
 
         //Get the currentUser displayImage if it's available, and set it to editProfilePictureView
@@ -143,70 +147,20 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         //OCL for display name edit
-        final TextView displayName = (TextView) findViewById(R.id.edit_display_name_tv);
+        final TextView editDisplayName = (TextView) findViewById(R.id.edit_display_name_tv);
+        editDisplayName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editDisplayName();
+            }
+        });
+
+        //OCL for display name edit
+        final TextView displayName = (TextView) findViewById(R.id.display_name_tv);
         displayName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                String storedDisplayName = sharedPreferences.getString("storedDisplayName", "");
-
-                final View view = getLayoutInflater().inflate(R.layout.activity_edit_display_name, null);
-                //Open dialog that allows user to change their name
-                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
-                builder.setTitle("Edit your display name...");
-
-                final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.edit_display_name);
-
-                input.setText(storedDisplayName);
-
-                builder.setView(view);
-
-                // Save changes
-                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        displayNameString = input.getText().toString();
-                        int displayNameTextField = input.getText().length();
-                        //Take user input and save it to parse as "displayName"
-                        if (displayNameTextField > 1) {
-                            currentUser.put("displayName", displayNameString);
-                            currentUser.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    //Restart Settings Activity
-                                    Toast.makeText(getApplicationContext(), "Your display name has been changed", Toast.LENGTH_LONG).show();
-
-                                    //Save the current users display name to shared prefs
-                                    SharedPreferences.Editor editor;
-                                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                    editor = sharedPreferences.edit();
-                                    editor.putString("storedDisplayName", displayNameString);
-                                    editor.commit();
-
-                                    //Call to update the users name after edit
-                                    updateDisplayNameTextView(displayNameString);
-
-                                }
-                            });
-
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Display name must be at least 2 characters.", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-                //Discard changes
-                builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        Toast.makeText(getApplicationContext(), "Your display name was not changed.", Toast.LENGTH_LONG).show();
-
-                    }
-                });
-
-                builder.show();
+                editDisplayName();
             }
         });
 
@@ -216,75 +170,151 @@ public class SettingsActivity extends AppCompatActivity {
         editUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                editUserInfo();
+            }
+        });
 
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                String storedDisplayName = sharedPreferences.getString("storedUserInfo", "");
-
-                final View view = getLayoutInflater().inflate(R.layout.activity_edit_user_info, null);
-                //Open dialog that allows user to change their info
-                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
-                builder.setTitle("Edit your info...");
-
-                final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.edit_user_info);
-
-                input.setText(storedDisplayName);
-
-                builder.setView(view);
-
-                // Save changes
-                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        userInfoString = input.getText().toString();
-                        int dropTextField = input.getText().length();
-                        //Take user input and save it to parse as "userInfo"
-                        if (dropTextField > 0) {
-                            currentUser.put("userInfo", userInfoString);
-                            currentUser.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    //Restart Settings Activity
-                                    Toast.makeText(getApplicationContext(), "Your info has been saved", Toast.LENGTH_LONG).show();
-
-                                    //Save the current user info to shared prefs
-                                    SharedPreferences.Editor editor;
-                                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                    editor = sharedPreferences.edit();
-                                    editor.putString("storedUserInfo", userInfoString);
-                                    editor.commit();
-
-                                    //Call to update user info view after edit
-                                    updateInfoTextView(userInfoString);
-                                }
-                            });
-
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Enter some text first.", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-                //Discard changes
-                builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        Toast.makeText(getApplicationContext(), "Your info was not changed.", Toast.LENGTH_LONG).show();
-
-                    }
-                });
-
-                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-
-                    }
-                });
-
-                builder.show();
+        //OCL for user info edit
+        TextView userInfo = (TextView) findViewById(R.id.user_info_tv);
+        userInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editUserInfo();
             }
         });
     }
+
+    public void editDisplayName() {
+
+        //                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String storedDisplayName = sharedPreferences.getString("storedDisplayName", "");
+
+        final View view = getLayoutInflater().inflate(R.layout.activity_edit_display_name, null);
+        //Open dialog that allows user to change their name
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Edit your display name...");
+
+        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.edit_display_name);
+
+        input.setText(storedDisplayName);
+
+        builder.setView(view);
+
+        // Save changes
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                displayNameString = input.getText().toString();
+                int displayNameTextField = input.getText().length();
+                //Take user input and save it to parse as "displayName"
+                if (displayNameTextField > 1) {
+                    currentUser.put("displayName", displayNameString);
+                    currentUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            //Restart Settings Activity
+                            Toast.makeText(getApplicationContext(), "Your display name has been changed", Toast.LENGTH_LONG).show();
+
+                            //Save the current users display name to shared prefs
+                            SharedPreferences.Editor editor;
+//                                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            editor = sharedPreferences.edit();
+                            editor.putString("storedDisplayName", displayNameString);
+                            editor.commit();
+
+                            //Call to update the users name after edit
+                            updateDisplayNameTextView(displayNameString);
+
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Display name must be at least 2 characters.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        //Discard changes
+        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                Toast.makeText(getApplicationContext(), "Your display name was not changed.", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        builder.show();
+    }
+
+    public void editUserInfo() {
+
+        String storedDisplayName = sharedPreferences.getString("storedUserInfo", "");
+
+        final View view = getLayoutInflater().inflate(R.layout.activity_edit_user_info, null);
+        //Open dialog that allows user to change their info
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Edit your info...");
+
+        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.edit_user_info);
+
+        input.setText(storedDisplayName);
+
+        builder.setView(view);
+
+        // Save changes
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                userInfoString = input.getText().toString();
+                int dropTextField = input.getText().length();
+                //Take user input and save it to parse as "userInfo"
+                if (dropTextField > 0) {
+                    currentUser.put("userInfo", userInfoString);
+                    currentUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            //Restart Settings Activity
+                            Toast.makeText(getApplicationContext(), "Your info has been saved", Toast.LENGTH_LONG).show();
+
+                            //Save the current user info to shared prefs
+                            SharedPreferences.Editor editor;
+                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            editor = sharedPreferences.edit();
+                            editor.putString("storedUserInfo", userInfoString);
+                            editor.commit();
+
+                            //Call to update user info view after edit
+                            updateInfoTextView(userInfoString);
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Enter some text first.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        //Discard changes
+        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                Toast.makeText(getApplicationContext(), "Your info was not changed.", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+
+            }
+        });
+
+        builder.show();
+    }
+
 
     //Updates the users display name after edit
     public void updateDisplayNameTextView(String updatedName) {
@@ -342,6 +372,7 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
         }
+
     }
 
     //Open image chooser intent for custom image upload

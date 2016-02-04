@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -58,7 +60,9 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.sinch.android.rtc.SinchClient;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -91,9 +95,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LocationRequest mLocationRequest;
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
     public Location mLastLocation;
-    public String mLatitudeText;
-    public String mLongitudeText;
+    public Double mLatitudeDouble;
+    public Double mLongitudeDouble;
     public String mLastLocationString;
+    public String userLocationString;
 
 
     @Override
@@ -642,7 +647,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -655,9 +660,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
-            mLatitudeText = String.valueOf(mLastLocation.getLatitude());
-            mLongitudeText = String.valueOf(mLastLocation.getLongitude());
+            mLatitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLatitude()));
+            mLongitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLongitude()));
             mLastLocationString = String.valueOf(mLastLocation);
+
+            if (mLatitudeDouble != null && mLongitudeDouble != null) {
+                getCompleteAddressString(mLatitudeDouble, mLongitudeDouble);
+            }
         }
     }
 
@@ -669,6 +678,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
        Log.d(TAG, "location error = " + connectionResult.getErrorCode());
     }
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses != null) {
+                String city = addresses.get(0).getLocality();
+                String state = addresses.get(0).getAdminArea();
+                String country = addresses.get(0).getCountryName();
+                userLocationString = city + ", " + state + ", " + country;
+            }
+
+        Log.d(TAG, "Location = " + userLocationString);
+        SaveToSharedPrefs.saveStringPreferences(this, "userLocation", userLocationString);
+        return userLocationString;
+    }
+
+
+
+
 
 
 }

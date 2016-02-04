@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 public class SaveToSharedPrefs {
 
     // Save booleanTips to shared prefs
-    public void saveBooleanPreferences(Context context, String key, Boolean value){
+    public static void saveBooleanPreferences(Context context, String key, Boolean value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
@@ -19,7 +19,7 @@ public class SaveToSharedPrefs {
     }
 
     // Save String to shared prefs
-    public void saveStringPreferences(Context context, String key, String value){
+    public static void saveStringPreferences(Context context, String key, String value){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, value);
@@ -27,7 +27,7 @@ public class SaveToSharedPrefs {
     }
 
     // Save all tips to shard prefs
-    public void saveAllTipsBoolean(Context context, Boolean value) {
+    public static void saveAllTipsBoolean(Context context, Boolean value) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("allTipsBoolean", value);

@@ -1,6 +1,7 @@
-<ScrollView android:layout_height="fill_parent"
-            android:layout_width="fill_parent"
-            xmlns:android="http://schemas.android.com/apk/res/android">
+<ScrollView android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:outlineProvider="bounds">
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,14 +17,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Edit Your Display Name..."
+        android:text="Name..."
         android:id="@+id/edit_display_name_tv"
         android:textSize="20dp"
         android:textStyle="bold"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:layout_below="@+id/display_name_tv"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edit_profile_picture"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="32dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,14 +45,17 @@
         android:layout_height="wrap_content"
         android:text="User Name"
         android:id="@+id/display_name_tv"
-        android:textSize="30dp"
-        android:layout_below="@+id/edit_profile_picture"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:textSize="20dp"
         android:singleLine="true"
-        android:textStyle="italic"/>
+        android:textStyle="italic"
+        android:layout_below="@+id/edit_display_name_tv"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="32dp"
+        android:layout_alignLeft="@+id/edit_display_name_tv"
+        android:layout_alignStart="@+id/edit_display_name_tv"
+        android:gravity="right"
+        android:layout_marginBottom="32dp"/>
 
 
 
@@ -58,13 +63,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="User Location"
             android:id="@+id/user_location_tv"
             android:textSize="20dp"
-            android:layout_below="@+id/edit_display_name_tv"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"/>
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/textView2"
+            android:textStyle="italic"
+            android:layout_marginRight="32dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="right"/>
 
         <!--<GridLayout-->
             <!--android:layout_width="match_parent"-->
@@ -157,28 +165,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Edit Your Info..."
+        android:text="Info..."
         android:id="@+id/edit_info_tv"
         android:textSize="20dp"
         android:textStyle="bold"
         android:gravity="center_horizontal"
-        android:layout_below="@+id/user_info_tv"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"/>
+        android:layout_below="@+id/display_name_tv"
+        android:layout_alignLeft="@+id/display_name_tv"
+        android:layout_alignStart="@+id/display_name_tv"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Info"
         android:id="@+id/user_info_tv"
-        android:layout_below="@+id/user_location_tv"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:textSize="18sp"
+        android:textSize="20dp"
         android:textStyle="italic"
-        android:gravity="center"/>
+        android:gravity="center|center_horizontal"
+        android:layout_below="@+id/edit_info_tv"
+        android:layout_marginBottom="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location..."
+        android:id="@+id/textView2"
+        android:textSize="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/user_info_tv"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginLeft="32dp"/>
 
 
 </RelativeLayout>
