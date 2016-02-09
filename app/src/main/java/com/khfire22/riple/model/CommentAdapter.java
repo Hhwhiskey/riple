@@ -208,7 +208,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         public void showCommentMenu() {
 
-            CharSequence todoDrop[] = new CharSequence[]{"Message the Commenter", "Report"};
+            CharSequence todoDrop[] = new CharSequence[]{"Message", "Report"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
             builder.setTitle("Comment Menu");

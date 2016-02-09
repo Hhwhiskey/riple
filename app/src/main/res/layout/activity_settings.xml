@@ -54,7 +54,7 @@
         android:layout_marginRight="32dp"
         android:layout_alignLeft="@+id/edit_display_name_tv"
         android:layout_alignStart="@+id/edit_display_name_tv"
-        android:gravity="right"
+        android:gravity="center_horizontal"
         android:layout_marginBottom="32dp"/>
 
 
@@ -72,7 +72,7 @@
             android:layout_marginRight="32dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:gravity="right"/>
+            android:gravity="center_horizontal"/>
 
         <!--<GridLayout-->
             <!--android:layout_width="match_parent"-->

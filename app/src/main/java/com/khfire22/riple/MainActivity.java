@@ -37,7 +37,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.khfire22.riple.ViewPagers.MainSlidingTabLayout;
@@ -45,9 +44,9 @@ import com.khfire22.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22.riple.activities.AboutActivity;
 import com.khfire22.riple.activities.SettingsActivity;
 import com.khfire22.riple.activities.TitleActivity;
-import com.khfire22.riple.application.RipleApplication;
 import com.khfire22.riple.utils.ConnectionDetector;
 import com.khfire22.riple.utils.MessageService;
+import com.khfire22.riple.utils.NetworkStateChangeReceiver;
 import com.khfire22.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -93,12 +92,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public GoogleApiClient mGoogleApiClient;
     private boolean mRequestingLocationUpdates = false;
     private LocationRequest mLocationRequest;
-    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
+    //    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
     public Location mLastLocation;
     public Double mLatitudeDouble;
     public Double mLongitudeDouble;
     public String mLastLocationString;
     public String userLocationString;
+    private NetworkStateChangeReceiver networkReceiver;
+    private SharedPreferences sharedPreferences;
 
 
     @Override
@@ -106,8 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Saves current parse instance in the background
-        RipleApplication.updateParseInstallation();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // First we need to check availability of play services
         if (checkGooglePlayServices()) {
@@ -125,6 +125,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (currentUser != null) {
             startService(serviceIntent);
         }
+
+        // Instantiate the broadcast receiver/Network detector so it can be terminated onPause
+        networkReceiver = new NetworkStateChangeReceiver();
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logUser();
     }
 
+
 //    public void saveTipPreferences(String key, Boolean value){
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -219,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Tip dialog box method that will show if tips enabled by the user
     public void viewUserTip() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         boolean test = sharedPreferences.getBoolean("postDropTips", true);
 
         if (test) {
@@ -469,6 +473,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPause() {
         super.onPause();
+        // onPause, cease the network detector
+//        try {
+//            unregisterReceiver(networkReceiver);
+//        } catch (Exception e) {
+//            Log.d(TAG, "onPause: " + e);
+//        }
+
     }
 
     @Override
@@ -598,13 +609,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Method to verify google play services on the device
-     * */
+     */
 
     private boolean checkGooglePlayServices() {
         int checkGooglePlayServices = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(this);
         if (checkGooglePlayServices != ConnectionResult.SUCCESS) {
-		/*
+        /*
 		* Google Play Services is missing or update is required
 		*  return code could be
 		* SUCCESS,
@@ -647,25 +658,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
+        if (mGoogleApiClient.isConnected()) {
 
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLatitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLatitude()));
-            mLongitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLongitude()));
-            mLastLocationString = String.valueOf(mLastLocation);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
 
-            if (mLatitudeDouble != null && mLongitudeDouble != null) {
-                getCompleteAddressString(mLatitudeDouble, mLongitudeDouble);
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (mLastLocation != null) {
+                mLatitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLatitude()));
+                mLongitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLongitude()));
+                mLastLocationString = String.valueOf(mLastLocation);
+
+                if (mLatitudeDouble != null && mLongitudeDouble != null) {
+
+                    // Call to geoCode method
+                    getCompleteAddressString(mLatitudeDouble, mLongitudeDouble);
+                }
             }
         }
     }
@@ -676,9 +692,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-       Log.d(TAG, "location error = " + connectionResult.getErrorCode());
+        Log.d(TAG, "location error = " + connectionResult.getErrorCode());
     }
 
+    // Convert long and lat and convert to location with geoCoder
     private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
 
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -690,20 +707,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
         if (addresses != null) {
-                String city = addresses.get(0).getLocality();
-                String state = addresses.get(0).getAdminArea();
-                String country = addresses.get(0).getCountryName();
-                userLocationString = city + ", " + state + ", " + country;
-            }
+            String city = addresses.get(0).getLocality();
+            String state = addresses.get(0).getAdminArea();
+            String country = addresses.get(0).getCountryName();
+            // Save all location info to this userLocationString
+            userLocationString = city + ", " + state + ", " + country;
+        }
 
         Log.d(TAG, "Location = " + userLocationString);
-        SaveToSharedPrefs.saveStringPreferences(this, "userLocation", userLocationString);
+
+        // Call to save location info in shared prefs
+        SaveToSharedPrefs.saveStringPreferences(this, "userLastLocation", userLocationString);
+
+        // Call to save location info to Parse
+        saveUserLocationToParse(userLocationString);
+
         return userLocationString;
     }
 
+    // Save the currentUser location to Parse
+    public void saveUserLocationToParse(String currentUserLocation) {
 
-
-
+        currentUser.put("userLastLocation", currentUserLocation);
+        currentUser.saveInBackground();
+    }
 
 
 }

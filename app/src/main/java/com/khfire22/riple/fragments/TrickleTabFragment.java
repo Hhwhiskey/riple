@@ -293,6 +293,14 @@ public class TrickleTabFragment extends Fragment {
                     //Author Info
                     dropItemAll.setAuthorInfo(authorData.getString("userInfo"));
 
+                    //Author location
+                    String authorLocation = authorData.getString("userLastLocation");
+                    if (authorLocation == null) {
+                        dropItemAll.setUserLastLocation("Location unknown");
+                    } else {
+                        dropItemAll.setUserLastLocation("From " + authorData.getString("userLastLocation"));
+                    }
+
                     //Drop Data///////////////////////////////////////////////////////////////
                     //DropObjectId
                     dropItemAll.setObjectId(listFromParse.get(i).getObjectId());

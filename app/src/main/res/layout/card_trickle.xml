@@ -108,14 +108,14 @@
                 android:maxLines="5"
                 android:singleLine="false"
                 android:text="Description"
-                android:layout_below="@+id/other_profile_picture"
                 android:textColor="@color/PrimaryText"
                 android:textSize="14sp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/user_last_location"
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/riple_count"
@@ -188,7 +188,21 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="2dp"/>
 
-
+            <TextView
+                android:id="@+id/user_last_location"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="From..."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="12dp"
+                android:singleLine="true"
+                android:gravity="left"
+                android:layout_below="@+id/other_profile_picture"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_alignRight="@+id/riple_count"
+                android:layout_alignEnd="@+id/riple_count"
+                android:layout_marginRight="8dp"/>
 
 
         </RelativeLayout>

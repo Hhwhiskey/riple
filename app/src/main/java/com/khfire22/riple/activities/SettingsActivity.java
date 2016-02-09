@@ -78,7 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
         currentUser = ParseUser.getCurrentUser();
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        mUserLocaton = sharedPreferences.getString("userLocation", "");
+        mUserLocaton = sharedPreferences.getString("userLastLocation", "Location Unknown");
 
 
         //Instantiate the views

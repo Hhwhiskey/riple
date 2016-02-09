@@ -44,7 +44,7 @@
                 android:layout_alignParentTop="false"
                 android:text="Kevin Hodges"
                 android:textAlignment="center"
-                android:textSize="20dp"
+                android:textSize="18dp"
                 android:textColor="#FFFFFF"
                 android:singleLine="true"
                 android:layout_alignTop="@+id/other_profile_picture"
@@ -52,7 +52,7 @@
                 android:ellipsize="end"
                 android:layout_toRightOf="@+id/other_profile_picture"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginLeft="8dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"/>
@@ -87,7 +87,25 @@
                 android:layout_below="@+id/other_display_name"
                 android:gravity="top"
                 android:layout_alignParentTop="false"
-                android:layout_marginTop="6dp"/>
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="From..."
+                android:id="@+id/user_last_location"
+                android:textSize="14dp"
+                android:textColor="#FFFFFF"
+                android:textStyle="italic"
+                android:gravity="top"
+                android:layout_toRightOf="@+id/other_profile_picture"
+                android:layout_below="@+id/other_rank"
+                android:layout_marginLeft="8dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="false"
+                android:layout_marginRight="8dp"
+                android:alpha=".7"/>
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

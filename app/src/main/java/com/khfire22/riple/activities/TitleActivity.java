@@ -3,8 +3,6 @@ package com.khfire22.riple.activities;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v7.app.AlertDialog;
@@ -16,7 +14,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -59,19 +56,19 @@ public class TitleActivity extends AppCompatActivity {
         //Remove status bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //Splash Video
-        VideoView drops = (VideoView) findViewById(R.id.title_video);
-        String path = "android.resource://" + getPackageName() + "/" + R.raw.duckfinal;
-        drops.setVideoURI(Uri.parse(path));
-        drops.start();
-
-        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
+//        //Splash Video
+//        VideoView drops = (VideoView) findViewById(R.id.title_video);
+//        String path = "android.resource://" + getPackageName() + "/" + R.raw.releasetitlevideo;
+//        drops.setVideoURI(Uri.parse(path));
+//        drops.start();
+//
+//        drops.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//
+//            @Override
+//            public void onPrepared(MediaPlayer mp) {
+//                mp.setLooping(true);
+//            }
+//        });
 
         // Bypass login screen if user is currently logged in
         intent = new Intent(getApplicationContext(), MainActivity.class);

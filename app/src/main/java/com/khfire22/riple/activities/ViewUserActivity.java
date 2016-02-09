@@ -363,6 +363,14 @@ public class ViewUserActivity extends AppCompatActivity {
                                         //Author Info
                                         dropItem.setAuthorInfo(authorData.getString("userInfo"));
 
+                                        //Author location
+                                        String authorLocation = authorData.getString("userLastLocation");
+                                        if (authorLocation == null) {
+                                            dropItem.setUserLastLocation("Location unknown");
+                                        } else {
+                                            dropItem.setUserLastLocation("From " + authorData.getString("userLastLocation"));
+                                        }
+
                                         //Drop Data////////////////////////////////////////////////////////////////
                                         //DropObjectId
                                         dropItem.setObjectId(list.get(i).getObjectId());

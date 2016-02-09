@@ -58,7 +58,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     public static final String drop = "drop";
     public static final String trickle = "trickle";
     public static final String viewUser = "viewUser";
-    public ParseUser currentUser;
+
     private ParseFile parseProfilePictureCheck;
     private String displayNameCheck;
     private ContentResolver contentResolver;
@@ -68,6 +68,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private Context applicationContext;
     private static final String TAG = "DropAdapter";
     private ConnectionDetector detector;
+    private ParseUser mCurrentUser;
+    public String mCurrentUserId;
 
     public DropAdapter() {
 //        this.data =
@@ -86,7 +88,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     @Override
     public DropViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        currentUser = ParseUser.getCurrentUser();
+        mCurrentUser = ParseUser.getCurrentUser();
 
         // Change the inflated card based on which RV is being viewed
         int xmlLayoutId = -1;
@@ -193,7 +195,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
-        //Modify currentUser relations to Drop
+        //Modify mCurrentUser relations to Drop
         ParseRelation completeRelation1 = currentUser.getRelation("completedDrops");
         completeRelation1.add(mDropObject);
         ParseRelation completeRelation2 = currentUser.getRelation("todoDrops");
@@ -290,8 +292,8 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         String dropDescription = (data.get(position).getDescription());
         String ripleCount = (data.get(position).getRipleCount());
         String commentCount = (data.get(position).getCommentCount());
-//        String mPosition = String.valueOf((data.get(position)));
         String createdAt = (data.get(position).getCreatedAt());
+        String userLastLocation = (data.get(position).getUserLastLocation());
 
         Log.d("sViewDropAcitivty", "Send drop's dropObjectId = " + dropObjectId);
         Log.d("sViewDropAcitivty", "Send drop's authorId = " + authorId);
@@ -313,7 +315,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("commentCount", commentCount);
         intent.putExtra("createdAt", createdAt);
         intent.putExtra("mTabName", mTabName);
-//        intent.putExtra("mPosition", mPosition);
+        intent.putExtra("userLastLocation", userLastLocation);
 
         mContext.startActivity(intent);
     }
@@ -405,7 +407,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     }
 
     public void shareToFacebook(int position) {
-        String displayName = currentUser.getString("displayName");
+        String displayName = mCurrentUser.getString("displayName");
         String shareAuthor = data.get(position).getAuthorName();
         String shareDescription = data.get(position).getDescription();
         Bitmap sharedImage = data.get(position).getParseProfilePicture();
@@ -426,7 +428,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
     // TODO: 11/19/2015 Include pics with share
     public void shareWithOther(int position) {
-        String displayName = currentUser.getString("displayName");
+        String displayName = mCurrentUser.getString("displayName");
         String shareAuthor = data.get(position).getAuthorName();
         String shareDescription = data.get(position).getDescription();
         Bitmap sharedImage = data.get(position).getParseProfilePicture();
@@ -454,6 +456,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         private final Button todoButton;
         private final Button completeButton;
+        private final TextView userLastLocation;
         private ImageView menuButton;
         public TextView authorName;
         public TextView createdAt;
@@ -472,6 +475,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             todoButton = (Button) itemView.findViewById(R.id.button_todo);
             completeButton = (Button) itemView.findViewById(R.id.button_complete);
             createdAt = (TextView) itemView.findViewById(R.id.comment_created_at);
+            userLastLocation = (TextView) itemView.findViewById(R.id.user_last_location);
             authorName = (TextView) itemView.findViewById(R.id.name);
             description = (TextView) itemView.findViewById(R.id.description);
             ripleCount = (TextView) itemView.findViewById(R.id.riple_count);
@@ -509,6 +513,10 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
             parseProfilePicture.setImageBitmap(current.parseProfilePicture);
             createdAt.setText(current.createdAt);
+            if (userLastLocation != null) {
+                userLastLocation.setText(current.userLastLocation);
+            }
+
             authorName.setText(current.authorName);
             description.setText(current.description);
             ripleCount.setText(String.valueOf(current.ripleCount));
@@ -519,29 +527,35 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         @Override
         public void onClick(View view) {
 
+            ParseUser currentUser;
+            int position = getAdapterPosition();
+            mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
+            String authorId = data.get(position).getAuthorId();
+
             if (!detector.isConnectedToInternet()) {
                 Toast.makeText(mContext, R.string.no_connection, Toast.LENGTH_LONG).show();
             } else {
 
+                Intent intent = new Intent(mContext, SettingsActivity.class);
+
                 if (view == todoButton) {
                     //Check to see if user has picture and display name set
-                    ParseUser currentUser = ParseUser.getCurrentUser();
+                    currentUser = ParseUser.getCurrentUser();
                     parseProfilePictureCheck = (ParseFile) currentUser.get("parseProfilePicture");
                     displayNameCheck = (String) currentUser.get("displayName");
 
                     if (parseProfilePictureCheck == null && displayNameCheck == null) {
                         Toast.makeText(mContext, R.string.picAndNameToast, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(mContext, SettingsActivity.class);
                         mContext.startActivity(intent);
+
                     } else if (parseProfilePicture == null) {
                         Toast.makeText(mContext, R.string.picToast, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(mContext, SettingsActivity.class);
                         mContext.startActivity(intent);
 
                     } else if (displayNameCheck == null) {
                         Toast.makeText(mContext, R.string.nameToast, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(mContext, SettingsActivity.class);
                         mContext.startActivity(intent);
+
                         //Add Drop to to-do list if user has picture and display name set
                     } else {
                         getTrickleObjectFromRowToAdd(getAdapterPosition());
@@ -553,10 +567,20 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                     removeDropFromView(getAdapterPosition());
                     //Show menu context
                 } else if (view == menuButton) {
-                    if (mTabName.equals(drop)) {
-                        showDropMenu();
+                    if (!authorId.equals(mCurrentUserId)) {
+                        switch (mTabName) {
+                            case drop:
+                                showDropMenu();
+                                break;
+                            case trickle:
+                                showTrickleMenu();
+                                break;
+                            default:
+                                showStandardMenu();
+                                break;
+                        }
                     } else {
-                        showTrickleMenu();
+                        showAuthorsDropMenu();
                     }
                     //If click is anywhere on picture or toolbar, view the user
                 } else if (view == parseProfilePicture || view == toolbar) {
@@ -574,14 +598,28 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             Vibrate vibrate = new Vibrate();
             vibrate.vibrate(mContext);
 
+            int position = getAdapterPosition();
+            mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
+            String authorId = data.get(position).getAuthorId();
+
             if (!detector.isConnectedToInternet()) {
                 Toast.makeText(mContext, R.string.no_connection, Toast.LENGTH_LONG).show();
             } else {
 
-                if (mTabName.equals(drop)) {
-                    showDropMenu();
+                if (!authorId.equals(mCurrentUserId)) {
+                    switch (mTabName) {
+                        case drop:
+                            showDropMenu();
+                            break;
+                        case trickle:
+                            showTrickleMenu();
+                            break;
+                        default:
+                            showStandardMenu();
+                            break;
+                    }
                 } else {
-                    showTrickleMenu();
+                    showAuthorsDropMenu();
                 }
             }
             return false;
@@ -629,7 +667,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
 
         public void showDropMenu() {
 
-            CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Remove From Todo", "Report"};
+            CharSequence todoDrop[] = new CharSequence[]{"Remove from Todo", "Message the Author", "Share with Facebook", "Share", "Report"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
             builder.setTitle("Drop Menu");
@@ -638,17 +676,17 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
                 public void onClick(DialogInterface dialog, int selected) {
 
                     if (selected == 0) {
-                        messageTheAuthor(getAdapterPosition());
-
-                    } else if (selected == 1) {
-                        shareToFacebook(getAdapterPosition());
-
-                    } else if (selected == 2) {
-                        shareWithOther(getAdapterPosition());
-
-                    } else if (selected == 3) {
                         getDropObjectFromRowToRemove(getAdapterPosition());
                         removeDropFromView(getAdapterPosition());
+
+                    } else if (selected == 1) {
+                        messageTheAuthor(getAdapterPosition());
+
+                    } else if (selected == 2) {
+                        shareToFacebook(getAdapterPosition());
+
+                    } else if (selected == 3) {
+                        shareWithOther(getAdapterPosition());
 
                     } else if (selected == 4) {
                         final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
@@ -673,7 +711,74 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
             });
             builder.show();
         }
+
+        private void showAuthorsDropMenu() {
+
+            CharSequence todoDrop[] = new CharSequence[]{"Share with Facebook", "Share"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Menu");
+            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+
+                    if (selected == 0) {
+                        shareToFacebook(getAdapterPosition());
+
+                    }else if (selected == 1) {
+                        shareWithOther(getAdapterPosition());
+                    }
+                }
+            });
+            builder.show();
+        }
+
+        private void showStandardMenu() {
+
+            CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Report"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+            builder.setTitle("Menu");
+            builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selected) {
+
+                    if (selected == 0) {
+                        messageTheAuthor(getAdapterPosition());
+
+                    }else if (selected == 1) {
+                        shareToFacebook(getAdapterPosition());
+
+                    }else if (selected == 2) {
+                        shareWithOther(getAdapterPosition());
+
+                    } else if (selected == 3) {
+                        final AlertDialog.Builder builderVerify = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
+                        builderVerify.setTitle("Report Drop Author");
+                        builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
+                        builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+
+                        builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                reportDropAuthor(getAdapterPosition());
+                            }
+                        });
+                        builderVerify.show();
+
+                    }
+                }
+            });
+            builder.show();
+        }
+
     }
+
+
 
     public void removeDropFromView(int position) {
         data.remove(position);

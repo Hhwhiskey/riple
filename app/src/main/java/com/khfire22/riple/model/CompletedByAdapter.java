@@ -147,6 +147,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     class CompletedByViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
+        private final TextView userLastLocation;
         public TextView displayNameView;
         public ImageView otherProfilePicture;
         public TextView userRankView;
@@ -159,6 +160,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
             displayNameView = (TextView) itemView.findViewById(R.id.other_display_name);
             userRankView = (TextView) itemView.findViewById(R.id.other_rank);
             userRipleCountView = (TextView) itemView.findViewById(R.id.other_riple_count);
+            userLastLocation = (TextView) itemView.findViewById(R.id.user_last_location);
 
             //Set OCL
             itemView.setOnClickListener(this);
@@ -176,6 +178,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
             otherProfilePicture.setImageBitmap(current.parseProfilePicture);
             displayNameView.setText(current.displayName);
             userRankView.setText(current.userRank);
+            userLastLocation.setText(current.userLastLocation);
 
             if (current.userRipleCount.equals(testVariable)) {
                 userRipleCountView.setText("with " + current.userRipleCount + " Riple");
