@@ -223,15 +223,13 @@ public class FriendsTabFragment extends Fragment {
                         friendItem.setRipleRank(recipient.getString("userRank"));
                         friendItem.setFriendInfo(recipient.getString("userInfo"));
 
-
-
-
-//                        int userRipleCount = recipient.getInt("userRipleCount");
-//                        if (userRipleCount == 1) {
-//                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riple")));
-//                        } else {
-//                            friendItem.setRipleCount(String.valueOf(("with " + userRipleCount + " Riples")));
-//                        }
+                        //Author location
+                        String authorLocation = recipient.getString("userLastLocation");
+                        if (authorLocation == null) {
+                            friendItem.setFriendLastLocation("Location unavailable");
+                        } else {
+                            friendItem.setFriendInfo("From " + recipient.getString("userLastLocation"));
+                        }
 
                         friendItem.setRipleCount(String.valueOf(recipient.getInt("userRipleCount")));
                         friendsList.add(friendItem);

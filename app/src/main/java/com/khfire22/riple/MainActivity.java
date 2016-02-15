@@ -465,9 +465,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         checkGooglePlayServices();
 
-        // Resuming the periodic location updates
-        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-        }
+//        // Resuming the periodic location updates
+//        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+//        }
     }
 
     @Override
@@ -653,7 +653,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void onStop() {
         super.onStop();
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override

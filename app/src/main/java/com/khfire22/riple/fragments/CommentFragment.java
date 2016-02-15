@@ -344,18 +344,22 @@ public class CommentFragment extends Fragment {
 
                         //CommenterId
                         commentItem.setCommenterId(commenterData.getObjectId());
-
                         //Commenter Name
                         commentItem.setCommenterName((String) commenterData.get("displayName"));
-
                         //Commenter Rank
                         commentItem.setCommenterRank((String) commenterData.get("userRank"));
-
                         //Commenter Riple Count
                         commentItem.setCommenterRipleCount(String.valueOf(commenterData.getInt("userRipleCount")));
-
                         //Commenter Info
                         commentItem.setCommenterInfo((String)commenterData.get("userInfo"));
+                        //Commenter Location
+                        String authorLocation = commenterData.getString("userLastLocation");
+                        if (authorLocation == null) {
+                            commentItem.setUserLastLocation("Location unavailable");
+                        } else {
+                            commentItem.setUserLastLocation("From " + commenterData.getString("userLastLocation"));
+                        }
+
 
                         //Comment Data/////////////////////////////////////////////////////////////
                         // Comment Id

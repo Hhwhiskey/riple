@@ -100,11 +100,12 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     private void viewOtherUser(int position) {
 
-        String clickedUserId = (data.get(position).getUserObjectId());
-        String clickedUserName = (data.get(position).getDisplayName());
-        String clickedUserRank = (data.get(position).getUserRank());
-        String clickedUserRipleCount = (data.get(position).getUserRipleCount());
-        String clickedUserInfo = (data.get(position).getUserInfo());
+        String clickedUserId = data.get(position).getUserObjectId();
+        String clickedUserName = data.get(position).getDisplayName();
+        String clickedUserRank = data.get(position).getUserRank();
+        String clickedUserRipleCount = data.get(position).getUserRipleCount();
+        String clickedUserInfo = data.get(position).getUserInfo();
+        String clickedUserLastLocation = data.get(position).getUserLastLocation();
 
         Log.d("sDropViewUser", "Clicked User's Id = " + clickedUserId);
         Log.d("sDropViewUser", "Clicked User's Name = " + clickedUserName);
@@ -115,6 +116,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
         intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
+        intent.putExtra(Constants.CLICKED_USER_LOCATION, clickedUserLastLocation);
 
         mContext.startActivity(intent);
     }

@@ -323,11 +323,12 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     // onClick action for viewing other user
     private void viewOtherUser(int position) {
 
-        String clickedUserId = (data.get(position).getAuthorId());
-        String clickedUserName = (data.get(position).getAuthorName());
-        String clickedUserRank = (data.get(position).getAuthorRank());
-        String clickedUserRipleCount = (data.get(position).getAuthorRipleCount());
-        String clickedUserInfo = (data.get(position).getAuthorInfo());
+        String clickedUserId = data.get(position).getAuthorId();
+        String clickedUserName = data.get(position).getAuthorName();
+        String clickedUserRank = data.get(position).getAuthorRank();
+        String clickedUserRipleCount = data.get(position).getAuthorRipleCount();
+        String clickedUserInfo = data.get(position).getAuthorInfo();
+        String clickedUserLocation = data.get(position).getUserLastLocation();
 
         Log.d(TAG, "Clicked User's Id = " + clickedUserId);
         Log.d(TAG, "Clicked User's Name = " + clickedUserName);
@@ -339,7 +340,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
         intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
-
+        intent.putExtra(Constants.CLICKED_USER_LOCATION, clickedUserLocation);
 
         mContext.startActivity(intent);
     }

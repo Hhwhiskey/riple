@@ -31,6 +31,8 @@ android {
         applicationId "com.khfire22.riple"
         minSdkVersion 16
         targetSdkVersion 23
+        renderscriptTargetApi 20
+        renderscriptSupportModeEnabled true
 
         // REMOVE DEBUG MODE!!!!!!!!!!!!!!!!!!!!!!!
         versionCode 6
@@ -93,8 +95,6 @@ dependencies {
     compile 'com.githang:com.edmodo.cropper:1.0.2'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.google.android.gms:play-services-location:8.4.0'
-
-
 }
 
 

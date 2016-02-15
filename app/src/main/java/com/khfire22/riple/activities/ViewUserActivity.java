@@ -1,5 +1,6 @@
 package com.khfire22.riple.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +17,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v8.renderscript.Allocation;
+import android.support.v8.renderscript.Element;
+import android.support.v8.renderscript.RenderScript;
+import android.support.v8.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,6 +73,10 @@ public class ViewUserActivity extends AppCompatActivity {
     private String stringTestVariable;
     private ArrayList<DropItem> mViewUserDropList;
     private String mClickedUserInfo;
+    private String mClickedUserLocation;
+    private ImageView profileCirclePictureView;
+    private Bitmap blurredImage;
+    private TextView authorLastLocation;
 
 
     @Override
@@ -85,7 +94,9 @@ public class ViewUserActivity extends AppCompatActivity {
 
         profilePictureView = (ImageView) findViewById(R.id.view_user_profile_picture);
         authorRipleRank = (TextView) findViewById(R.id.view_user_rank);
-        authorRipleCount = (TextView) findViewById(R.id.view_user_ripleCount);
+//        authorRipleCount = (TextView) findViewById(R.id.view_user_ripleCount);
+        authorLastLocation = (TextView) findViewById(R.id.user_last_location);
+        profileCirclePictureView = (ImageView) findViewById(R.id.user_circle_image);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -101,43 +112,64 @@ public class ViewUserActivity extends AppCompatActivity {
         mClickedUserRank = intent.getStringExtra(Constants.CLICKED_USER_RANK);
         mClickedUserRipleCount = intent.getStringExtra(Constants.CLICKED_USER_RIPLE_COUNT);
         mClickedUserInfo = intent.getStringExtra(Constants.CLICKED_USER_INFO);
+        mClickedUserLocation = intent.getStringExtra(Constants.CLICKED_USER_LOCATION);
         Log.d("rViewUser", "mClickedUserId = " + mClickedUserId);
         Log.d("rViewUser", "mClickedUserName = " + mClickedUserName);
         Log.d("rViewUser", "mClickedUserRipleCount = " + mClickedUserRipleCount);
         Log.d("rViewUser", "mClickedUserRank = " + mClickedUserRank);
 
 
+
+
+
         //Populate the viewed users data////////////////////////////////////
-
-        //Get viewedUsers parseProfilePicture and set it to imageView
-        getViewedUserProfilePicture(mClickedUserId);
-
-        //Set the name, rank and riple count of the viewed user
-        collapsingToolbar.setTitle(mClickedUserName);
-        authorRipleRank.setText(mClickedUserRank);
-
-
-
-
-
-
-        // Compares the viewedUser's riple count against "1"
-        // If 1, use "Riple", otherwise use "Riples"
-        stringTestVariable = String.valueOf(1);
 
         final String ripleString;
 
         //If ripleCount == stringTestVariable(1)
+        stringTestVariable = String.valueOf(1);
         if (mClickedUserRipleCount.equals(stringTestVariable)) {
             ripleString = "Riple";
         } else {
             ripleString = "Riples";
         }
 
-        authorRipleCount.setText(mClickedUserRipleCount + " " + ripleString);
+        // If location is unavailble, omit it.
+        if (mClickedUserLocation.equals("Location unavailable")) {
+            mClickedUserLocation = "";
+        }
+
+
+        //Get viewedUsers parseProfilePicture and set it to imageView
+        getViewedUserProfilePicture(mClickedUserId);
+
+        //Set the name, rank and riple count of the viewed user
+        collapsingToolbar.setTitle(mClickedUserName);
+        collapsingToolbar.setExpandedTitleGravity(0x01|0x50);
+
+        authorRipleRank.setText(mClickedUserRank + " with " + mClickedUserRipleCount + " " + ripleString);
+
+
+        authorLastLocation.setText(mClickedUserLocation);
+
+        // Compares the viewedUser's riple count against "1"
+        // If 1, use "Riple", otherwise use "Riples"
+
+
+
+
+//        authorRipleCount.setText(mClickedUserRipleCount + " " + ripleString);
 
         //Set hero image OCL
         profilePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewUserInfo(mClickedUserName, mClickedUserRank + " with " +
+                        mClickedUserRipleCount + " " + ripleString + "...\n\n" + mClickedUserInfo);
+            }
+        });
+
+        profileCirclePictureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 viewUserInfo(mClickedUserName, mClickedUserRank + " with " +
@@ -213,6 +245,7 @@ public class ViewUserActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewUserActivity.this, R.style.MyAlertDialogStyle);
         //Set title to users name
         builder.setTitle(userName);
+
         //If user has message show it, otherwise show default note
         if (mClickedUserInfo.equals("") || mClickedUserInfo == null) {
             builder.setMessage(userInfo + "No information entered yet.");
@@ -247,7 +280,11 @@ public class ViewUserActivity extends AppCompatActivity {
                                     Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
                                     if (bmp != null) {
                                         Bitmap resized = Bitmap.createScaledBitmap(bmp, 500, 500, true);
-                                        profilePictureView.setImageBitmap(resized);
+
+                                        BlurBuilder blurBuilder = new BlurBuilder();
+                                        blurredImage = blurBuilder.blur(ViewUserActivity.this, resized);
+                                        profilePictureView.setImageBitmap(blurredImage);
+                                        profileCirclePictureView.setImageBitmap(resized);
                                     }
                                 }
                             }
@@ -256,6 +293,30 @@ public class ViewUserActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public class BlurBuilder {
+        private static final float BITMAP_SCALE = .5f;
+        private static final float BLUR_RADIUS = 12.5f;
+
+        public Bitmap blur(Context context, Bitmap image) {
+            int width = Math.round(image.getWidth() * BITMAP_SCALE);
+            int height = Math.round(image.getHeight() * BITMAP_SCALE);
+
+            Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height, false);
+            Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
+
+            RenderScript rs = RenderScript.create(context);
+            ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+            Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
+            Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
+            theIntrinsic.setRadius(BLUR_RADIUS);
+            theIntrinsic.setInput(tmpIn);
+            theIntrinsic.forEach(tmpOut);
+            tmpOut.copyTo(outputBitmap);
+
+            return outputBitmap;
+        }
     }
 
     public class LoadUserActivityFromParse {

@@ -290,7 +290,7 @@ public class DropsTabFragment extends Fragment {
                             //Author location
                             String authorLocation = authorData.getString("userLastLocation");
                             if (authorLocation == null) {
-                                dropItem.setUserLastLocation("Location unknown");
+                                dropItem.setUserLastLocation("Location unavailable");
                             } else {
                                 dropItem.setUserLastLocation("From " + authorData.getString("userLastLocation"));
                             }

@@ -296,7 +296,7 @@ public class TrickleTabFragment extends Fragment {
                     //Author location
                     String authorLocation = authorData.getString("userLastLocation");
                     if (authorLocation == null) {
-                        dropItemAll.setUserLastLocation("Location unknown");
+                        dropItemAll.setUserLastLocation("Location unavailable");
                     } else {
                         dropItemAll.setUserLastLocation("From " + authorData.getString("userLastLocation"));
                     }

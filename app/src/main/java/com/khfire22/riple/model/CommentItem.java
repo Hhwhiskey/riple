@@ -11,6 +11,7 @@ public class CommentItem {
     public String commentObjectId;
     public String commentText;
     public String createdAt;
+    public String userLastLocation;
 
     public String commenterId;
     public String commenterName;
@@ -19,6 +20,14 @@ public class CommentItem {
     public String commenterRipleCount;
     public Bitmap commenterParseProfilePicture;
 
+
+    public String getUserLastLocation() {
+        return userLastLocation;
+    }
+
+    public void setUserLastLocation(String userLastLocation) {
+        this.userLastLocation = userLastLocation;
+    }
 
     public String getCommenterInfo() {
         return commenterInfo;
