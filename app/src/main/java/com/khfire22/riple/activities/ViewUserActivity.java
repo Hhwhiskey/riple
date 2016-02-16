@@ -134,10 +134,10 @@ public class ViewUserActivity extends AppCompatActivity {
             ripleString = "Riples";
         }
 
-        // If location is unavailble, omit it.
-        if (mClickedUserLocation.equals("Location unavailable")) {
-            mClickedUserLocation = "";
-        }
+//        // If location is unavailble, omit it.
+//        if (mClickedUserLocation.equals("Location unavailable")) {
+//            mClickedUserLocation = "";
+//        }
 
 
         //Get viewedUsers parseProfilePicture and set it to imageView
@@ -148,8 +148,6 @@ public class ViewUserActivity extends AppCompatActivity {
         collapsingToolbar.setExpandedTitleGravity(0x01|0x50);
 
         authorRipleRank.setText(mClickedUserRank + " with " + mClickedUserRipleCount + " " + ripleString);
-
-
         authorLastLocation.setText(mClickedUserLocation);
 
         // Compares the viewedUser's riple count against "1"
@@ -427,9 +425,9 @@ public class ViewUserActivity extends AppCompatActivity {
                                         //Author location
                                         String authorLocation = authorData.getString("userLastLocation");
                                         if (authorLocation == null) {
-                                            dropItem.setUserLastLocation("Location unknown");
+                                            dropItem.setUserLastLocation("Location unavailable");
                                         } else {
-                                            dropItem.setUserLastLocation("From " + authorData.getString("userLastLocation"));
+                                            dropItem.setUserLastLocation(authorLocation);
                                         }
 
                                         //Drop Data////////////////////////////////////////////////////////////////

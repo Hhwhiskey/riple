@@ -152,7 +152,7 @@ public class CompletedFragment extends Fragment {
                                     if (userLastLocation == null) {
                                         completedByItem.setUserLastLocation("Location unavailable");
                                     } else {
-                                        completedByItem.setUserLastLocation(list.get(i).getString("userLastLocation"));
+                                        completedByItem.setUserLastLocation(userLastLocation);
                                     }
 
                                     completedByList.add(completedByItem);

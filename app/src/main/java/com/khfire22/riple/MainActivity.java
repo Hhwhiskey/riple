@@ -646,9 +646,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
+        mGoogleApiClient.connect();
+
     }
 
     protected void onStop() {

@@ -228,7 +228,7 @@ public class FriendsTabFragment extends Fragment {
                         if (authorLocation == null) {
                             friendItem.setFriendLastLocation("Location unavailable");
                         } else {
-                            friendItem.setFriendInfo("From " + recipient.getString("userLastLocation"));
+                            friendItem.setFriendLastLocation(authorLocation);
                         }
 
                         friendItem.setRipleCount(String.valueOf(recipient.getInt("userRipleCount")));

@@ -357,7 +357,7 @@ public class CommentFragment extends Fragment {
                         if (authorLocation == null) {
                             commentItem.setUserLastLocation("Location unavailable");
                         } else {
-                            commentItem.setUserLastLocation("From " + commenterData.getString("userLastLocation"));
+                            commentItem.setUserLastLocation(authorLocation);
                         }
 
 

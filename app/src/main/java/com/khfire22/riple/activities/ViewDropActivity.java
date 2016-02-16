@@ -86,7 +86,7 @@ public class ViewDropActivity extends AppCompatActivity {
     private ParseUser mCurrentUser;
     private String mAuthorRipleCount;
     private String mAuthorInfo;
-    private String userLastLocation;
+    private String mAuthorLastLocation;
     private TextView userLastLocationView;
     private String mCurrentUserId;
     private Intent intentRefresh;
@@ -122,12 +122,12 @@ public class ViewDropActivity extends AppCompatActivity {
         mAuthorRank = intent.getStringExtra("authorRank");
         mAuthorRipleCount = intent.getStringExtra("clickedUserRipleCount");
         mAuthorInfo = intent.getStringExtra("clickedUserInfo");
+        mAuthorLastLocation = intent.getStringExtra("userLastLocation");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = (String) intent.getSerializableExtra("createdAt");
-        userLastLocation = intent.getStringExtra("userLastLocation");
         mTabName = intent.getStringExtra("mTabName");
 
         Log.d("rDropExtra", "mDropObjectId = " + mDropObjectId);
@@ -213,7 +213,7 @@ public class ViewDropActivity extends AppCompatActivity {
         createdAtView = (TextView) findViewById(R.id.comment_created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
         userLastLocationView = (TextView) findViewById(R.id.user_last_location);
-        userLastLocationView.setText(userLastLocation);
+        userLastLocationView.setText(mAuthorLastLocation);
         ///////////////
 
         //Allows the query of the viewed drop
@@ -290,6 +290,7 @@ public class ViewDropActivity extends AppCompatActivity {
         intent.putExtra(Constants.CLICKED_USER_RANK, mAuthorRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, mAuthorRipleCount);
         intent.putExtra(Constants.CLICKED_USER_INFO, mAuthorInfo);
+        intent.putExtra(Constants.CLICKED_USER_LOCATION, mAuthorLastLocation);
 
         this.startActivity(intent);
     }

@@ -407,7 +407,7 @@ public class RipleTabFragment extends Fragment {
                             if (authorLocation == null) {
                                 dropItem.setUserLastLocation("Location unavailable");
                             } else {
-                                dropItem.setUserLastLocation("From " + authorData.getString("userLastLocation"));
+                                dropItem.setUserLastLocation(authorLocation);
                             }
 
                             //Drop Data////////////////////////////////////////////////////////////////
