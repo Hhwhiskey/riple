@@ -67,12 +67,13 @@
             android:id="@+id/user_location_tv"
             android:textSize="20dp"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/textView2"
+            android:layout_below="@+id/user_location_tag"
             android:textStyle="italic"
             android:layout_marginRight="32dp"
+            android:gravity="center_horizontal"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:gravity="center_horizontal"/>
+            android:layout_marginLeft="32dp"/>
 
         <!--<GridLayout-->
             <!--android:layout_width="match_parent"-->
@@ -196,7 +197,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Location..."
-        android:id="@+id/textView2"
+        android:id="@+id/user_location_tag"
         android:textSize="20dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -204,6 +205,33 @@
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_marginLeft="32dp"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/auto_location_cb"
+        android:layout_below="@+id/user_location_tv"
+        android:layout_marginTop="28dp"
+        android:checked="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="32dp"
+        android:gravity="bottom"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Automatic Location..."
+        android:id="@+id/auto_location"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignBottom="@+id/auto_location_cb"
+        android:singleLine="true"
+        android:layout_alignLeft="@+id/user_location_tag"
+        android:layout_alignStart="@+id/user_location_tag"
+        android:layout_below="@+id/user_location_tv"
+        android:layout_marginTop="32dp"/>
 
 
 </RelativeLayout>

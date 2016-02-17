@@ -225,7 +225,7 @@ public class FriendsTabFragment extends Fragment {
 
                         //Author location
                         String authorLocation = recipient.getString("userLastLocation");
-                        if (authorLocation == null) {
+                        if (authorLocation == null || authorLocation.equals("")) {
                             friendItem.setFriendLastLocation("Location unavailable");
                         } else {
                             friendItem.setFriendLastLocation(authorLocation);

@@ -354,7 +354,7 @@ public class CommentFragment extends Fragment {
                         commentItem.setCommenterInfo((String)commenterData.get("userInfo"));
                         //Commenter Location
                         String authorLocation = commenterData.getString("userLastLocation");
-                        if (authorLocation == null) {
+                        if (authorLocation == null || authorLocation.equals("")) {
                             commentItem.setUserLastLocation("Location unavailable");
                         } else {
                             commentItem.setUserLastLocation(authorLocation);

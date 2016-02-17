@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -37,7 +38,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.khfire22.riple.ViewPagers.MainSlidingTabLayout;
 import com.khfire22.riple.ViewPagers.MainViewPagerAdapter;
@@ -46,7 +46,6 @@ import com.khfire22.riple.activities.SettingsActivity;
 import com.khfire22.riple.activities.TitleActivity;
 import com.khfire22.riple.utils.ConnectionDetector;
 import com.khfire22.riple.utils.MessageService;
-import com.khfire22.riple.utils.NetworkStateChangeReceiver;
 import com.khfire22.riple.utils.SaveToSharedPrefs;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -63,7 +62,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
+public class MainActivity extends AppCompatActivity
+        implements
+        View.OnClickListener,
+        GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
@@ -90,16 +92,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ConnectionDetector detector;
     private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1000;
     public GoogleApiClient mGoogleApiClient;
-    private boolean mRequestingLocationUpdates = false;
-    private LocationRequest mLocationRequest;
-    //    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
     public Location mLastLocation;
     public Double mLatitudeDouble;
     public Double mLongitudeDouble;
     public String mLastLocationString;
     public String userLocationString;
-    private NetworkStateChangeReceiver networkReceiver;
     private SharedPreferences sharedPreferences;
+    private String mCurrentUserLocation;
 
 
     @Override
@@ -118,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         detector = new ConnectionDetector(this);
         currentUser = ParseUser.getCurrentUser();
+        mCurrentUserLocation = ParseUser.getCurrentUser().getString("userLastLocation");
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
@@ -125,9 +125,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (currentUser != null) {
             startService(serviceIntent);
         }
-
-        // Instantiate the broadcast receiver/Network detector so it can be terminated onPause
-        networkReceiver = new NetworkStateChangeReceiver();
 
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
@@ -616,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .isGooglePlayServicesAvailable(this);
         if (checkGooglePlayServices != ConnectionResult.SUCCESS) {
         /*
-		* Google Play Services is missing or update is required
+        * Google Play Services is missing or update is required
 		*  return code could be
 		* SUCCESS,
 		* SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED,
@@ -633,20 +630,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected synchronized void buildGoogleApiClient() {
         // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        try {
+            mGoogleApiClient.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "onStart: " + e);
+        }
 
     }
 
@@ -659,29 +659,97 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (mGoogleApiClient.isConnected()) {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Boolean locationPrefs = sharedPreferences.getBoolean("shouldShowLocationDialog", true);
 
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-                mLatitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLatitude()));
-                mLongitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLongitude()));
-                mLastLocationString = String.valueOf(mLastLocation);
+        if (locationPrefs) {
 
-                if (mLatitudeDouble != null && mLongitudeDouble != null) {
+            if (mGoogleApiClient.isConnected()) {
 
-                    // Call to geoCode method
-                    getCompleteAddressString(mLatitudeDouble, mLongitudeDouble);
+                final SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+
+
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+                if (mLastLocation != null) {
+                    mLatitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLatitude()));
+                    mLongitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLongitude()));
+                    mLastLocationString = String.valueOf(mLastLocation);
+
+                    if (mLatitudeDouble != null && mLongitudeDouble != null) {
+
+                        // Call to geoCode method
+                        getCompleteAddressString(mLatitudeDouble, mLongitudeDouble);
+                    }
+
+
+                    // Show location prefs dialog if this is true and location is null
+                } else {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+                    builder.setTitle("Please Enable Location");
+                    builder.setMessage("Allow others to see where they are making an impact by " +
+                            "sharing your location. Enable automatic or manual location. You may also" +
+                            " hide your location if you prefer.");
+
+                    // Set up the buttons
+                    builder.setPositiveButton("Automatic", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Send user to location settings
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+
+                            // Save locationPrefs and locationBoolean to shared prefs
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "shouldShowLocationDialog", true);
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "automaticLocationBoolean", true);
+                            Toast.makeText(MainActivity.this, "Your location will be updated " +
+                                    "automatically", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder.setNegativeButton("Manual", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            startActivity(intent);
+
+                            // Save locationPrefs and locationBoolean to shared prefs
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "shouldShowLocationDialog", false);
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "automaticLocationBoolean", false);
+                            Toast.makeText(MainActivity.this, "Please set your location manually", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    builder.setNeutralButton("Hide", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+
+                            currentUser.put("userLastLocation", "");
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    // Save locationPrefs and locationBoolean to shared prefs
+                                    saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "shouldShowLocationDialog", false);
+                                    saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "automaticLocationBoolean", false);
+                                    Toast.makeText(MainActivity.this, "Your location will not be displayed", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                    builder.show();
                 }
             }
         }

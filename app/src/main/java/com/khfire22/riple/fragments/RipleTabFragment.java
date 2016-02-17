@@ -404,7 +404,7 @@ public class RipleTabFragment extends Fragment {
 
                             //Author location
                             String authorLocation = authorData.getString("userLastLocation");
-                            if (authorLocation == null) {
+                            if (authorLocation == null || authorLocation.equals("")) {
                                 dropItem.setUserLastLocation("Location unavailable");
                             } else {
                                 dropItem.setUserLastLocation(authorLocation);

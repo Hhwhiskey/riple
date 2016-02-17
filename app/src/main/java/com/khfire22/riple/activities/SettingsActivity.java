@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,12 +21,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.khfire22.riple.R;
+import com.khfire22.riple.utils.LocationServicesCheck;
+import com.khfire22.riple.utils.SaveToSharedPrefs;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -67,19 +72,27 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView userLocationTV;
     private String mlastLocationString;
     private SharedPreferences sharedPreferences;
-    private String mUserLocaton;
+    private String mUserLocationFromPrefs;
+    private String mUserLocationString;
+    private SaveToSharedPrefs savetoSharedPrefs;
+    private boolean mAutomaticLocationBooleanFromPrefs;
+    private CheckBox autoLocatonCheckBox;
+    private TextView userLocationTag;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
         currentUser = ParseUser.getCurrentUser();
 
+        // Instantiate Shared prefs object
+        savetoSharedPrefs = new SaveToSharedPrefs();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        mUserLocaton = sharedPreferences.getString("userLastLocation", "Location Unknown");
 
+        mUserLocationFromPrefs = sharedPreferences.getString("userLastLocation", "");
+        mAutomaticLocationBooleanFromPrefs = sharedPreferences.getBoolean("shouldShowLocationDialog", false);
 
         //Instantiate the views
         editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
@@ -87,6 +100,8 @@ public class SettingsActivity extends AppCompatActivity {
         displayNameTV = (TextView) findViewById(R.id.display_name_tv);
         userInfoTV = (TextView) findViewById(R.id.user_info_tv);
         userLocationTV = (TextView) findViewById(R.id.user_location_tv);
+        autoLocatonCheckBox = (CheckBox) findViewById(R.id.auto_location_cb);
+        userLocationTag = (TextView) findViewById(R.id.user_location_tag);
 
         //if currentUser is not null, get their name, picture and facebookId from Parse
         if ((currentUser != null) && currentUser.isAuthenticated()) {
@@ -95,7 +110,6 @@ public class SettingsActivity extends AppCompatActivity {
             parseDisplayName = (String) currentUser.get("displayName");
             facebookId = (String) currentUser.get("facebookId");
             userInfoString = (String) currentUser.get("userInfo");
-
         }
 
         //If currentUser has a picture, decode it at 300x300 and display it in TV
@@ -123,8 +137,8 @@ public class SettingsActivity extends AppCompatActivity {
         //Set curentUser name and info to textviews
         displayNameTV.setText(parseDisplayName);
         userInfoTV.setText(userInfoString);
-        userLocationTV.setText(mUserLocaton);
-
+        userLocationTV.setText(mUserLocationFromPrefs);
+        autoLocatonCheckBox.setChecked(mAutomaticLocationBooleanFromPrefs);
 
         //Get the currentUser displayImage if it's available, and set it to editProfilePictureView
 //        if (parseProfilePicture != null) {
@@ -138,7 +152,7 @@ public class SettingsActivity extends AppCompatActivity {
 //            //If the user has a valid facebookId, use their facebook picture by default
 
         //OCL for new image selection
-        ImageView image = (ImageView) findViewById(R.id.edit_profile_picture);
+        final ImageView image = (ImageView) findViewById(R.id.edit_profile_picture);
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,14 +196,61 @@ public class SettingsActivity extends AppCompatActivity {
                 editUserInfo();
             }
         });
+
+        userLocationTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editLocation();
+            }
+        });
+
+        userLocationTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editLocation();
+            }
+        });
+
+        // Checkbox for enabling or disabling automatic location updating
+        autoLocatonCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+
+                    LocationServicesCheck locationServicesCheck = new LocationServicesCheck();
+                    locationServicesCheck.isLocationEnabled(SettingsActivity.this);
+
+                    // Save checkbox shared prefs
+                    savetoSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "shouldShowLocationDialog", true);
+
+                    Toast.makeText(SettingsActivity.this, "Please enable location services", Toast.LENGTH_LONG).show();
+
+                    // If gps or network is not detected, start location intent
+                    if (!locationServicesCheck.isLocationEnabled(SettingsActivity.this)) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                    }
+
+
+                } else {
+                    // save checkbox shared prefs
+                    savetoSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "shouldShowLocationDialog", false);
+                    Toast.makeText(SettingsActivity.this, "Your location will no longer be " +
+                            "updated automatically", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
+
+
+
 
     public void editDisplayName() {
 
         //                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String storedDisplayName = sharedPreferences.getString("storedDisplayName", "");
 
-        final View view = getLayoutInflater().inflate(R.layout.activity_edit_display_name, null);
+        final View view = getLayoutInflater().inflate(R.layout.dialog_edit_display_name, null);
         //Open dialog that allows user to change their name
         AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Edit your display name...");
@@ -251,7 +312,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         String storedDisplayName = sharedPreferences.getString("storedUserInfo", "");
 
-        final View view = getLayoutInflater().inflate(R.layout.activity_edit_user_info, null);
+        final View view = getLayoutInflater().inflate(R.layout.dialog_edit_user_info, null);
         //Open dialog that allows user to change their info
         AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Edit your info...");
@@ -315,6 +376,70 @@ public class SettingsActivity extends AppCompatActivity {
         builder.show();
     }
 
+    public void editLocation() {
+
+        // Get stored shared prefs for userLastLocation
+        String userLastLocationFromPrefs = sharedPreferences.getString("userLastLocation", "");
+
+        final View view = getLayoutInflater().inflate(R.layout.dialog_edit_user_location, null);
+        //Open dialog that allows user to change their name
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Edit your location...");
+
+        final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.edit_user_location);
+
+        input.setText(userLastLocationFromPrefs);
+
+        builder.setView(view);
+
+        // Save changes
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                mUserLocationString = input.getText().toString();
+
+                //Save user location to Parse
+                currentUser.put("userLastLocation", mUserLocationString);
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+
+                        // Inform the user that location has been updated and will no longer be updated automatically
+                        Toast.makeText(getApplicationContext(), "Your location has been " +
+                                "saved and will no longer update automatically",
+                                Toast.LENGTH_LONG).show();
+
+                        //Save the current users display name to shared prefs
+                        SharedPreferences.Editor editor;
+                        editor = sharedPreferences.edit();
+                        editor.putString("userLastLocation", mUserLocationString);
+                        editor.putBoolean("shouldShowLocationDialog", false);
+                        editor.commit();
+
+                        // Call to update the users name after edit
+                        updateLocationTextView(mUserLocationString);
+
+                        // Uncheck the autoLocation box
+                        updateAutomaticLocationCheckBox(false);
+
+                    }
+                });
+            }
+        });
+        //Discard changes
+        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                Toast.makeText(getApplicationContext(), "Your location was not changed.", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        builder.show();
+    }
+
 
     //Updates the users display name after edit
     public void updateDisplayNameTextView(String updatedName) {
@@ -326,6 +451,18 @@ public class SettingsActivity extends AppCompatActivity {
     private void updateInfoTextView(String updatedInfo) {
         TextView userInfoView = (TextView) findViewById(R.id.user_info_tv);
         userInfoView.setText(updatedInfo);
+    }
+
+    // Updates the users current location after edit
+    public void updateLocationTextView(String updatedLocation) {
+        TextView displayNameView = (TextView) findViewById(R.id.user_location_tv);
+        displayNameView.setText(updatedLocation);
+    }
+
+    // Updates the automaticLocation checkbox after edit
+    private void updateAutomaticLocationCheckBox(Boolean status) {
+        CheckBox automaticLocationCheckBox = (CheckBox) findViewById(R.id.auto_location_cb);
+        automaticLocationCheckBox.setChecked(status);
     }
 
     //Async to download the currentUser FB picture
