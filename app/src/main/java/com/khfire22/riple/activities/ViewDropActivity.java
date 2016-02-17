@@ -83,9 +83,13 @@ public class ViewDropActivity extends AppCompatActivity {
     private int mPosition;
     private String displayName;
     Context mContext;
-    private ParseUser currentUser;
+    private ParseUser mCurrentUser;
     private String mAuthorRipleCount;
     private String mAuthorInfo;
+    private String mAuthorLastLocation;
+    private TextView userLastLocationView;
+    private String mCurrentUserId;
+    private Intent intentRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +104,13 @@ public class ViewDropActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        currentUser = ParseUser.getCurrentUser();
+        mCurrentUser = ParseUser.getCurrentUser();
+        mCurrentUserId = ParseUser.getCurrentUser().getObjectId();
 
+        // Intent to refresh the data from which the user came
+        intentRefresh = new Intent(ViewDropActivity.this, MainActivity.class);
+
+        // String to test the tab name and show the proper menu items
         drop = "drop";
         trickle = "trickle";
 
@@ -113,6 +122,7 @@ public class ViewDropActivity extends AppCompatActivity {
         mAuthorRank = intent.getStringExtra("authorRank");
         mAuthorRipleCount = intent.getStringExtra("clickedUserRipleCount");
         mAuthorInfo = intent.getStringExtra("clickedUserInfo");
+        mAuthorLastLocation = intent.getStringExtra("userLastLocation");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mRipleCount = intent.getStringExtra("ripleCount");
@@ -148,10 +158,17 @@ public class ViewDropActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 Vibrator vb = (Vibrator) ViewDropActivity.this.getSystemService(ViewDropActivity.VIBRATOR_SERVICE);
                 vb.vibrate(5);
-                if (mTabName.equals(drop)) {
-                    showDropMenu();
+
+                if (!mAuthorId.equals(mCurrentUserId)) {
+                    if (mTabName.equals(drop)) {
+                        showDropMenu();
+                    } else if (mTabName.equals(trickle)) {
+                        showTrickleMenu();
+                    } else {
+                        showStandardMenu();
+                    }
                 } else {
-                    showTrickleMenu();
+                    showAuthorsDropMenu();
                 }
                 return false;
             }
@@ -169,10 +186,16 @@ public class ViewDropActivity extends AppCompatActivity {
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTabName.equals(drop)) {
-                    showDropMenu();
+                if (!mAuthorId.equals(mCurrentUserId)) {
+                    if (mTabName.equals(drop)) {
+                        showDropMenu();
+                    } else if (mTabName.equals(trickle)) {
+                        showTrickleMenu();
+                    } else {
+                        showStandardMenu();
+                    }
                 } else {
-                    showTrickleMenu();
+                    showAuthorsDropMenu();
                 }
             }
         });
@@ -189,6 +212,8 @@ public class ViewDropActivity extends AppCompatActivity {
         //Set createdAt on Drop card
         createdAtView = (TextView) findViewById(R.id.comment_created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
+        userLastLocationView = (TextView) findViewById(R.id.user_last_location);
+        userLastLocationView.setText(mAuthorLastLocation);
         ///////////////
 
         //Allows the query of the viewed drop
@@ -196,6 +221,7 @@ public class ViewDropActivity extends AppCompatActivity {
 
         showUserTips();
     }
+
 
     public void showUserTips() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -264,6 +290,7 @@ public class ViewDropActivity extends AppCompatActivity {
         intent.putExtra(Constants.CLICKED_USER_RANK, mAuthorRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, mAuthorRipleCount);
         intent.putExtra(Constants.CLICKED_USER_INFO, mAuthorInfo);
+        intent.putExtra(Constants.CLICKED_USER_LOCATION, mAuthorLastLocation);
 
         this.startActivity(intent);
     }
@@ -352,7 +379,7 @@ public class ViewDropActivity extends AppCompatActivity {
     }
 
     public void shareToFacebook() {
-        String displayName = currentUser.getString("displayName");
+        String displayName = mCurrentUser.getString("displayName");
         String shareAuthor = mAuthorName;
         String shareDescription = mDropDescription;
 //        Bitmap sharedImage = data.get(position).getCommenterParseProfilePicture();
@@ -373,7 +400,7 @@ public class ViewDropActivity extends AppCompatActivity {
 
     // TODO: 11/19/2015 Include pics with share
     public void shareWithOther() {
-        String displayName = currentUser.getString("displayName");
+        String displayName = mCurrentUser.getString("displayName");
         String shareAuthor = mAuthorName;
         String shareDescription = mDropDescription;
 //        Bitmap sharedImage = data.get(position).getCommenterParseProfilePicture();
@@ -396,7 +423,7 @@ public class ViewDropActivity extends AppCompatActivity {
     // If the viewed Drop is not on your to-do list, show this menu
     public void showTrickleMenu() {
 
-        CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Report"};
+        CharSequence trickleDrop[] = new CharSequence[]{"Add to Todo", "Message the Author", "Share with Facebook", "Share", "Report"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
@@ -404,14 +431,18 @@ public class ViewDropActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int selected) {
                 if (selected == 0) {
+                    getDropObject(mDropObjectId);
+
+                } else if (selected == 1) {
                     messageTheAuthor();
-                }else if (selected == 1) {
+
+                }else if (selected == 2) {
                     shareToFacebook();
 
-                } else if (selected == 2) {
+                } else if (selected == 3) {
                     shareWithOther();
 
-                }else if (selected == 3) {
+                }else if (selected == 4) {
                     final AlertDialog.Builder builderVerify = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
                     builderVerify.setTitle("Report Drop Author");
                     builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
@@ -437,27 +468,30 @@ public class ViewDropActivity extends AppCompatActivity {
     //If the viewed Drop is on your to-do list, show this menu
     public void showDropMenu() {
 
-        CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Remove From Todo", "Report"};
+        CharSequence todoDrop[] = new CharSequence[]{"Complete Drop", "Remove From Todo", "Message the Author", "Share with Facebook", "Share", "Report"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
         builder.setTitle("Drop Menu");
         builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int selected) {
-
                 if (selected == 0) {
-                    messageTheAuthor();
+                    getDropObjectFromRowToComplete(mDropObjectId);
+                }
 
-                }else if (selected == 1) {
-                    shareToFacebook();
-
-                }else if (selected == 2) {
-                    shareWithOther();
-
-                } else if (selected == 3) {
+                if (selected == 1) {
                     getDropObject(mDropObjectId);
 
-                } else if (selected == 4) {
+                } else if (selected == 2) {
+                    messageTheAuthor();
+
+                }else if (selected == 3) {
+                    shareToFacebook();
+
+                }else if (selected == 4) {
+                    shareWithOther();
+
+                } else if (selected == 5) {
                     final AlertDialog.Builder builderVerify = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
                     builderVerify.setTitle("Report Drop Author");
                     builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
@@ -481,18 +515,153 @@ public class ViewDropActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void showAuthorsDropMenu() {
+
+        CharSequence todoDrop[] = new CharSequence[]{"Share with Facebook", "Share"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Menu");
+        builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int selected) {
+
+                if (selected == 0) {
+                    shareToFacebook();
+
+                }else if (selected == 1) {
+                    shareWithOther();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void showStandardMenu() {
+
+        CharSequence todoDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share", "Report"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Menu");
+        builder.setItems(todoDrop, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int selected) {
+
+                if (selected == 0) {
+                    messageTheAuthor();
+
+                }else if (selected == 1) {
+                    shareToFacebook();
+
+                }else if (selected == 2) {
+                    shareWithOther();
+
+                } else if (selected == 3) {
+                    final AlertDialog.Builder builderVerify = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
+                    builderVerify.setTitle("Report Drop Author");
+                    builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
+                    builderVerify.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
+                    builderVerify.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            reportDropAuthor();
+                        }
+                    });
+                    builderVerify.show();
+
+                }
+            }
+        });
+        builder.show();
+    }
+
+    // Get the Drop object to be interacted with
     public void getDropObject(String dropObjectId) {
         ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
         interactedDropQuery.getInBackground(dropObjectId, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
-                    removeFromTodo(object);
+                    if (mTabName.equals(drop)) {
+                        removeFromTodo(object);
+                    } else {
+                        todoDrop(object);
+                    }
                 }
             }
         });
-
     }
 
+    private void getDropObjectFromRowToComplete(String dropObjectId) {
+
+        ParseQuery<ParseObject> interactedDropQuery = ParseQuery.getQuery("Drop");
+        interactedDropQuery.getInBackground(dropObjectId, new GetCallback<ParseObject>() {
+            public void done(ParseObject dropObject, ParseException e) {
+                if (e == null) {
+                    ParseObject dropAuthorPointer = dropObject.getParseObject("authorPointer");
+                    completeDropAndIncrement(dropObject, dropAuthorPointer);
+                }
+            }
+        });
+    }
+
+    // Add the Drop to users todo list
+    public void todoDrop(ParseObject trickleObject) {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        ParseRelation<ParseObject> todoRelation1 = user.getRelation("todoDrops");
+        todoRelation1.add(trickleObject);
+        user.saveInBackground();
+
+        ParseRelation<ParseObject> todoRelation2 = user.getRelation("hasRelationTo");
+        todoRelation2.add(trickleObject);
+        user.saveInBackground();
+
+        startActivity(intentRefresh);
+    }
+
+    //Complete drop and increment the Drop and Author
+    public void completeDropAndIncrement(ParseObject mDropObject, ParseObject dropAuthor) {
+
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+
+        //Modify mCurrentUser relations to Drop
+        ParseRelation completeRelation1 = currentUser.getRelation("completedDrops");
+        completeRelation1.add(mDropObject);
+        ParseRelation completeRelation2 = currentUser.getRelation("todoDrops");
+        completeRelation2.remove(mDropObject);
+        ParseRelation completeRelation3 = currentUser.getRelation("hasRelationTo");
+        completeRelation3.add(mDropObject);
+
+        currentUser.saveEventually();
+
+        //Add to completedBy list
+        ParseRelation completedByRelation = mDropObject.getRelation("completedBy");
+        completedByRelation.add(currentUser);
+        //Increment the Drop
+        mDropObject.increment("ripleCount");
+
+        mDropObject.saveEventually();
+
+        //Increment the Author
+        ParseQuery ripleCountQuery = ParseQuery.getQuery("UserRipleCount");
+        ripleCountQuery.whereEqualTo("userPointer", dropAuthor);
+        ripleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                parseObject.increment("ripleCount");
+                parseObject.saveInBackground();
+            }
+        });
+
+        startActivity(intentRefresh);
+    }
+
+    // Remove Drop from the users todo list
     public void removeFromTodo(ParseObject dropObject) {
 
         ParseUser user = ParseUser.getCurrentUser();
@@ -505,9 +674,6 @@ public class ViewDropActivity extends AppCompatActivity {
         removeRelation2.remove(dropObject);
         user.saveInBackground();
 
-        Intent intent = new Intent(ViewDropActivity.this, MainActivity.class);
-        startActivity(intent);
-
-//        DropAdapter.data.remove(mPosition);
+        startActivity(intentRefresh);
     }
 }

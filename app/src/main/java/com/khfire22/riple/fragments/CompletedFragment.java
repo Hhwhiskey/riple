@@ -147,6 +147,14 @@ public class CompletedFragment extends Fragment {
                                     completedByItem.setUserInfo(list.get(i).getString("userInfo"));
                                     completedByItem.setUserRipleCount(String.valueOf(list.get(i).getInt("userRipleCount")));
 
+                                    // User last location
+                                    String userLastLocation = list.get(i).getString("userLastLocation");
+                                    if (userLastLocation == null || userLastLocation.equals("")) {
+                                        completedByItem.setUserLastLocation("Location unavailable");
+                                    } else {
+                                        completedByItem.setUserLastLocation(userLastLocation);
+                                    }
+
                                     completedByList.add(completedByItem);
                                 }
                             }

@@ -17,6 +17,7 @@ public class DropItem {
     public String authorRank;
     public String authorRipleCount;
     public String authorInfo;
+    public String userLastLocation;
     public String description;
     public String comment;
     public String ripleCount;
@@ -24,6 +25,15 @@ public class DropItem {
     public ParseObject drop;
     public Bitmap parseProfilePicture;
     public String createdAt;
+
+
+    public String getUserLastLocation() {
+        return userLastLocation;
+    }
+
+    public void setUserLastLocation(String userLastLocation) {
+        this.userLastLocation = userLastLocation;
+    }
 
     public String getAuthorInfo() {
         return authorInfo;

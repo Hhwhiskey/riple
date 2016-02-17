@@ -287,6 +287,14 @@ public class DropsTabFragment extends Fragment {
                             //Author Info
                             dropItem.setAuthorInfo(authorData.getString("userInfo"));
 
+                            //Author location
+                            String authorLocation = authorData.getString("userLastLocation");
+                            if (authorLocation == null || authorLocation.equals("")) {
+                                dropItem.setUserLastLocation("Location unavailable");
+                            } else {
+                                dropItem.setUserLastLocation(authorLocation);
+                            }
+
                             //Drop Data////////////////////////////////////////////////////////////////
                             //DropObjectId
                             dropItem.setObjectId(list.get(i).getObjectId());

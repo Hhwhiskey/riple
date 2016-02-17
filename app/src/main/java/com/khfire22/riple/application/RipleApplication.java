@@ -51,6 +51,8 @@ public class RipleApplication extends Application {
 
         // Sub currentUser to Push channels
         ParsePush.subscribeInBackground("messages");
+
+        updateParseInstallation();
     }
 
     // Update the current user installation, which will label it on parse

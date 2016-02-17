@@ -100,11 +100,12 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     private void viewOtherUser(int position) {
 
-        String clickedUserId = (data.get(position).getUserObjectId());
-        String clickedUserName = (data.get(position).getDisplayName());
-        String clickedUserRank = (data.get(position).getUserRank());
-        String clickedUserRipleCount = (data.get(position).getUserRipleCount());
-        String clickedUserInfo = (data.get(position).getUserInfo());
+        String clickedUserId = data.get(position).getUserObjectId();
+        String clickedUserName = data.get(position).getDisplayName();
+        String clickedUserRank = data.get(position).getUserRank();
+        String clickedUserRipleCount = data.get(position).getUserRipleCount();
+        String clickedUserInfo = data.get(position).getUserInfo();
+        String clickedUserLastLocation = data.get(position).getUserLastLocation();
 
         Log.d("sDropViewUser", "Clicked User's Id = " + clickedUserId);
         Log.d("sDropViewUser", "Clicked User's Name = " + clickedUserName);
@@ -115,6 +116,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
         intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
+        intent.putExtra(Constants.CLICKED_USER_LOCATION, clickedUserLastLocation);
 
         mContext.startActivity(intent);
     }
@@ -147,6 +149,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
 
     class CompletedByViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
+        private final TextView userLastLocation;
         public TextView displayNameView;
         public ImageView otherProfilePicture;
         public TextView userRankView;
@@ -159,6 +162,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
             displayNameView = (TextView) itemView.findViewById(R.id.other_display_name);
             userRankView = (TextView) itemView.findViewById(R.id.other_rank);
             userRipleCountView = (TextView) itemView.findViewById(R.id.other_riple_count);
+            userLastLocation = (TextView) itemView.findViewById(R.id.user_last_location);
 
             //Set OCL
             itemView.setOnClickListener(this);
@@ -176,6 +180,7 @@ public class CompletedByAdapter extends RecyclerView.Adapter<CompletedByAdapter.
             otherProfilePicture.setImageBitmap(current.parseProfilePicture);
             displayNameView.setText(current.displayName);
             userRankView.setText(current.userRank);
+            userLastLocation.setText(current.userLastLocation);
 
             if (current.userRipleCount.equals(testVariable)) {
                 userRipleCountView.setText("with " + current.userRipleCount + " Riple");

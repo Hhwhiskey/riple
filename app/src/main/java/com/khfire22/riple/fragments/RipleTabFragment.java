@@ -284,6 +284,7 @@ public class RipleTabFragment extends Fragment {
             String currentUserRank = currentUser.getString("userRank");
             String currentUserRipleCount = String.valueOf(currentUser.getInt("userRipleCount"));
             String currentUserInfo = currentUser.getString("userInfo");
+            String currentUserLastLocation = currentUser.getString("userLastLocation");
 
             Intent intent = new Intent(getActivity(), ViewUserActivity.class);
             intent.putExtra(Constants.CLICKED_USER_ID, currentUserId);
@@ -291,6 +292,7 @@ public class RipleTabFragment extends Fragment {
             intent.putExtra(Constants.CLICKED_USER_RANK, currentUserRank);
             intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, currentUserRipleCount);
             intent.putExtra(Constants.CLICKED_USER_INFO, currentUserInfo);
+            intent.putExtra(Constants.CLICKED_USER_LOCATION, currentUserLastLocation);
             getActivity().startActivity(intent);
         }
     }
@@ -399,6 +401,14 @@ public class RipleTabFragment extends Fragment {
                             dropItem.setAuthorRipleCount(String.valueOf(authorData.getInt("userRipleCount")));
                             //Author Info
                             dropItem.setAuthorInfo(authorData.getString("userInfo"));
+
+                            //Author location
+                            String authorLocation = authorData.getString("userLastLocation");
+                            if (authorLocation == null || authorLocation.equals("")) {
+                                dropItem.setUserLastLocation("Location unavailable");
+                            } else {
+                                dropItem.setUserLastLocation(authorLocation);
+                            }
 
                             //Drop Data////////////////////////////////////////////////////////////////
                             //DropObjectId

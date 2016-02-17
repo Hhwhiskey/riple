@@ -56,11 +56,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     private void viewOtherUser(int position) {
 
-        String clickedUserId = (data.get(position).getCommenterId());
-        String clickedUserName = (data.get(position).getCommenterName());
-        String clickedUserRank = (data.get(position).getCommenterRank());
-        String clickedUserInfo = (data.get(position).getCommenterInfo());
-        String clickedUserRipleCount = (data.get(position).getCommenterRipleCount());
+        String clickedUserId = data.get(position).getCommenterId();
+        String clickedUserName = data.get(position).getCommenterName();
+        String clickedUserRank = data.get(position).getCommenterRank();
+        String clickedUserInfo = data.get(position).getCommenterInfo();
+        String clickedUserRipleCount = data.get(position).getCommenterRipleCount();
+        String clickedUserLastLocation = data.get(position).getUserLastLocation();
 
         Log.d("sCommentViewUser", "Clicked User's userObjectId = " + clickedUserId);
         Log.d("sCommentViewUser", "Clicked User's clickedUserName = " + clickedUserName);
@@ -71,6 +72,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         intent.putExtra(Constants.CLICKED_USER_RANK, clickedUserRank);
         intent.putExtra(Constants.CLICKED_USER_RIPLE_COUNT, clickedUserRipleCount);
         intent.putExtra(Constants.CLICKED_USER_INFO, clickedUserInfo);
+        intent.putExtra(Constants.CLICKED_USER_LOCATION, clickedUserLastLocation);
 
         mContext.startActivity(intent);
     }
@@ -152,6 +154,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         public TextView commentText;
         public TextView commenterName;
         public TextView commenterRipleCount;
+        public TextView commenterLastLocation;
         public ImageView parseProfilePicture;
         public ImageView menuButton;
 
@@ -163,6 +166,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             commenterName = (TextView) itemView.findViewById(R.id.commenter_name);
             commentText = (TextView) itemView.findViewById(R.id.comment_text);
             commenterRipleCount = (TextView) itemView.findViewById(R.id.commenter_rank);
+            commenterLastLocation = (TextView) itemView.findViewById(R.id.user_last_location);
             menuButton = (ImageView) itemView.findViewById(R.id.menu_button);
 
 
@@ -187,6 +191,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             commentText.setText(current.commentText);
             createdAt.setText(String.valueOf(current.createdAt));
             commenterRipleCount.setText(String.valueOf(current.commenterRank));
+            commenterLastLocation.setText(current.userLastLocation);
         }
 
         @Override
@@ -208,7 +213,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         public void showCommentMenu() {
 
-            CharSequence todoDrop[] = new CharSequence[]{"Message the Commenter", "Report"};
+            CharSequence todoDrop[] = new CharSequence[]{"Message", "Report"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle);
             builder.setTitle("Comment Menu");

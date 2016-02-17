@@ -1,22 +1,31 @@
 package com.khfire22.riple;
 
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,12 +35,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.khfire22.riple.ViewPagers.MainSlidingTabLayout;
 import com.khfire22.riple.ViewPagers.MainViewPagerAdapter;
 import com.khfire22.riple.activities.AboutActivity;
 import com.khfire22.riple.activities.SettingsActivity;
 import com.khfire22.riple.activities.TitleActivity;
-import com.khfire22.riple.application.RipleApplication;
 import com.khfire22.riple.utils.ConnectionDetector;
 import com.khfire22.riple.utils.MessageService;
 import com.khfire22.riple.utils.SaveToSharedPrefs;
@@ -46,10 +58,17 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.sinch.android.rtc.SinchClient;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity
+        implements
+        View.OnClickListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
+    private static final String TAG = "MainActivity";
     Toolbar toolbar;
     ViewPager mPager;
     MainViewPagerAdapter adapter;
@@ -71,21 +90,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean checkTest;
     private ParseUser currentUser;
     private ConnectionDetector detector;
+    private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1000;
+    public GoogleApiClient mGoogleApiClient;
+    public Location mLastLocation;
+    public Double mLatitudeDouble;
+    public Double mLongitudeDouble;
+    public String mLastLocationString;
+    public String userLocationString;
+    private SharedPreferences sharedPreferences;
+    private String mCurrentUserLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        AIzaSyDCZ0w0ycJ3l4AlzjdM1hPQktSPvI7XAE4
-//
-//        606769846786
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        //Saves current parse instance in the background
-        RipleApplication.updateParseInstallation();
+        // First we need to check availability of play services
+        if (checkGooglePlayServices()) {
+
+            // Building the GoogleApi client
+            buildGoogleApiClient();
+        }
 
         detector = new ConnectionDetector(this);
         currentUser = ParseUser.getCurrentUser();
+        mCurrentUserLocation = ParseUser.getCurrentUser().getString("userLastLocation");
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
@@ -97,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab_create_drop);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 parseProfilePicture = (ParseFile) currentUser.get("parseProfilePicture");
                 displayName = (String) currentUser.get("displayName");
@@ -120,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     createDropDialog();
                 }
             }
+
+
         });
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -176,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logUser();
     }
 
+
 //    public void saveTipPreferences(String key, Boolean value){
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -186,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Tip dialog box method that will show if tips enabled by the user
     public void viewUserTip() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         boolean test = sharedPreferences.getBoolean("postDropTips", true);
 
         if (test) {
@@ -298,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void showSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     public void hideSoftKeyboard() {
@@ -309,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //If the Drop dialog is cleared or canceled, clear the stored string from S.P
-    public void removeDropStringFromSharedPreferences () {
+    public void removeDropStringFromSharedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("storedDropString", "");
@@ -425,6 +459,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!detector.isConnectedToInternet()) {
             Toast.makeText(MainActivity.this, getString(R.string.no_connection), Toast.LENGTH_LONG).show();
         }
+
+        checkGooglePlayServices();
+
+//        // Resuming the periodic location updates
+//        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+//        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // onPause, cease the network detector
+//        try {
+//            unregisterReceiver(networkReceiver);
+//        } catch (Exception e) {
+//            Log.d(TAG, "onPause: " + e);
+//        }
+
     }
 
     @Override
@@ -479,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     saveToSharedPrefs.saveAllTipsBoolean(this, true);
                     Toast.makeText(MainActivity.this, "All tips will be displayed.", Toast.LENGTH_LONG).show();
 
-                //If the box is unchecked, hide all tips
+                    //If the box is unchecked, hide all tips
                 } else {
                     saveToSharedPrefs.saveAllTipsBoolean(this, false);
                     Toast.makeText(MainActivity.this, "Tips will no longer be displayed.", Toast.LENGTH_LONG).show();
@@ -546,6 +598,209 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopService(new Intent(this, MessageService.class));
         super.onDestroy();
     }
+
+    /******************************************************************************************
+     * Google api callback methods
+     */
+
+
+    /**
+     * Method to verify google play services on the device
+     */
+
+    private boolean checkGooglePlayServices() {
+        int checkGooglePlayServices = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (checkGooglePlayServices != ConnectionResult.SUCCESS) {
+        /*
+        * Google Play Services is missing or update is required
+		*  return code could be
+		* SUCCESS,
+		* SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED,
+		* SERVICE_DISABLED, SERVICE_INVALID.
+		*/
+            GooglePlayServicesUtil.getErrorDialog(checkGooglePlayServices,
+                    this, REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        // Create an instance of GoogleAPIClient.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        try {
+            mGoogleApiClient.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "onStart: " + e);
+        }
+
+    }
+
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Boolean locationPrefs = sharedPreferences.getBoolean("shouldShowLocationDialog", true);
+
+        if (locationPrefs) {
+
+            if (mGoogleApiClient.isConnected()) {
+
+                final SaveToSharedPrefs saveToSharedPrefs = new SaveToSharedPrefs();
+
+
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+                if (mLastLocation != null) {
+                    mLatitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLatitude()));
+                    mLongitudeDouble = Double.valueOf(String.valueOf(mLastLocation.getLongitude()));
+                    mLastLocationString = String.valueOf(mLastLocation);
+
+                    if (mLatitudeDouble != null && mLongitudeDouble != null) {
+
+                        // Call to geoCode method
+                        getCompleteAddressString(mLatitudeDouble, mLongitudeDouble);
+                    }
+
+
+                    // Show location prefs dialog if this is true and location is null
+                } else {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.MyAlertDialogStyle);
+                    builder.setTitle("Please Enable Location");
+                    builder.setMessage("Allow others to see where they are making an impact by " +
+                            "sharing your location. Enable automatic or manual location. You may also" +
+                            " hide your location if you prefer.");
+
+                    // Set up the buttons
+                    builder.setPositiveButton("Automatic", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Send user to location settings
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+
+                            // Save locationPrefs and locationBoolean to shared prefs
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "shouldShowLocationDialog", true);
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "automaticLocationBoolean", true);
+                            Toast.makeText(MainActivity.this, "Your location will be updated " +
+                                    "automatically", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder.setNegativeButton("Manual", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            startActivity(intent);
+
+                            // Save locationPrefs and locationBoolean to shared prefs
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "shouldShowLocationDialog", false);
+                            saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "automaticLocationBoolean", false);
+                            Toast.makeText(MainActivity.this, "Please set your location manually", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    builder.setNeutralButton("Hide", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+
+                            currentUser.put("userLastLocation", "");
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    // Save locationPrefs and locationBoolean to shared prefs
+                                    saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "shouldShowLocationDialog", false);
+                                    saveToSharedPrefs.saveBooleanPreferences(MainActivity.this, "automaticLocationBoolean", false);
+                                    Toast.makeText(MainActivity.this, "Your location will not be displayed", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                    builder.show();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG, "location error = " + connectionResult.getErrorCode());
+    }
+
+    // Convert long and lat and convert to location with geoCoder
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses != null) {
+            String city = addresses.get(0).getLocality();
+            String state = addresses.get(0).getAdminArea();
+            String country = addresses.get(0).getCountryName();
+            // Save all location info to this userLocationString
+            userLocationString = city + ", " + state + ", " + country;
+        }
+
+        Log.d(TAG, "Location = " + userLocationString);
+
+        // Call to save location info in shared prefs
+        SaveToSharedPrefs.saveStringPreferences(this, "userLastLocation", userLocationString);
+
+        // Call to save location info to Parse
+        saveUserLocationToParse(userLocationString);
+
+        return userLocationString;
+    }
+
+    // Save the currentUser location to Parse
+    public void saveUserLocationToParse(String currentUserLocation) {
+
+        currentUser.put("userLastLocation", currentUserLocation);
+        currentUser.saveInBackground();
+    }
+
 
 }
 

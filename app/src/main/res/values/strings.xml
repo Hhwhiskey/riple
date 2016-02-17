@@ -82,7 +82,7 @@
     <string name="about_email">kevinhodgesriple@gmail.com</string>
     <string name="about_created_by">Created by Kevin Hodges</string>
     <string name="rorate_picture_prompt">Please rotate and crop your picture to your liking...</string>
-    <string name="edit_display_name_hint">Edit Your Display Name</string>
+    <string name="edit_display_name_hint">Edit your display name</string>
     <string name="share_about_yourself_hint">Share a little about yourself</string>
     <string name="network_connection_established">Network connection established!</string>
     <string name="riple_is_a_place_of_good_a_community_whose_members_strive_to_make_the_world_a_better_place_in_the_event_that_your_account_contains_spam_or_offensive_inappropriate_material_you_will_be_reported_and_your_account_will_be_removed_thanks_for_following_the_rules">Riple is a place of good. A community whose members strive to make the world a better place. In the event that your account contains spam or offensive/inappropriate material, you will be reported and your account will be removed. Thanks for following the rules!</string>
@@ -93,6 +93,8 @@
     <string name="view_drop_tip">This is where you can get a better look at a Drop and post comments. You can even swipe to the right to see who has completed this Drop.</string>
     <string name="view_user_tip">Here, you can view other users Riple activity. View all the Drops they have created and completed. Feel free to send them a message as well.</string>
     <string name="post_drop_tip">Here, you can post a Drop for everyone to see. A Drop is an idea you have to make the world a better place. No matter how big or small your Drop is, you can create huge Riples. Post your Drop and then watch the Riples spread.</string>
+    <string name="edit_your_display_name">Edit your display name</string>
+    <string name="edit_your_location">Edit your location</string>
 
     <string-array name="showGuidelinesArray">showGuidlinesArray
         <item>Off</item>

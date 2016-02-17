@@ -12,10 +12,21 @@ public class FriendItem {
     public String ripleRank;
     public String ripleCount;
     public String friendInfo;
+    public String friendLastLocation;
     public String relationshipObjectId;
     public String friendObjectId;
     public String lastMessageSnippet;
     public String lastMessageTimeStamp;
+
+
+
+    public String getFriendLastLocation() {
+        return friendLastLocation;
+    }
+
+    public void setFriendLastLocation(String friendLastLocation) {
+        this.friendLastLocation = friendLastLocation;
+    }
 
     public String getLastMessageTimeStamp() {
         return lastMessageTimeStamp;

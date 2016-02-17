@@ -14,6 +14,16 @@ public class CompletedByItem {
     public Bitmap parseProfilePicture;
     public String userRipleCount;
     public String userRank;
+    public String userLastLocation;
+
+
+    public String getUserLastLocation() {
+        return userLastLocation;
+    }
+
+    public void setUserLastLocation(String userLastLocation) {
+        this.userLastLocation = userLastLocation;
+    }
 
     public String getUserInfo() {
         return userInfo;
