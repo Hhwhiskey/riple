@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences sharedPreferences;
     private String mCurrentUserLocation;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -680,6 +679,7 @@ public class MainActivity extends AppCompatActivity
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
+
 
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 

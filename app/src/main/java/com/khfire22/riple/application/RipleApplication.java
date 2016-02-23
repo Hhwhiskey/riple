@@ -60,15 +60,23 @@ public class RipleApplication extends Application {
 
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 
-        String userObjectId = ParseUser.getCurrentUser().getObjectId();
-        String displayName = ParseUser.getCurrentUser().getString("displayName");
+        if (installation != null) {
 
-        if (displayName == null) {
-            displayName = "newUser";
+            ParseUser currentUser = ParseUser.getCurrentUser();
+
+            if (currentUser != null) {
+
+                String userObjectId = ParseUser.getCurrentUser().getObjectId();
+                String displayName = ParseUser.getCurrentUser().getString("displayName");
+
+                if (displayName == null) {
+                    displayName = "newUser";
+                }
+
+                installation.put("userObjectId", userObjectId);
+                installation.put("displayName", displayName);
+                installation.saveInBackground();
+            }
         }
-
-        installation.put("userObjectId", userObjectId);
-        installation.put("displayName", displayName);
-        installation.saveInBackground();
     }
 }
