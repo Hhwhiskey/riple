@@ -48,4 +48,12 @@ public class SaveToSharedPrefs {
         editor.putInt(key, value);
         editor.commit();
     }
+
+    // Save the amount of Drops posted count
+    public static void saveAllDropsCount(Context context, String key, int value) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.commit();
+    }
 }

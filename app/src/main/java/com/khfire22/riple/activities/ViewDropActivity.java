@@ -213,7 +213,11 @@ public class ViewDropActivity extends AppCompatActivity {
         createdAtView = (TextView) findViewById(R.id.comment_created_at);
         createdAtView.setText(String.valueOf(mCreatedAt));
         userLastLocationView = (TextView) findViewById(R.id.user_last_location);
-        userLastLocationView.setText(mAuthorLastLocation);
+        if (mAuthorLastLocation.equals("")) {
+            userLastLocationView.setText("Location unavailable");
+        } else {
+            userLastLocationView.setText(mAuthorLastLocation);
+        }
         ///////////////
 
         //Allows the query of the viewed drop

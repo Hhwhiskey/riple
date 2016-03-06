@@ -61,8 +61,8 @@ public class TrickleTabFragment extends Fragment {
     private EndlessRecyclerViewOnScrollListener mEndlessListener;
     ParseUser currentUser;
     private ConnectionDetector detector;
+    String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
-    @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trickle_tab, container, false);
 
@@ -142,6 +142,10 @@ public class TrickleTabFragment extends Fragment {
 
 //        LoadAllDropsTask loadAllDropsTask = new LoadAllDropsTask();
 //        loadAllDropsTask.execute();
+
+        if (isVisibleToUser) {
+            SaveToSharedPrefs.saveAllDropsCount(getActivity(), currentUserId, 0);
+        }
 
         if (isVisibleToUser && loadSavedPreferences()) {
                 trickleTip();

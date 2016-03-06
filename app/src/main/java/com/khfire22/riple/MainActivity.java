@@ -51,14 +51,22 @@ import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.sinch.android.rtc.SinchClient;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -99,6 +107,9 @@ public class MainActivity extends AppCompatActivity
     public String userLocationString;
     private SharedPreferences sharedPreferences;
     private String mCurrentUserLocation;
+    private String currentUserId;
+    private String dropObjectId;
+    private Date dropDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +127,7 @@ public class MainActivity extends AppCompatActivity
 
         detector = new ConnectionDetector(this);
         currentUser = ParseUser.getCurrentUser();
+        currentUserId = ParseUser.getCurrentUser().getObjectId();
         mCurrentUserLocation = ParseUser.getCurrentUser().getString("userLastLocation");
 
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
@@ -368,6 +380,16 @@ public class MainActivity extends AppCompatActivity
             drop.saveInBackground(new SaveCallback() {// saveInBackground first and then run relation
                 @Override
                 public void done(ParseException e) {
+
+                    dropObjectId = drop.getObjectId();
+                    dropDate = drop.getCreatedAt();
+
+                    try {
+                        sendDropNotification();
+                    } catch (JSONException exception) {
+                        e.printStackTrace();
+                    }
+
                     //Get currentUser createdRelation instance
                     ParseRelation<ParseObject> relationCreatedDrops = currentUser.getRelation("createdDrops");
                     relationCreatedDrops.add(drop);
@@ -449,7 +471,35 @@ public class MainActivity extends AppCompatActivity
                     });
                 }
             });
+
+
         }
+    }
+
+    private void sendDropNotification() throws JSONException {
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo("channels", "allDrops");
+
+        JSONObject data = new JSONObject();
+        data.put("dropAuthorId", currentUserId);
+        data.put("dropAuthorName", displayName);
+        data.put("dropAuthorRank", currentUser.getString("userRank"));
+        data.put("dropAuthorLocation", currentUser.getString("userLastLocation"));
+        data.put("dropAuthorRipleCount", currentUser.getInt("userRipleCount"));
+
+        data.put("dropObjectId", dropObjectId);
+        data.put("dropContent", dropDescription);
+
+        //Get created at from parse and convert it to friendly String
+        Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h a");
+        String dateAfter = formatter.format(dropDate);
+
+        data.put("dropCreatedAt", dateAfter);
+
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setData(data);
+        push.sendInBackground();
     }
 
     @Override

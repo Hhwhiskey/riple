@@ -51,6 +51,9 @@ public class RipleApplication extends Application {
 
         // Sub currentUser to Push channels
         ParsePush.subscribeInBackground("messages");
+        ParsePush.subscribeInBackground("allDrops");
+        ParsePush.subscribeInBackground("bigDrops");
+        ParsePush.subscribeInBackground("interactedDrops");
 
         updateParseInstallation();
     }
