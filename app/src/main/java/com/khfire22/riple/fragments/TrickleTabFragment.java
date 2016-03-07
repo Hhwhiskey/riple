@@ -144,7 +144,7 @@ public class TrickleTabFragment extends Fragment {
 //        loadAllDropsTask.execute();
 
         if (isVisibleToUser) {
-            SaveToSharedPrefs.saveAllDropsCount(getActivity(), currentUserId, 0);
+            SaveToSharedPrefs.saveIntPreferences(getActivity(), "unreadAllDrops", 0);
         }
 
         if (isVisibleToUser && loadSavedPreferences()) {

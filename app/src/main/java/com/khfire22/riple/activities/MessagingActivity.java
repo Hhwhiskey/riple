@@ -100,7 +100,7 @@ public class MessagingActivity extends AppCompatActivity {
         recipientId = intent.getStringExtra("RECIPIENT_ID");
 //        unreadCount = Integer.parseInt(intent.getStringExtra("unreadCount"));
 
-        SaveToSharedPrefs.saveUnreadCount(this, recipientId, 0);
+        SaveToSharedPrefs.saveIntPreferences(this, recipientId, 0);
 
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);

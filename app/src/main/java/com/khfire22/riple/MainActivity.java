@@ -486,6 +486,7 @@ public class MainActivity extends AppCompatActivity
         data.put("dropAuthorRank", currentUser.getString("userRank"));
         data.put("dropAuthorLocation", currentUser.getString("userLastLocation"));
         data.put("dropAuthorRipleCount", currentUser.getInt("userRipleCount"));
+        data.put("dropAuthorInfo", currentUser.getString("userInfo"));
 
         data.put("dropObjectId", dropObjectId);
         data.put("dropContent", dropDescription);

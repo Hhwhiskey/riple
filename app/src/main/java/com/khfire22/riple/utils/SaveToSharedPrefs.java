@@ -42,18 +42,12 @@ public class SaveToSharedPrefs {
     }
 
     // Save the unread count for the related user
-    public static void saveUnreadCount(Context context, String key, int value) {
+    public static void saveIntPreferences(Context context, String key, int value) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(key, value);
         editor.commit();
     }
 
-    // Save the amount of Drops posted count
-    public static void saveAllDropsCount(Context context, String key, int value) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(key, value);
-        editor.commit();
-    }
+
 }

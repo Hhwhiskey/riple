@@ -34,7 +34,7 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
 
 //    static int unreadCount = 0;
     private static int NOTIFICATION_ID;
-    String currentUser = ParseUser.getCurrentUser().getObjectId();
+    String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
     public CustomPushBroadcastReceiver() {
     }
@@ -46,17 +46,12 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
         if (data != null) {
             String jsonData = data.getString("com.parse.Data");
 
+            // Try for message notification
             try {
                 JSONObject jsonObject = new JSONObject(jsonData);
                 final String pusherId = jsonObject.getString("sendPusherId");
                 final String pusherName = jsonObject.getString("sendPusherName");
                 final String pushMessageBody = jsonObject.getString("pushMessageBody");
-
-                try {
-                    NOTIFICATION_ID = Integer.parseInt(pusherId);
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
 
                 ParseQuery pusherPictureQuery = ParseQuery.getQuery("_User");
                 pusherPictureQuery.getInBackground(pusherId, new GetCallback<ParseUser>() {
@@ -80,12 +75,11 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
                         }
                     }
                 });
-
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
+            // Try for allDrop notification
             try {
                 JSONObject jsonObject = new JSONObject(jsonData);
                 final String dropAuthorId = jsonObject.getString("dropAuthorId");
@@ -93,18 +87,60 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
                 final String dropAuthorRank = jsonObject.getString("dropAuthorRank");
                 final String dropAuthorRipleCount = jsonObject.getString("dropAuthorRipleCount");
                 final String dropAuthorLocation = jsonObject.getString("dropAuthorLocation");
+                final String dropAuthorInfo = jsonObject.getString("dropAuthorInfo");
 
                 final String dropObjectId = jsonObject.getString("dropObjectId");
                 final String dropContent = jsonObject.getString("dropContent");
                 final String dropCreatedAt = jsonObject.getString("dropCreatedAt");
 
+                // If this was sent by the currentUser, then don't show the notification
+                if (!dropAuthorId.equals(currentUserId)) {
 
-
-                try {
-                    NOTIFICATION_ID = Integer.parseInt(dropAuthorId);
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    ParseQuery pusherPictureQuery = ParseQuery.getQuery("_User");
+                    pusherPictureQuery.getInBackground(dropAuthorId, new GetCallback<ParseUser>() {
+                        @Override
+                        public void done(ParseUser parseObject, ParseException e) {
+                            if (e != null) {
+                            } else {
+                                ParseFile pusherProfileImage = parseObject.getParseFile("parseProfilePicture");
+                                pusherProfileImage.getDataInBackground(new GetDataCallback() {
+                                    @Override
+                                    public void done(byte[] bytes, ParseException e) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                        if (e == null) {
+                                            if (bmp != null) {
+                                                Bitmap resizedPusherBitmap = Bitmap.createScaledBitmap(bmp, 500, 500, true);
+                                                generateAllDropsNotification(context, dropAuthorName, dropAuthorId, dropAuthorRank, dropAuthorRipleCount, dropAuthorLocation,  dropAuthorInfo, dropObjectId, dropCreatedAt, dropContent, resizedPusherBitmap);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            // Try for comment notification
+            try {
+                JSONObject jsonObject = new JSONObject(jsonData);
+                final String dropAuthorId = jsonObject.getString("dropAuthorId");
+                final String dropAuthorName = jsonObject.getString("dropAuthorName");
+                final String dropAuthorRank = jsonObject.getString("dropAuthorRank");
+                final String dropAuthorRipleCount = jsonObject.getString("dropAuthorRipleCount");
+                final String dropAuthorLocation = jsonObject.getString("dropAuthorLocation");
+                final String dropAuthorInfo = jsonObject.getString("dropAuthorInfo");
+
+                final String dropObjectId = jsonObject.getString("dropObjectId");
+                final String dropDescription = jsonObject.getString("dropContent");
+                final String dropCreatedAt = jsonObject.getString("dropCreatedAt");
+
+                final String commenterId = jsonObject.getString("commenterId");
+                final String commenterName = jsonObject.getString("commenterName");
+                final String commentText = jsonObject.getString("commentText");
 
                 ParseQuery pusherPictureQuery = ParseQuery.getQuery("_User");
                 pusherPictureQuery.getInBackground(dropAuthorId, new GetCallback<ParseUser>() {
@@ -120,7 +156,7 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
                                     if (e == null) {
                                         if (bmp != null) {
                                             Bitmap resizedPusherBitmap = Bitmap.createScaledBitmap(bmp, 500, 500, true);
-                                            generateAllDropsNotification(context, dropAuthorName, dropAuthorId, dropAuthorRank, dropAuthorRipleCount, dropAuthorLocation, dropObjectId, dropCreatedAt, dropContent, resizedPusherBitmap);
+                                            generateCommentNotification(context, dropAuthorName, dropAuthorId, dropAuthorRank, dropAuthorRipleCount, dropAuthorLocation, dropAuthorInfo, dropObjectId, dropCreatedAt, dropDescription, commenterId, commenterName, commentText, resizedPusherBitmap);
                                         }
                                     }
                                 }
@@ -132,8 +168,6 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
         }
     }
 
@@ -157,7 +191,7 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
                         .setNumber(++sharedPrefUnreadCount);
 
         // Save the current unread count to shared prefs so that it can be displayed/reset
-        SaveToSharedPrefs.saveUnreadCount(context, pusherId, sharedPrefUnreadCount);
+        SaveToSharedPrefs.saveIntPreferences(context, pusherId, sharedPrefUnreadCount);
 
         // Intent for the notification
         Intent intentExtra = new Intent(context, MessagingActivity.class);
@@ -172,10 +206,10 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
         mNotifM.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
-    private void generateAllDropsNotification(Context context, String commenterName, String authorId, String authorRank, String authorRipleCount, String userLastLocation, String dropObjectId, String createdAt, String dropDescription, Bitmap pusherBitmap) {
+    private void generateAllDropsNotification(Context context, String commenterName, String authorId, String authorRank, String authorRipleCount, String userLastLocation, String authorInfo, String dropObjectId, String createdAt, String dropDescription, Bitmap pusherBitmap) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int sharedPrefUnreadCount = sharedPreferences.getInt(authorId, 0);
+        int sharedPrefUnreadCount = sharedPreferences.getInt("unreadAllDrops", 0);
 
         NotificationManager mNotifM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder =
@@ -192,7 +226,7 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
                         .setNumber(++sharedPrefUnreadCount);
 
         // Save the current unread count to shared prefs so that it can be displayed/reset
-        SaveToSharedPrefs.saveAllDropsCount(context, currentUser, sharedPrefUnreadCount);
+        SaveToSharedPrefs.saveIntPreferences(context, "unreadAllDrops", sharedPrefUnreadCount);
 
         // Intent for the notification
         Intent intentExtra = new Intent(context, ViewDropActivity.class);
@@ -201,6 +235,7 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
         intentExtra.putExtra("authorRank", authorRank);
         intentExtra.putExtra("clickedUserRipleCount", authorRipleCount);
         intentExtra.putExtra("userLastLocation", userLastLocation);
+        intentExtra.putExtra("clickedUserInfo", authorInfo);
 
         intentExtra.putExtra("dropObjectId", dropObjectId);
         intentExtra.putExtra("dropDescription", dropDescription);
@@ -208,6 +243,47 @@ public class CustomPushBroadcastReceiver extends BroadcastReceiver {
 
 
 //        int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
+
+        PendingIntent contentIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, intentExtra, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(contentIntent);
+
+        mNotifM.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void generateCommentNotification(Context context, String authorName, String authorId, String authorRank, String authorRipleCount, String userLastLocation, String authorInfo, String dropObjectId, String createdAt, String dropDescription, String commenterId, String commenterName, String commentText, Bitmap pusherBitmap) {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int sharedPrefUnreadCount = sharedPreferences.getInt("unreadComments", 0);
+
+        NotificationManager mNotifM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ripleicon2)
+                        .setLargeIcon(pusherBitmap)
+                        .setContentTitle("Comment from " + commenterName + "!")
+                        .setContentText(commentText)
+                        .setTicker(commenterName + " has posted a new comment!" + " " + commentText)
+                        .setSound(Uri.parse(String.valueOf(Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.waterdropsound))))
+                        .setVibrate(new long[] {0, 1000})
+                        .setLights(Color.BLUE, 1000, 1000)
+                        .setAutoCancel(true)
+                        .setNumber(++sharedPrefUnreadCount);
+
+        // Save the current unread count to shared prefs so that it can be displayed/reset
+        SaveToSharedPrefs.saveIntPreferences(context, "unreadComments", sharedPrefUnreadCount);
+
+        // Intent for the notification
+        Intent intentExtra = new Intent(context, ViewDropActivity.class);
+        intentExtra.putExtra("authorId", authorId);
+        intentExtra.putExtra("commenterName", authorName);
+        intentExtra.putExtra("authorRank", authorRank);
+        intentExtra.putExtra("clickedUserRipleCount", authorRipleCount);
+        intentExtra.putExtra("userLastLocation", userLastLocation);
+        intentExtra.putExtra("clickedUserInfo", authorInfo);
+
+        intentExtra.putExtra("dropObjectId", dropObjectId);
+        intentExtra.putExtra("dropDescription", dropDescription);
+        intentExtra.putExtra("createdAt", createdAt);
 
         PendingIntent contentIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, intentExtra, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(contentIntent);

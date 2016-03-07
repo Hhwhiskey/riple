@@ -30,10 +30,15 @@ import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -116,10 +121,10 @@ public class CommentFragment extends Fragment {
         mAuthorName = intent.getStringExtra("commenterName");
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
-        mAuthorInfo = intent.getStringExtra("commenterInfo");
+        mAuthorInfo = intent.getStringExtra("clickedUserInfo");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
-        mCreatedAt = (String) intent.getSerializableExtra("createdAt");
+        mCreatedAt = intent.getStringExtra("createdAt");
         mTabName = intent.getStringExtra("mTabName");
 
         loadCommentsFromParse();
@@ -210,9 +215,15 @@ public class CommentFragment extends Fragment {
                 @Override
                 public void done(ParseException e) {
 
-                    if (e != null) {
+                    ParsePush.subscribeInBackground(mDropObjectId);
 
-                    } else {
+                    try {
+                        sendCommentNotification();
+                    } catch (JSONException exception) {
+                        exception.printStackTrace();
+                    }
+
+                    if (e == null) {
 
                         Toast.makeText(getActivity(), "Your comment has been posted!", Toast.LENGTH_SHORT).show();
                         loadCommentsFromParse();
@@ -297,6 +308,36 @@ public class CommentFragment extends Fragment {
         }
         hideSoftKeyboard();
 //        mCommentAdapter.addCommentToView(0, comment);
+    }
+
+    private void sendCommentNotification() throws JSONException {
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo("channels", mDropObjectId);
+
+        JSONObject data = new JSONObject();
+        // Drop author data
+        data.put("dropAuthorId", mAuthorId);
+        data.put("dropAuthorName", displayName);
+        data.put("dropAuthorRank", currentUser.getString("userRank"));
+        data.put("dropAuthorLocation", currentUser.getString("userLastLocation"));
+        data.put("dropAuthorRipleCount", currentUser.getInt("userRipleCount"));
+        data.put("dropAuthorInfo", mAuthorInfo);
+
+        // Drop data
+        data.put("dropObjectId", mDropObjectId);
+        data.put("dropContent", mDropDescription);
+        data.put("dropCreatedAt", mCreatedAt);
+
+        // Commenter data
+        data.put("commenterId", currentUser.getObjectId());
+        data.put("commenterName", currentUser.getString("displayName"));
+        data.put("commentText", commentText);
+
+        // Send the push
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setData(data);
+        push.sendInBackground();
     }
 
     public void loadCommentsFromParse() {
