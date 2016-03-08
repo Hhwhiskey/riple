@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="This is how others will see you..."
+        android:text="Edit your preferences"
         android:id="@+id/textView4"
         android:textSize="20dp"
         android:layout_centerHorizontal="true"
@@ -55,7 +55,8 @@
         android:layout_alignLeft="@+id/edit_display_name_tv"
         android:layout_alignStart="@+id/edit_display_name_tv"
         android:gravity="center_horizontal"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="32dp"
+        android:layout_marginTop="16dp" />
 
 
 
@@ -63,7 +64,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Location"
+            android:text="Set manual location"
             android:id="@+id/user_location_tv"
             android:textSize="20dp"
             android:layout_alignParentRight="true"
@@ -73,85 +74,8 @@
             android:gravity="center_horizontal"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginLeft="32dp"/>
-
-        <!--<GridLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:rowCount="2"-->
-            <!--android:columnCount="2"-->
-            <!--android:layout_centerHorizontal="true"-->
-            <!--android:layout_below="@+id/textView8"-->
-            <!--android:orientation="horizontal">-->
-
-
-            <!--<CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Messages"
-                android:id="@+id/switch1"
-                android:checked="true"
-                android:lines="1"
-                android:layout_alignParentTop="true"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_row="0"
-                android:layout_column="0"
-                android:layout_marginLeft="50dp"/>
-
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Challenges"
-                android:id="@+id/switch2"
-                android:checked="true"
-                android:lines="1"
-                android:layout_alignParentTop="false"
-                android:layout_toRightOf="@+id/switch1"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_row="0"
-                android:layout_column="1"
-                android:layout_marginTop="16dp"
-                android:layout_marginLeft="50dp"
-                />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your Riples"
-                android:id="@+id/switch3"
-                android:checked="true"
-                android:lines="1"
-                android:layout_below="@+id/switch1"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_toLeftOf="@+id/switch4"
-                android:layout_toStartOf="@+id/switch4"
-                android:layout_row="1"
-                android:layout_column="0"
-                android:layout_marginLeft="50dp"/>
-
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Big Riples"
-                android:id="@+id/switch4"
-                android:checked="true"
-                android:layout_alignTop="@+id/switch3"
-                android:layout_alignLeft="@+id/switch2"
-                android:layout_alignStart="@+id/switch2"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_row="1"
-                android:layout_column="1"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"/>-->
-        <!--</GridLayout>-->
-
-
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="16dp" />
 
     <ImageView
         android:layout_width="183dp"
@@ -191,7 +115,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
-        />
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -206,32 +130,63 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_marginLeft="32dp"/>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/auto_location_cb"
-        android:layout_below="@+id/user_location_tv"
-        android:layout_marginTop="28dp"
-        android:checked="false"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="32dp"
-        android:gravity="bottom"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Automatic Location..."
-        android:id="@+id/auto_location"
+        android:text="Notifications..."
+        android:id="@+id/textView2"
         android:textSize="20dp"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_alignBottom="@+id/auto_location_cb"
-        android:singleLine="true"
         android:layout_alignLeft="@+id/user_location_tag"
         android:layout_alignStart="@+id/user_location_tag"
+        android:layout_marginBottom="16dp"
+        android:layout_below="@+id/auto_location_cb"
+        android:layout_marginTop="32dp" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Messages"
+        android:id="@+id/check_box_messages"
+        android:checked="true"
+        android:textSize="20dp"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Drops"
+        android:id="@+id/check_box_all_drops"
+        android:checked="true"
+        android:textSize="20dp"
+        android:layout_below="@+id/check_box_messages"
+        android:layout_alignStart="@+id/check_box_messages"
+        android:layout_marginBottom="8dp"
+        android:layout_centerHorizontal="true" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drop Activity"
+        android:id="@+id/check_box_interacted_drops"
+        android:checked="true"
+        android:textSize="20dp"
+        android:layout_below="@+id/check_box_all_drops"
+        android:layout_centerHorizontal="true" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set auto location"
+        android:id="@+id/auto_location_cb"
+        android:checked="false"
+        android:textSize="20dp"
         android:layout_below="@+id/user_location_tv"
-        android:layout_marginTop="32dp"/>
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

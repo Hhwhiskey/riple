@@ -223,6 +223,9 @@ public class ViewDropActivity extends AppCompatActivity {
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
 
+        SaveToSharedPrefs.saveIntPreferences(ViewDropActivity.this, "unreadComments", 0);
+        SaveToSharedPrefs.saveIntPreferences(ViewDropActivity.this, "unreadDrops", 0);
+
         showUserTips();
     }
 

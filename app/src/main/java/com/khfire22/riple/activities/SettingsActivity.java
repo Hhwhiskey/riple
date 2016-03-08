@@ -34,6 +34,7 @@ import com.khfire22.riple.utils.SaveToSharedPrefs;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -74,10 +75,16 @@ public class SettingsActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private String mUserLocationFromPrefs;
     private String mUserLocationString;
-    private SaveToSharedPrefs savetoSharedPrefs;
+    private SaveToSharedPrefs saveToSharedPrefs;
     private boolean mAutomaticLocationBooleanFromPrefs;
     private CheckBox autoLocatonCheckBox;
     private TextView userLocationTag;
+    private CheckBox messagesCheckBox;
+    private CheckBox interactedDropsCheckBox;
+    private CheckBox allDropsCheckBox;
+    private boolean mMessagesBooleanFromPrefs;
+    private boolean mAllDropsBooleanFromPrefs;
+    private boolean mInteracteDropsBooleanFromPrefs;
 
 
     @Override
@@ -88,11 +95,14 @@ public class SettingsActivity extends AppCompatActivity {
         currentUser = ParseUser.getCurrentUser();
 
         // Instantiate Shared prefs object
-        savetoSharedPrefs = new SaveToSharedPrefs();
+        saveToSharedPrefs = new SaveToSharedPrefs();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         mUserLocationFromPrefs = sharedPreferences.getString("userLastLocation", "");
         mAutomaticLocationBooleanFromPrefs = sharedPreferences.getBoolean("shouldShowLocationDialog", false);
+        mMessagesBooleanFromPrefs = sharedPreferences.getBoolean("messagesCB", true);
+        mAllDropsBooleanFromPrefs = sharedPreferences.getBoolean("allDropsCB", true);
+        mInteracteDropsBooleanFromPrefs = sharedPreferences.getBoolean("interactedDropsCB", true);
 
         //Instantiate the views
         editProfilePictureView = (ImageView) findViewById(R.id.edit_profile_picture);
@@ -101,6 +111,10 @@ public class SettingsActivity extends AppCompatActivity {
         userInfoTV = (TextView) findViewById(R.id.user_info_tv);
         userLocationTV = (TextView) findViewById(R.id.user_location_tv);
         autoLocatonCheckBox = (CheckBox) findViewById(R.id.auto_location_cb);
+        messagesCheckBox = (CheckBox) findViewById(R.id.check_box_messages);
+        allDropsCheckBox = (CheckBox) findViewById(R.id.check_box_all_drops);
+        interactedDropsCheckBox = (CheckBox) findViewById(R.id.check_box_interacted_drops);
+
         userLocationTag = (TextView) findViewById(R.id.user_location_tag);
 
         //if currentUser is not null, get their name, picture and facebookId from Parse
@@ -139,6 +153,10 @@ public class SettingsActivity extends AppCompatActivity {
         userInfoTV.setText(userInfoString);
         userLocationTV.setText(mUserLocationFromPrefs);
         autoLocatonCheckBox.setChecked(mAutomaticLocationBooleanFromPrefs);
+        messagesCheckBox.setChecked(mMessagesBooleanFromPrefs);
+        allDropsCheckBox.setChecked(mAllDropsBooleanFromPrefs);
+        interactedDropsCheckBox.setChecked(mInteracteDropsBooleanFromPrefs);
+
 
         //Get the currentUser displayImage if it's available, and set it to editProfilePictureView
 //        if (parseProfilePicture != null) {
@@ -221,12 +239,11 @@ public class SettingsActivity extends AppCompatActivity {
                     locationServicesCheck.isLocationEnabled(SettingsActivity.this);
 
                     // Save checkbox shared prefs
-                    savetoSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "shouldShowLocationDialog", true);
-
-                    Toast.makeText(SettingsActivity.this, "Please enable location services", Toast.LENGTH_LONG).show();
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "shouldShowLocationDialog", true);
 
                     // If gps or network is not detected, start location intent
                     if (!locationServicesCheck.isLocationEnabled(SettingsActivity.this)) {
+                        Toast.makeText(SettingsActivity.this, "Please enable location services", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivity(intent);
                     }
@@ -234,9 +251,46 @@ public class SettingsActivity extends AppCompatActivity {
 
                 } else {
                     // save checkbox shared prefs
-                    savetoSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "shouldShowLocationDialog", false);
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "shouldShowLocationDialog", false);
                     Toast.makeText(SettingsActivity.this, "Your location will no longer be " +
                             "updated automatically", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        messagesCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "messagesCB", true);
+                    ParsePush.subscribeInBackground("messages");
+                } else {
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "messagesCB", false);
+                    ParsePush.unsubscribeInBackground("messages");
+                }
+            }
+        });
+
+        allDropsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "allDropsCB", true);
+                    ParsePush.subscribeInBackground("allDrops");
+                } else {
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "allDropsCB", false);
+                    ParsePush.unsubscribeInBackground("allDrops");
+                }
+            }
+        });
+
+        interactedDropsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "interactedDropsCB", true);
+                } else {
+                    saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "interactedDropsCB", false);
                 }
             }
         });

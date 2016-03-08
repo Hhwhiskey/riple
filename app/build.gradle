@@ -35,8 +35,8 @@ android {
         renderscriptSupportModeEnabled true
 
         // REMOVE DEBUG MODE!!!!!!!!!!!!!!!!!!!!!!!
-        versionCode 6
-        versionName "1.32"
+        versionCode 7
+        versionName "2.0"
         signingConfig signingConfigs.Riple
     }
 
@@ -50,7 +50,7 @@ android {
 
         // SET DEBUGGABLE TO FALSE THEN TEST THAT IT HAS BEEN REMOVED!!!!!!!!!!!!!!!
         release {
-            debuggable true
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.Riple

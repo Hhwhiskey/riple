@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity
     private String currentUserId;
     private String dropObjectId;
     private Date dropDate;
+    private String userLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -384,6 +385,9 @@ public class MainActivity extends AppCompatActivity
                     dropObjectId = drop.getObjectId();
                     dropDate = drop.getCreatedAt();
 
+                    //Sub to this Drop to receive push notifications
+                    ParsePush.subscribeInBackground(dropObjectId);
+
                     try {
                         sendDropNotification();
                     } catch (JSONException exception) {
@@ -484,7 +488,16 @@ public class MainActivity extends AppCompatActivity
         data.put("dropAuthorId", currentUserId);
         data.put("dropAuthorName", displayName);
         data.put("dropAuthorRank", currentUser.getString("userRank"));
-        data.put("dropAuthorLocation", currentUser.getString("userLastLocation"));
+
+        userLastLocation = currentUser.getString("userLastLocation");
+
+        if (userLastLocation.equals(null) || userLastLocation.equals("")) {
+            userLastLocation = "Location unavailable";
+            data.put("dropAuthorLocation", userLastLocation);
+        }
+
+        data.put("dropAuthorLocation", userLastLocation);
+
         data.put("dropAuthorRipleCount", currentUser.getInt("userRipleCount"));
         data.put("dropAuthorInfo", currentUser.getString("userInfo"));
 
@@ -496,6 +509,8 @@ public class MainActivity extends AppCompatActivity
         String dateAfter = formatter.format(dropDate);
 
         data.put("dropCreatedAt", dateAfter);
+
+        data.put("allDropsBoolean", true);
 
         ParsePush push = new ParsePush();
         push.setQuery(query);
