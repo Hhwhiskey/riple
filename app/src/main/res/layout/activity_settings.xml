@@ -170,7 +170,7 @@
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Drop Activity"
+        android:text="Drop Interaction"
         android:id="@+id/check_box_interacted_drops"
         android:checked="true"
         android:textSize="20dp"

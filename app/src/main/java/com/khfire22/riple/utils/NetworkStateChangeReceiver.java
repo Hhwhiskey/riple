@@ -19,13 +19,9 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
         if (info != null) {
-            if (info.isConnected()) {
-                Toast.makeText(context, R.string.network_connection_established, Toast.LENGTH_SHORT).show();
-            } else {
+            if (!info.isConnected()) {
                 Toast.makeText(context, R.string.no_connection, Toast.LENGTH_LONG).show();
             }
         }
     }
-
-
 }

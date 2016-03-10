@@ -262,9 +262,11 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    Toast.makeText(SettingsActivity.this, "You will now receive message notifications from your friends", Toast.LENGTH_LONG).show();
                     saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "messagesCB", true);
                     ParsePush.subscribeInBackground("messages");
                 } else {
+                    Toast.makeText(SettingsActivity.this, "You will not receive message notifications from your friends", Toast.LENGTH_LONG).show();
                     saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "messagesCB", false);
                     ParsePush.unsubscribeInBackground("messages");
                 }
@@ -275,9 +277,11 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    Toast.makeText(SettingsActivity.this, "You will now receive notifications for all new Drops", Toast.LENGTH_LONG).show();
                     saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "allDropsCB", true);
                     ParsePush.subscribeInBackground("allDrops");
                 } else {
+                    Toast.makeText(SettingsActivity.this, "You will not receive notifications for new Drops", Toast.LENGTH_LONG).show();
                     saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "allDropsCB", false);
                     ParsePush.unsubscribeInBackground("allDrops");
                 }
@@ -288,8 +292,10 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    Toast.makeText(SettingsActivity.this, "You will now receive notifications for Drops that you are associated with", Toast.LENGTH_LONG).show();
                     saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "interactedDropsCB", true);
                 } else {
+                    Toast.makeText(SettingsActivity.this, "You will not receive notifications for Drops that you are associated with", Toast.LENGTH_LONG).show();
                     saveToSharedPrefs.saveBooleanPreferences(SettingsActivity.this, "interactedDropsCB", false);
                 }
             }

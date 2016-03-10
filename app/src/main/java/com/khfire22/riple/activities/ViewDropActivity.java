@@ -40,11 +40,16 @@ import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -118,7 +123,7 @@ public class ViewDropActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mDropObjectId = intent.getStringExtra("dropObjectId");
         mAuthorId = intent.getStringExtra("authorId");
-        mAuthorName = intent.getStringExtra("commenterName");
+        mAuthorName = intent.getStringExtra("authorName");
         mAuthorRank = intent.getStringExtra("authorRank");
         mAuthorRipleCount = intent.getStringExtra("clickedUserRipleCount");
         mAuthorInfo = intent.getStringExtra("clickedUserInfo");
@@ -159,17 +164,23 @@ public class ViewDropActivity extends AppCompatActivity {
                 Vibrator vb = (Vibrator) ViewDropActivity.this.getSystemService(ViewDropActivity.VIBRATOR_SERVICE);
                 vb.vibrate(5);
 
-                if (!mAuthorId.equals(mCurrentUserId)) {
-                    if (mTabName.equals(drop)) {
-                        showDropMenu();
-                    } else if (mTabName.equals(trickle)) {
-                        showTrickleMenu();
+                if (mTabName != null) {
+
+                    if (!mAuthorId.equals(mCurrentUserId)) {
+                        if (mTabName.equals(drop)) {
+                            showDropMenu();
+                        } else if (mTabName.equals(trickle)) {
+                            showTrickleMenu();
+                        } else {
+                            showStandardMenu();
+                        }
                     } else {
-                        showStandardMenu();
+                        showAuthorsDropMenu();
                     }
                 } else {
-                    showAuthorsDropMenu();
+                    showNotificationMenu();
                 }
+
                 return false;
             }
         });
@@ -186,16 +197,22 @@ public class ViewDropActivity extends AppCompatActivity {
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mAuthorId.equals(mCurrentUserId)) {
-                    if (mTabName.equals(drop)) {
-                        showDropMenu();
-                    } else if (mTabName.equals(trickle)) {
-                        showTrickleMenu();
+
+                if (mTabName != null) {
+
+                    if (!mAuthorId.equals(mCurrentUserId)) {
+                        if (mTabName.equals(drop)) {
+                            showDropMenu();
+                        } else if (mTabName.equals(trickle)) {
+                            showTrickleMenu();
+                        } else {
+                            showStandardMenu();
+                        }
                     } else {
-                        showStandardMenu();
+                        showAuthorsDropMenu();
                     }
                 } else {
-                    showAuthorsDropMenu();
+                    showNotificationMenu();
                 }
             }
         });
@@ -223,8 +240,10 @@ public class ViewDropActivity extends AppCompatActivity {
         //Allows the query of the viewed drop
         currentDrop = mObjectId;
 
+        //Reset unread counts when drop is viewed
         SaveToSharedPrefs.saveIntPreferences(ViewDropActivity.this, "unreadComments", 0);
         SaveToSharedPrefs.saveIntPreferences(ViewDropActivity.this, "unreadDrops", 0);
+        SaveToSharedPrefs.saveIntPreferences(ViewDropActivity.this, "completedDrops", 0);
 
         showUserTips();
     }
@@ -443,13 +462,13 @@ public class ViewDropActivity extends AppCompatActivity {
                 } else if (selected == 1) {
                     messageTheAuthor();
 
-                }else if (selected == 2) {
+                } else if (selected == 2) {
                     shareToFacebook();
 
                 } else if (selected == 3) {
                     shareWithOther();
 
-                }else if (selected == 4) {
+                } else if (selected == 4) {
                     final AlertDialog.Builder builderVerify = new AlertDialog.Builder(ViewDropActivity.this, R.style.MyAlertDialogStyle);
                     builderVerify.setTitle("Report Drop Author");
                     builderVerify.setMessage("Would you say this Drop contains spam or inappropriate/offensive material?");
@@ -492,10 +511,10 @@ public class ViewDropActivity extends AppCompatActivity {
                 } else if (selected == 2) {
                     messageTheAuthor();
 
-                }else if (selected == 3) {
+                } else if (selected == 3) {
                     shareToFacebook();
 
-                }else if (selected == 4) {
+                } else if (selected == 4) {
                     shareWithOther();
 
                 } else if (selected == 5) {
@@ -535,7 +554,7 @@ public class ViewDropActivity extends AppCompatActivity {
                 if (selected == 0) {
                     shareToFacebook();
 
-                }else if (selected == 1) {
+                } else if (selected == 1) {
                     shareWithOther();
                 }
             }
@@ -556,10 +575,10 @@ public class ViewDropActivity extends AppCompatActivity {
                 if (selected == 0) {
                     messageTheAuthor();
 
-                }else if (selected == 1) {
+                } else if (selected == 1) {
                     shareToFacebook();
 
-                }else if (selected == 2) {
+                } else if (selected == 2) {
                     shareWithOther();
 
                 } else if (selected == 3) {
@@ -584,6 +603,30 @@ public class ViewDropActivity extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+
+    public void showNotificationMenu() {
+
+        CharSequence trickleDrop[] = new CharSequence[]{"Message the Author", "Share with Facebook", "Share"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyAlertDialogStyle);
+        builder.setTitle("Drop Menu");
+        builder.setItems(trickleDrop, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int selected) {
+                if (selected == 0) {
+                    messageTheAuthor();
+
+                } else if (selected == 1) {
+                    shareToFacebook();
+
+                } else if (selected == 2) {
+                    shareWithOther();
+                }
+            }
+        });
+        builder.show();
+
     }
 
     // Get the Drop object to be interacted with
@@ -662,6 +705,12 @@ public class ViewDropActivity extends AppCompatActivity {
             public void done(ParseObject parseObject, ParseException e) {
                 parseObject.increment("ripleCount");
                 parseObject.saveInBackground();
+
+                try {
+                    sendDropCompletionNotification();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
 
@@ -683,4 +732,59 @@ public class ViewDropActivity extends AppCompatActivity {
 
         startActivity(intentRefresh);
     }
+
+    private void sendDropCompletionNotification() throws JSONException {
+
+        //Drop Data to push
+        String dropObjectId = mDropObjectId;
+        String dropDescription = mDropDescription;
+        String dropCreatedAt = mCreatedAt;
+
+        //Author data to push
+        String authorId = mAuthorId;
+        String authorDisplayName = mAuthorName;
+        String authorRank = mAuthorRank;
+        String authorRipleCount = mRipleCount;
+        String authorInfo = mAuthorInfo;
+
+        String authorLocation = mAuthorLastLocation;
+        if (authorLocation == null || authorLocation.equals("")) {
+            authorLocation = "Location unavailable";
+        }
+
+        //Completed by data to push
+        String completedObjectId = mCurrentUser.getObjectId();
+        String completedDisplayName = mCurrentUser.getString("displayName");
+
+
+        //Send push with these parameters
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo("channels", mDropObjectId);
+
+        JSONObject data = new JSONObject();
+
+        data.put("dropObjectId", dropObjectId);
+        data.put("dropContent", dropDescription);
+        data.put("dropCreatedAt", dropCreatedAt);
+
+        data.put("authorId", authorId);
+        data.put("authorDisplayName", authorDisplayName);
+        data.put("authorRank", authorRank);
+        data.put("authorRipleCount", authorRipleCount);
+        data.put("authorInfo", authorInfo);
+        data.put("authorLocation", authorLocation);
+
+        data.put("completedObjectId", completedObjectId);
+        data.put("completedDisplayName", completedDisplayName);
+
+        // Send the push
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setData(data);
+        push.sendInBackground();
+
+        ParsePush.subscribeInBackground(dropObjectId);
+
+    }
+
 }

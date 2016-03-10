@@ -77,6 +77,7 @@ public class CommentFragment extends Fragment {
     private int mPage;
     private ParseUser currentUser;
     private String mAuthorInfo;
+    private String mAuthorLocation;
 
     public static CommentFragment newInstance(int page) {
         Bundle args = new Bundle();
@@ -122,6 +123,7 @@ public class CommentFragment extends Fragment {
         mAuthorFacebookId = intent.getStringExtra("authorFacebookId");
         mDropDescription = intent.getStringExtra("dropDescription");
         mAuthorInfo = intent.getStringExtra("clickedUserInfo");
+        mAuthorLocation = intent.getStringExtra("userLastLocation");
         mRipleCount = intent.getStringExtra("ripleCount");
         mCommentCount = intent.getStringExtra("commentCount");
         mCreatedAt = intent.getStringExtra("createdAt");
@@ -317,10 +319,10 @@ public class CommentFragment extends Fragment {
         JSONObject data = new JSONObject();
         // Drop author data
         data.put("dropAuthorId", mAuthorId);
-        data.put("dropAuthorName", displayName);
-        data.put("dropAuthorRank", currentUser.getString("userRank"));
-        data.put("dropAuthorLocation", currentUser.getString("userLastLocation"));
-        data.put("dropAuthorRipleCount", currentUser.getInt("userRipleCount"));
+        data.put("dropAuthorName", mAuthorName);
+        data.put("dropAuthorRank", mAuthorRank);
+        data.put("dropAuthorLocation", mAuthorLocation);
+        data.put("dropAuthorRipleCount", mRipleCount);
         data.put("dropAuthorInfo", mAuthorInfo);
 
         // Drop data

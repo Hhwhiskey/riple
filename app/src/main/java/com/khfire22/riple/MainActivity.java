@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity
 
         userLastLocation = currentUser.getString("userLastLocation");
 
-        if (userLastLocation.equals(null) || userLastLocation.equals("")) {
+        if (userLastLocation == null || userLastLocation.equals("")) {
             userLastLocation = "Location unavailable";
             data.put("dropAuthorLocation", userLastLocation);
         }

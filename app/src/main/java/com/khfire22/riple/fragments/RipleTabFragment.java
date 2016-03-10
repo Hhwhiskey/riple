@@ -376,10 +376,10 @@ public class RipleTabFragment extends Fragment {
                                     public void done(byte[] data, ParseException e) {
                                         if (e == null) {
                                             Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                           if (bmp != null) {
-                                               Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
-                                               dropItem.setParseProfilePicture(resized);
-                                           }
+                                            if (bmp != null) {
+                                                Bitmap resized = Bitmap.createScaledBitmap(bmp, 100, 100, true);
+                                                dropItem.setParseProfilePicture(resized);
+                                            }
 
                                             if (pageNumber != 0) {
                                                 mRipleAdapter.notifyDataSetChanged();
@@ -523,8 +523,7 @@ public class RipleTabFragment extends Fragment {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
 
-                if (e != null) {
-                } else {
+                if (e == null) {
                     updateRipleCount(parseObject);
                 }
             }
@@ -600,20 +599,21 @@ public class RipleTabFragment extends Fragment {
             if (ripleCount > 49999) {
                 ripleRank = ("\"10th Riple Master\"");//21
             }
-
-            // Save the currentUser ripleCount and rank to the user table
-            currentUser.put("userRipleCount", ripleCount);
-            currentUser.put("userRank", ripleRank);
-            currentUser.saveInBackground();
-
-            // Display the currentUser riple count and rank
-            if (ripleCount == 1) {
-                profileRipleCountView.setText(String.valueOf(ripleCount) + " Riple");
-            } else {
-                profileRipleCountView.setText(String.valueOf(ripleCount) + " Riples");
-            }
-            profileRankView.setText(ripleRank);
         }
+
+        // Save the currentUser ripleCount and rank to the user table
+        currentUser.put("userRipleCount", ripleCount);
+        currentUser.put("userRank", ripleRank);
+        currentUser.saveInBackground();
+
+        // Display the currentUser riple count and rank
+        if (ripleCount == 1) {
+            profileRipleCountView.setText(String.valueOf(ripleCount) + " Riple");
+        } else {
+            profileRipleCountView.setText(String.valueOf(ripleCount) + " Riples");
+        }
+        profileRankView.setText(ripleRank);
+
     }
 
     //Task to download the users facebook picture

@@ -37,13 +37,21 @@ import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -70,6 +78,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     private ConnectionDetector detector;
     private ParseUser mCurrentUser;
     public String mCurrentUserId;
+    private String dropId;
 
     public DropAdapter() {
 //        this.data =
@@ -191,27 +200,27 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     }
 
     //Complete drop and increment the Drop and Author
-    public void completeDropAndIncrement(ParseObject mDropObject, ParseObject dropAuthor) {
+    public void completeDropAndIncrement(final ParseObject dropObject, final ParseObject dropAuthor) {
 
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
         //Modify mCurrentUser relations to Drop
         ParseRelation completeRelation1 = currentUser.getRelation("completedDrops");
-        completeRelation1.add(mDropObject);
+        completeRelation1.add(dropObject);
         ParseRelation completeRelation2 = currentUser.getRelation("todoDrops");
-        completeRelation2.remove(mDropObject);
+        completeRelation2.remove(dropObject);
         ParseRelation completeRelation3 = currentUser.getRelation("hasRelationTo");
-        completeRelation3.add(mDropObject);
+        completeRelation3.add(dropObject);
 
         currentUser.saveEventually();
 
         //Add to completedBy list
-        ParseRelation completedByRelation = mDropObject.getRelation("completedBy");
+        ParseRelation completedByRelation = dropObject.getRelation("completedBy");
         completedByRelation.add(currentUser);
         //Increment the Drop
-        mDropObject.increment("ripleCount");
+        dropObject.increment("ripleCount");
 
-        mDropObject.saveEventually();
+        dropObject.saveEventually();
 
         //Increment the Author
         ParseQuery ripleCountQuery = ParseQuery.getQuery("UserRipleCount");
@@ -219,10 +228,79 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         ripleCountQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
+                dropId = parseObject.getObjectId();
                 parseObject.increment("ripleCount");
                 parseObject.saveInBackground();
+
+                //Call method to send completion push
+                try {
+                    sendDropCompletionNotification(dropObject, dropAuthor);
+                } catch (JSONException exception) {
+                    exception.printStackTrace();
+                }
             }
         });
+
+
+
+    }
+
+    private void sendDropCompletionNotification(ParseObject drop, ParseObject dropAuthor) throws JSONException {
+
+        //Drop Data to push
+        String dropObjectId = drop.getObjectId();
+        String dropDescription = drop.getString("description");
+
+        Date dropCreatedAt = drop.getCreatedAt();
+        Format formatter = new SimpleDateFormat("MMM dd, yyyy @ h a");
+        String dateAfter = formatter.format(dropCreatedAt);
+
+        //Author data to push
+        String authorId = dropAuthor.getObjectId();
+        String authorDisplayName = dropAuthor.getString("displayName");
+        String authorRank = dropAuthor.getString("userRank");
+        int authorRipleCount = dropAuthor.getInt("userRipleCount");
+        String authorInfo = dropAuthor.getString("userInfo");
+
+        String authorLocation = dropAuthor.getString("userLastLocation");
+        if (authorLocation == null || authorLocation.equals("")) {
+            authorLocation = "Location unavailable";
+        }
+
+        //Completed by data to push
+        String completedObjectId = mCurrentUser.getObjectId();
+        String completedDisplayName = mCurrentUser.getString("displayName");
+
+
+        //Send push with these parameters
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo("channels", dropObjectId);
+
+        JSONObject data = new JSONObject();
+
+        data.put("dropObjectId", dropObjectId);
+        data.put("dropContent", dropDescription);
+        data.put("dropCreatedAt", dateAfter);
+
+        data.put("authorId", authorId);
+        data.put("authorDisplayName", authorDisplayName);
+        data.put("authorRank", authorRank);
+        data.put("authorRipleCount", authorRipleCount);
+        data.put("authorInfo", authorInfo);
+        data.put("authorLocation", authorLocation);
+
+        data.put("completedObjectId", completedObjectId);
+        data.put("completedDisplayName", completedDisplayName);
+
+
+
+        // Send the push
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setData(data);
+        push.sendInBackground();
+
+        ParsePush.subscribeInBackground(dropObjectId);
 
     }
 
@@ -230,56 +308,6 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
     @Override
     public void onBindViewHolder(final DropViewHolder viewHolder, final int position) {
         viewHolder.update(position);
-
-//        viewHolder.description.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                viewDrop(position);
-//            }
-//        });
-//
-//        viewHolder.ripleCount.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                viewCompletedBy(position);
-//            }
-//        });
-//
-//        viewHolder.commentCount.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                viewDrop(position);
-//            }
-//        });
-//
-//        viewHolder.createdAt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                viewDrop(position);
-//            }
-//        });
-//
-//        viewHolder.commenterParseProfilePicture.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                viewOtherUser(position);
-//            }
-//        });
-//
-//        viewHolder.authorName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                viewOtherUser(position);
-//            }
-//        });
-//
-//        viewHolder.authorRank.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                viewOtherUser(position);
-//            }
-//        });
-
     }
 
     public void viewDrop(int position) {
@@ -309,7 +337,7 @@ public class DropAdapter extends RecyclerView.Adapter<DropAdapter.DropViewHolder
         intent.putExtra("authorRank", authorRank);
         intent.putExtra("clickedUserRipleCount", authorRipleCount);
         intent.putExtra("clickedUserInfo", clickedUserInfo);
-        intent.putExtra("commenterName", authorName);
+        intent.putExtra("authorName", authorName);
         intent.putExtra("dropDescription", dropDescription);
         intent.putExtra("ripleCount", ripleCount);
         intent.putExtra("commentCount", commentCount);
